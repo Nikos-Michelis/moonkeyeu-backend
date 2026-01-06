@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Configuration
 public class RootConfig {
-    @Value("${application.clean.root.data.folder}")
-    private String cleanRootFolder;
-    @Value("${application.raw.root.data.folder}")
-    private String rawRootFolder;
-    @Value("${application.clean.root.images.folder}")
+    @Value("${application.path.root.data.folder.json}")
+    private String jsonRootFolder;
+    @Value("${application.path.root.data.folder.csv}")
+    private String csvRootFolder;
+    @Value("${application.path.root.data.folder.images}")
     private String imagesRootFolder;
 }

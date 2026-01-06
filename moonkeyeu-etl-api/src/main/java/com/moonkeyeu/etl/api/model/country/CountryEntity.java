@@ -1,6 +1,7 @@
 package com.moonkeyeu.etl.api.model.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "country", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CountryEntity  {
+public class CountryEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "country_id")
     private Long country_id;
@@ -31,4 +32,9 @@ public class CountryEntity  {
     @Basic
     @Column(name = "nationality_name_composed")
     private String nationality_name_composed;
+
+    @Override
+    public Object getPrimaryKey() {
+        return country_id;
+    }
 }

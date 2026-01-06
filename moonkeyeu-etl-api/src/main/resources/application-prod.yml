@@ -20,11 +20,11 @@ spring:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
-  codec:
-    max-in-memory-size: 20MB
-
   main:
     allow-bean-definition-overriding: true
+  http:
+    codecs:
+      max-in-memory-size: 20MB
 
 aws:
   region: ${S3_REGION}
@@ -38,12 +38,13 @@ aws:
 application:
   backend:
     url: http://localhost:8080/api/v1/
-  clean:
+  path:
     root:
       data:
-        folder: ${OUTPUT_CLEAN_DIR}
-      images:
-        folder: ${DB_IMAGES_DIR}
+        folder:
+          csv: ${CSV_DATASET}
+          json: ${JSON_DATASET}
+          images: ${DB_IMAGES_DIR}
   raw:
     root:
       data:

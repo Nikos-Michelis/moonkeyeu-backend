@@ -2,6 +2,7 @@ package com.moonkeyeu.etl.api.model.spacecraft;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -15,16 +16,16 @@ import java.sql.Date;
 @Entity
 @Table(name = "spacecraft_configuration", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SpacecraftConfigurationEntity  {
+public class SpacecraftConfigurationEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "spacecraft_conf_id")
     private Long spacecraft_conf_id;
     @Basic
     @Column(name = "spacecraft_conf_name")
-    @JsonProperty("name")
     private String spacecraft_conf_name;
     @Column(name = "type_id")
-    private Integer type_id;
+    @JsonProperty("spacecraft_type_id")
+    private Long type_id;
     @Basic
     @Column(name = "in_use", columnDefinition = "TINYINT(1)")
     private Boolean in_use;
@@ -68,5 +69,10 @@ public class SpacecraftConfigurationEntity  {
     @Column(name = "info_link")
     private String info_link;
     @Column(name = "agency_id")
-    private Integer agency_id;
+    private Long agency_id;
+
+    @Override
+    public Object getPrimaryKey() {
+        return spacecraft_conf_id;
+    }
 }

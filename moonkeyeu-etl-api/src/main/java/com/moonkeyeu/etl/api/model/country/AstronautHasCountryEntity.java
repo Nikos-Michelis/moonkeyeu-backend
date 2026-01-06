@@ -1,0 +1,40 @@
+package com.moonkeyeu.etl.api.model.country;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.moonkeyeu.etl.api.model.CsvEntity;
+import com.moonkeyeu.etl.api.model.PkBuilder;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Data
+@Getter
+@Setter
+@Entity
+@Table(name = "astronaut_has_country", schema = "moonkey_db", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"astronaut_id", "country_id"})
+})
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AstronautHasCountryEntity implements CsvEntity<Object>, PkBuilder {
+    @Id
+    @Column(name = "astronaut_country_id")
+    private long id;
+    @Basic
+    @Column(name = "astronaut_id")
+    private long astronaut_id;
+    @Basic
+    @Column(name = "country_id")
+    private long country_id;
+
+    @Override
+    public Object getPrimaryKey() {
+        setPrimaryKey();
+        return id;
+    }
+    @Override
+    public void setPrimaryKey() {
+        this.id = Long.parseLong(astronaut_id + "" + country_id);
+    }
+
+}

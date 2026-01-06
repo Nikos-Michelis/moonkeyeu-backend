@@ -35,8 +35,8 @@ public class WebClientConfig {
                 .responseTimeout(Duration.ofSeconds(120))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
                 .doOnConnected(conn -> conn
-                        .addHandlerLast(new ReadTimeoutHandler(120))
-                        .addHandlerLast(new WriteTimeoutHandler(120))
+                        .addHandlerLast(new ReadTimeoutHandler(60))
+                        .addHandlerLast(new WriteTimeoutHandler(60))
                 );
 
         return WebClient.builder()

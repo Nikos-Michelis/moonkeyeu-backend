@@ -1,8 +1,11 @@
 package com.moonkeyeu.etl.api.model.programs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
@@ -12,7 +15,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "programs", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProgramsEntity  {
+public class ProgramsEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "program_id")
     private Long program_id;
@@ -35,4 +38,8 @@ public class ProgramsEntity  {
     @Column(name = "type_id")
     private Integer type_id;
 
+    @Override
+    public Object getPrimaryKey() {
+        return program_id;
+    }
 }

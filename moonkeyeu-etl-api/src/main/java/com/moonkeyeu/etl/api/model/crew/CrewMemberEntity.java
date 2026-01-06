@@ -1,6 +1,8 @@
 package com.moonkeyeu.etl.api.model.crew;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -11,8 +13,9 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "crew_member", schema = "moonkey_db")
+@JsonPropertyOrder({"crew_member_id", "astronaut_id", "role_id", "crew_group_id", "launch_id"})
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CrewMemberEntity  {
+public class CrewMemberEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "crew_member_id", nullable = false)
     private Long crew_member_id;
@@ -28,4 +31,9 @@ public class CrewMemberEntity  {
     @Basic
     @Column(name = "launch_id")
     private String launch_id;
+
+    @Override
+    public Object getPrimaryKey() {
+        return crew_member_id;
+    }
 }

@@ -1,6 +1,8 @@
 package com.moonkeyeu.etl.api.model.launch;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -14,7 +16,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "launch", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LaunchEntity  {
+public class LaunchEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "launch_id")
     private String launch_id;
@@ -26,6 +28,7 @@ public class LaunchEntity  {
     private String flightclub_url;
     @Basic
     @Column(name = "name")
+    @JsonProperty("launch_name")
     private String name;
     @Basic
     @Column(name = "last_updated", columnDefinition = "DATETIME")
@@ -47,17 +50,22 @@ public class LaunchEntity  {
     private String weather_concerns;
     @Basic
     @Column(name = "agency_id")
-    private Integer agency_id;
+    private Long agency_id;
     @Basic
     @Column(name = "rocket_id")
-    private Integer rocket_id;
+    private Long rocket_id;
     @Basic
     @Column(name = "mission_id")
-    private Integer mission_id;
+    private Long mission_id;
     @Basic
     @Column(name = "launch_pad_id")
-    private Integer launch_pad_id;
+    private Long launch_pad_id;
     @Basic
     @Column(name = "status_id")
     private String status_id;
+
+    @Override
+    public Object getPrimaryKey() {
+        return launch_id;
+    }
 }

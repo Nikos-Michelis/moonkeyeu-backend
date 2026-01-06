@@ -15,7 +15,7 @@ public class ScheduledTasksServiceImpl implements ScheduledTasksService {
 
     @PostConstruct
     public void initNasaApodCache() {
-        refreshNasaApodCache();
+       // refreshNasaApodCache();
     }
 
     @Override

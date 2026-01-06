@@ -1,5 +1,7 @@
 package com.moonkeyeu.etl.api.model.media;
 
+import com.moonkeyeu.etl.api.model.CsvEntity;
+import com.moonkeyeu.etl.api.model.PkBuilder;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -10,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "info_urls", schema = "moonkey_db")
-public class InfoUrlsEntity  {
+public class InfoUrlsEntity implements CsvEntity<Object>, PkBuilder {
     @Id
     @Column(name = "info_id")
     private String info_id;
@@ -35,4 +37,14 @@ public class InfoUrlsEntity  {
     @Basic
     @Column(name = "launch_id")
     private String launch_id;
+
+    @Override
+    public Object getPrimaryKey() {
+        setPrimaryKey();
+        return info_id;
+    }
+    @Override
+    public void setPrimaryKey() {
+        this.info_id = priority + launch_id;;
+    }
 }
