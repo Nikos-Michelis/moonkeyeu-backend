@@ -24,31 +24,19 @@ public class JobConfig {
     @Bean
     public Job runDailyUpdateJob() {
         return new JobBuilder("runDailyUpdateJob", jobRepository)
-                .start(latestLaunchesUntilFlow)
-                .on("FAILED").to(agenciesFlow)
-                .from(agenciesFlow)
-                .on("COMPLETED").to(latestLaunchesUntilFlow)
-                .from(agenciesFlow)
-                .on("FAILED").fail()
-                .from(latestLaunchesUntilFlow)
-                .on("*").end()
-                .end()
-                .build();
+                .start(latestLaunchesUntilFlow).end().build();
     }
 
     @Bean
-    public Job runMidnightUpdateJob() {
-        return new JobBuilder("runMidnightUpdateJob", jobRepository)
-                .start(allLatestLaunchesFlow)
-                .on("FAILED").to(agenciesFlow)
-                .from(agenciesFlow)
-                .on("COMPLETED").to(allLatestLaunchesFlow)
-                .from(agenciesFlow)
-                .on("FAILED").fail()
-                .from(allLatestLaunchesFlow)
-                .on("*").end()
-                .end()
-                .build();
+    public Job runLaunchesUpdateJob() {
+        return new JobBuilder("runLaunchesUpdateJob", jobRepository)
+                .start(allLatestLaunchesFlow).end().build();
+    }
+
+    @Bean
+    public Job runUpdateAgenciesJob() {
+        return new JobBuilder("runUpdateAgenciesJob", jobRepository)
+                .start(agenciesFlow).end().build();
     }
 
     @Bean

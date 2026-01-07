@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.service;
+package com.moonkeyeu.etl.api.service.job;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
@@ -10,39 +10,51 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service
 @Slf4j
-public class JobBuilderService {
+@Service
+public class JobExecutionService {
     private final JobLauncher jobLauncher;
     private final JobOperator jobOperator;
 
-    public JobBuilderService(JobLauncher jobLauncher, JobOperator jobOperator) {
+    public JobExecutionService(JobLauncher jobLauncher, JobOperator jobOperator) {
         this.jobLauncher = jobLauncher;
         this.jobOperator = jobOperator;
     }
 
-    public void stopJobByName(String jobName) throws NoSuchJobException {
+    public int stopJobByName(String jobName) throws NoSuchJobException {
         Set<Long> executionIds = jobOperator.getRunningExecutions(jobName);
+
         if (executionIds.isEmpty()) {
-            log.debug("No running executions found for job {}", jobName);
-            return;
+            return 0;
         }
-        if (executionIds.size() > 1) executionIds.forEach(this::stopByExecutionId);
+
+        int stoppedCount = 0;
+
+        for (Long executionId : executionIds) {
+            if (stopByExecutionId(executionId)) {
+                stoppedCount++;
+            }
+        }
+
+        return stoppedCount;
     }
+
 
     private boolean stopByExecutionId(Long executionId) {
         try {
             return jobOperator.stop(executionId);
         } catch (JobExecutionNotRunningException | NoSuchJobExecutionException e) {
-            log.warn("Execution {} was not running", executionId);
             return false;
         }
     }
 
-    public JobExecution jobLauncher(String jobName, JobParameters jobParameters, Job dataProcessingJob) throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
-        //stopJobByName(jobName);
-        JobExecution jobExecution = jobLauncher.run(dataProcessingJob, jobParameters);
-        log.debug("Started new job execution for {}: {}", jobName, jobParameters);
-        return jobExecution;
+    public JobExecution jobLauncher(String jobName, JobParameters jobParameters, Job dataProcessingJob) {
+        try {
+            log.debug("Started new job execution for {}: {}", jobName, jobParameters);
+            return jobLauncher.run(dataProcessingJob, jobParameters);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException |
+                 JobParametersInvalidException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

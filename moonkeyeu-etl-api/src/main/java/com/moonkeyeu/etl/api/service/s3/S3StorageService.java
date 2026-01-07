@@ -41,7 +41,7 @@ public class S3StorageService {
         }
     }
 
-    private void setImageUrl(ImageEntity entity, String bucketName, boolean skipUpload) {
+    public void setImageUrl(ImageEntity entity, String bucketName, boolean skipUpload) {
         try {
             String s3Key = entityToS3KeyMap.get(entity.getClass()) != null ? s3KeyValue + entityToS3KeyMap.get(entity.getClass()) : null;
             if (s3Key != null) {

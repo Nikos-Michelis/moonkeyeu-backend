@@ -32,7 +32,7 @@ public class FilePathProvider {
     public LinkedList<EntityConfig> getCsvGroups() {
         return Arrays.stream(CsvGroup.values())
                 .sorted(Comparator.comparingInt(CsvGroup::getOrder))
-                .map(g -> new EntityConfig(getCsvSource(g.getCsvSource().getCsvFile()), g.getEntityClass(), g.getOrder()))
+                .map(group -> new EntityConfig(getCsvSource(group.getCsvSource().getCsvFile()), group.getEntityClass(), group.getOrder()))
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 
