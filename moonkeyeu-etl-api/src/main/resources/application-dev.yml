@@ -42,9 +42,9 @@ application:
     root:
       data:
         folder:
-          csv: ${user.home}/Desktop/Projects/MoonkeyEU/MoonkeyEU-Github/backend/data/csv-dataset
-          json: ${user.home}/Desktop/Projects/MoonkeyEU/MoonkeyEU-Github/backend/data/json-dataset
-          images: ${user.home}/Documents/moonkeyeu_db_images
+          csv: ${user.home}/${LOCAL_PROJECT_PATH}/backend/data/csv-dataset
+          json: ${user.home}/${LOCAL_PROJECT_PATH}/backend/data/json-dataset
+          images: ${user.home}/${LOCAL_PROJECT_PATH}/backend/data/images
   api:
     the-space-devs:
       url: https://ll.thespacedevs.com

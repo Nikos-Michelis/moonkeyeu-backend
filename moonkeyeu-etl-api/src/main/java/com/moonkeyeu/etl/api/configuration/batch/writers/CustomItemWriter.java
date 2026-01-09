@@ -32,8 +32,6 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
     private FilePathProvider filePathProvider;
     private Chunk<?> data;
     private boolean headerWritten = false;
-    private static final String HEADER_WRITTEN_KEY = "headerWritten";
-
 
     public CustomItemWriter() {
         this.csvMapper = new MappersConfig().csvMapper();
@@ -46,11 +44,11 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
                 return;
             }
 
-            if (!headerWritten) {
+            if (!isHeaderWritten()) {
                 String[] headers = getHeaders(chunk.getItems().get(0));
                 CsvSchema csvSchema =  buildSchema(headers);
                 writer = buildSequenceWriter(csvSchema);
-                headerWritten = true;
+                setHeaderWritten(true);
             }
 
             for (Object obj : chunk.getItems()) {
@@ -66,8 +64,6 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
     @Override
     public void open(ExecutionContext executionContext) {
         try {
-            Object value = executionContext.get(HEADER_WRITTEN_KEY);
-            this.headerWritten = value instanceof Boolean && (Boolean) value;
             bufferedWriter = Files.newBufferedWriter(resource.getFile().toPath(),
                     StandardOpenOption.CREATE,
                     StandardOpenOption.APPEND
@@ -81,8 +77,8 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
     @Override
     public void close() throws ItemStreamException {
         try {
+            if (bufferedWriter != null) bufferedWriter.close();
             if (writer != null) writer.close();
-            //if (bufferedWriter != null) bufferedWriter.close();
         } catch (IOException e) {
             log.error("Failed to close file {}: {}", resource.getFilename(), e.getMessage(), e);
         }

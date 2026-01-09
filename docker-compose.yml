@@ -65,6 +65,7 @@ services:
         GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
         NASA_APOD_KEY: ${NASA_APOD_KEY}
+        PROJECT_PROFILE: ${PROJECT_PROFILE}
     volumes:
       - ./jwt-keys:/app/jwt-keys
     ports:
@@ -96,6 +97,7 @@ services:
       CSV_DATASET: /app/data/csv-dataset
       JSON_DATASET: /app/data/json-dataset
       DB_IMAGES_DIR: /app/db-images
+      PROJECT_PROFILE: ${PROJECT_PROFILE}
     volumes:
       - ./data/csv-dataset:/app/data/csv-dataset
       - ./data/json-dataset:/app/data/json-dataset
@@ -107,16 +109,16 @@ services:
     networks:
       - spring-backend-network
 
-  #certbot:
-    #image: certbot/certbot
-    #container_name: certbot
-    #volumes:
-     # - /etc/letsencrypt:/etc/letsencrypt
-      #- /var/www/certbot:/var/www/certbot
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
     #command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN_BACKEND} --agree-tos
     #command: renew --dry-run
     #command: renew --force-renewal
-    #command: renew
+    command: renew
 
   prometheus:
     image: prom/prometheus:v2.44.0

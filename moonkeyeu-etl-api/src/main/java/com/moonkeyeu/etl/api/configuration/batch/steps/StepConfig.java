@@ -1,18 +1,19 @@
 package com.moonkeyeu.etl.api.configuration.batch.steps;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.moonkeyeu.etl.api.configuration.batch.listeners.StepCompletionListener;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepContextSetter;
 import com.moonkeyeu.etl.api.configuration.batch.processors.ChunkProcessor;
 import com.moonkeyeu.etl.api.configuration.batch.readers.JsonItemReader;
 import com.moonkeyeu.etl.api.configuration.batch.writers.ItemWriterRegistry;
-import com.moonkeyeu.etl.api.configuration.files.CsvManager;
+import com.moonkeyeu.etl.api.service.ClientDataService;
+import com.moonkeyeu.etl.api.utils.CsvManager;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.configuration.url.UrlBuilderConfig;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
 import com.moonkeyeu.etl.api.dto.EntityConfig;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.service.client.ClientDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
@@ -56,11 +57,10 @@ public class StepConfig {
 
     @Bean
     public Step fetchLatestDataStep() {
+        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
         return new StepBuilder("fetchLatestDataStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
                     clientDataService.fetchData(urlBuilderConfig.getLaunchesUrlForWindow(), launchesJsonFile).block();
-                    //log.info("Successfully fetched latest data. Between " + windowsStart + " and " + windowEnd );
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .transactionManager(platformTransactionManager)
@@ -69,11 +69,10 @@ public class StepConfig {
 
     @Bean
     public Step fetchAllLatestDataStep() {
+        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
         return new StepBuilder("fetchAllLatestDataStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
                     clientDataService.fetchData(urlBuilderConfig.getAllLatestLaunchesUrl(), launchesJsonFile).block();
-                    //log.info("Successfully fetched all latest data. window start: " + windowsStart );
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .transactionManager(platformTransactionManager)
@@ -82,26 +81,26 @@ public class StepConfig {
 
     @Bean
     public Step fetchAgenciesDataStep() {
+        String agenciesJsonFile = filePathProvider.getJsonSource(JSON_AGENCIES.getJsonFile());
         return new StepBuilder("fetchAgenciesStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    String agenciesJsonFile = filePathProvider.getJsonSource(JSON_AGENCIES.getJsonFile());
                     clientDataService.fetchData(urlBuilderConfig.baseAgenciesUrl(), agenciesJsonFile).block();
-                    log.info("Successfully fetched JSON data.");
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
+                .listener(new StepCompletionListener())
                 .transactionManager(platformTransactionManager)
                 .build();
     }
 
     @Bean
     public Step fetchLaunchesDataStep() {
+        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
         return new StepBuilder("fetchLaunchesStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
                     clientDataService.fetchData(urlBuilderConfig.baseLaunchesUrl(), launchesJsonFile).block();
-                    log.info("Successfully fetched JSON data.");
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
+                .listener(new StepCompletionListener())
                 .transactionManager(platformTransactionManager)
                 .build();
     }
@@ -127,6 +126,7 @@ public class StepConfig {
                     }
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
+                .listener(new StepCompletionListener())
                 .transactionManager(platformTransactionManager)
                 .build();
     }
@@ -145,6 +145,7 @@ public class StepConfig {
                 .retry(WebClientResponseException.class)
                 .retryLimit(2)
                 .listener(new StepContextSetter<>("jsonFilePath", launchesJsonFile))
+                .listener(new StepCompletionListener())
                 .build();
     }
 
@@ -161,6 +162,7 @@ public class StepConfig {
                 .retry(WebClientResponseException.class)
                 .retryLimit(2)
                 .listener(new StepContextSetter<>("jsonFilePath", agenciesJsonFile))
+                .listener(new StepCompletionListener())
                 .build();
     }
     /**
@@ -185,6 +187,7 @@ public class StepConfig {
                 .processor(chunkProcessor)
                 .writer(jpaEntityWriter)
                 .listener(new StepContextSetter<>("entityConfig", config))
+                .listener(new StepCompletionListener())
                 .transactionManager(platformTransactionManager)
                 .build();
     }

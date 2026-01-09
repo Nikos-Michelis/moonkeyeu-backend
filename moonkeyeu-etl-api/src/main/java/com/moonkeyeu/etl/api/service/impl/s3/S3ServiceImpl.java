@@ -1,5 +1,6 @@
-package com.moonkeyeu.etl.api.service.s3;
+package com.moonkeyeu.etl.api.service.impl.s3;
 
+import com.moonkeyeu.etl.api.service.S3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -11,15 +12,15 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 @Slf4j
-public class S3Service {
+public class S3ServiceImpl implements S3Service {
 
     private final S3Client s3Client;
 
-    public S3Service(S3Client s3Client){
+    public S3ServiceImpl(S3Client s3Client){
         this.s3Client = s3Client;
     }
-
-    public void putObject(String bucketName, String key,  RequestBody requestBody){
+    @Override
+    public void putObject(String bucketName, String key,  RequestBody requestBody) {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
@@ -28,7 +29,7 @@ public class S3Service {
                 putObjectRequest, requestBody);
 
     }
-
+    @Override
     public boolean isObjectExists(String bucketName, String key) {
         try {
             HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()

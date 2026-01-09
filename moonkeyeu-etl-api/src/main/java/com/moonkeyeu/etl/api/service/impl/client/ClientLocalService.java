@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.service.client;
+package com.moonkeyeu.etl.api.service.impl.client;
 
 import com.moonkeyeu.etl.api.utils.ClientUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Deprecated
 @Service
 @Slf4j
 public class ClientLocalService {

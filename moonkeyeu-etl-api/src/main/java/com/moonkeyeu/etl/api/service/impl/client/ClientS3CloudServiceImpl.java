@@ -1,6 +1,7 @@
-package com.moonkeyeu.etl.api.service.client;
+package com.moonkeyeu.etl.api.service.impl.client;
 
-import com.moonkeyeu.etl.api.service.s3.S3Service;
+import com.moonkeyeu.etl.api.service.ClientS3CloudService;
+import com.moonkeyeu.etl.api.service.S3Service;
 import com.moonkeyeu.etl.api.utils.ClientUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.net.MalformedURLException;
 
 @Slf4j
 @Service
-public class ClientS3CloudService {
+public class ClientS3CloudServiceImpl implements ClientS3CloudService {
     @Value("${aws.cloudfront.url}")
     private String cloudFrontUrl;
     private final WebClient webClient;
@@ -28,7 +29,7 @@ public class ClientS3CloudService {
 
 
     @Autowired
-    public ClientS3CloudService(WebClient webClient, S3Service s3Service, CacheManager cacheManager) {
+    public ClientS3CloudServiceImpl(WebClient webClient, S3Service s3Service, CacheManager cacheManager) {
         this.webClient = webClient;
         this.s3Service = s3Service;
         this.cacheManager = cacheManager;
@@ -81,7 +82,7 @@ public class ClientS3CloudService {
         }
     }
 
-    public Mono<Void> uploadToS3(String bucketName, String key, DataBuffer dataBuffer) {
+    private Mono<Void> uploadToS3(String bucketName, String key, DataBuffer dataBuffer) {
         return Mono.fromRunnable(() -> {
             try {
                 RequestBody requestBody = RequestBody.fromInputStream(dataBuffer.asInputStream(true), dataBuffer.readableByteCount());

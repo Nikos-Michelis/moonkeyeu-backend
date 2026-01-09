@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.configuration.files;
+package com.moonkeyeu.etl.api.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -7,18 +7,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
 @Component
 public class CsvManager {
-    /**
-     * TODO:
-     * Verify whether the CSV source file is being modified or deleted during batch processing.
-     * A partially-read or truncated file would produce errors such as
-     * “Missing closing quote for value” during CSV parsing.
-     * **/
     public boolean deleteAllFiles(String folderPath) {
         Path folder = Paths.get(folderPath);
         if (!Files.exists(folder) || !Files.isDirectory(folder)) {

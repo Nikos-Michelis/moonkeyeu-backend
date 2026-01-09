@@ -2,7 +2,7 @@ package com.moonkeyeu.etl.api.configuration.batch.processors;
 
 import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.service.s3.S3StorageService;
+import com.moonkeyeu.etl.api.service.S3StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -25,7 +25,6 @@ public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
 
     @Override
     public CsvEntity<?> process(CsvEntity item) {
-        //System.out.println(item);
         if (item.getPrimaryKey() == null) return null;
         cleanValuesByField(item);
         s3StorageService.saveMediaToS3(item, s3Buckets.getBucketName(), skipS3BucketUpload);

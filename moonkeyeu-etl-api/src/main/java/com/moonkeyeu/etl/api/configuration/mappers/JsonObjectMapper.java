@@ -30,10 +30,6 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 @Slf4j
-/**
- * TODO
- * Define the json mapper in configuration section
- * **/
 public class JsonObjectMapper {
     public final ObjectMapper objectMapper;
 

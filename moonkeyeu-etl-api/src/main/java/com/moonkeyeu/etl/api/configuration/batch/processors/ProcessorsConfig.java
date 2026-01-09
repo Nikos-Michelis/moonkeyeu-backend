@@ -5,7 +5,7 @@ import com.moonkeyeu.etl.api.configuration.files.CsvSource;
 import com.moonkeyeu.etl.api.configuration.mappers.JsonObjectMapper;
 import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
-import com.moonkeyeu.etl.api.service.s3.S3StorageService;
+import com.moonkeyeu.etl.api.service.S3StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;

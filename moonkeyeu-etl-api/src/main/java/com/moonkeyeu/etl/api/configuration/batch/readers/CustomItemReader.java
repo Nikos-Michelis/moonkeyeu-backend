@@ -68,8 +68,11 @@ public class CustomItemReader implements ItemReader<CsvEntity<?>>, ItemStream {
     @Override
     public void close() throws ItemStreamException {
         try {
+            if (iterator != null) {
+                iterator.close();
+            }
+
             if (reader != null) {
-                log.info("closing buffer reader {}", reader.getClass());
                 reader.close();
             }
         } catch (IOException e) {

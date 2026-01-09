@@ -1,5 +1,6 @@
 package com.moonkeyeu.etl.api.configuration.batch;
 
+import com.moonkeyeu.etl.api.configuration.batch.listeners.JobCompletionListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -20,28 +21,33 @@ public class JobConfig {
     private final Flow allLatestLaunchesFlow;
     private final Flow latestLaunchesUntilFlow;
     private final Flow bulkInsertFlow;
-
+    private final JobCompletionListener jobCompletionListener;
     @Bean
     public Job runDailyUpdateJob() {
         return new JobBuilder("runDailyUpdateJob", jobRepository)
-                .start(latestLaunchesUntilFlow).end().build();
+                .start(latestLaunchesUntilFlow).end().listener(jobCompletionListener).build();
     }
 
     @Bean
     public Job runLaunchesUpdateJob() {
         return new JobBuilder("runLaunchesUpdateJob", jobRepository)
-                .start(allLatestLaunchesFlow).end().build();
+                .start(allLatestLaunchesFlow).end().listener(jobCompletionListener).build();
     }
 
     @Bean
     public Job runUpdateAgenciesJob() {
         return new JobBuilder("runUpdateAgenciesJob", jobRepository)
-                .start(agenciesFlow).end().build();
+                .start(agenciesFlow).end().listener(jobCompletionListener).build();
     }
 
     @Bean
     public Job runBulkInsertJob() {
         return new JobBuilder("runBulkInsertJob", jobRepository)
-                .start(bulkInsertFlow).end().build();
+                .start(bulkInsertFlow).end().listener(jobCompletionListener).build();
+    }
+    @Bean
+    public Job runBulkInsertJob2() {
+        return new JobBuilder("runBulkInsertJob2", jobRepository)
+                .start(bulkInsertFlow).end().listener(jobCompletionListener).build();
     }
 }

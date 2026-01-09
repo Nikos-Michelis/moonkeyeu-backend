@@ -6,7 +6,7 @@ import com.moonkeyeu.etl.api.model.images.*;
 import com.moonkeyeu.etl.api.model.images.SpacecraftImagesEntity;
 import com.moonkeyeu.etl.api.model.media.MissionPatchesEntity;
 import com.moonkeyeu.etl.api.model.pad.LaunchPadEntity;
-import com.moonkeyeu.etl.api.service.client.ClientLocalService;
+import com.moonkeyeu.etl.api.service.impl.client.ClientLocalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Deprecated
 @Slf4j
 public class LocalStorageService {
 

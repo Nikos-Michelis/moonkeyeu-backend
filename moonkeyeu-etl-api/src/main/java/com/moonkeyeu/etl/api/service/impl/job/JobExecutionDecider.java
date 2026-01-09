@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.service.job;
+package com.moonkeyeu.etl.api.service.impl.job;
 
 import com.moonkeyeu.etl.api.dto.chunks.JobParamsDTO;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,8 @@ public class JobExecutionDecider {
     private final Job runDailyUpdateJob;
     @Qualifier("runBulkInsertJob")
     private final Job runBulkInsertJob;
+    @Qualifier("runBulkInsertJob2")
+    private final Job runBulkInsertJob2;
     @Qualifier("runUpdateAgenciesJob")
     private final Job runUpdateAgenciesJob;
     private final JobExecutionService jobExecutionService;
@@ -31,22 +33,21 @@ public class JobExecutionDecider {
                 .toJobParameters();
 
         JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", jobParameters, runDailyUpdateJob);
-        if (launchesUpdateJob.getStatus() == BatchStatus.COMPLETED) {
-            return BatchStatus.COMPLETED;
-        }
-
-        //log.warn("LaunchesUpdateJob did not complete on first run. Status: {}", launchesUpdateJob.getStatus());
-        JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);
-        if (updateAgenciesJob.getStatus() == BatchStatus.FAILED) {
-            log.error("UpdateAgenciesJob failed. Aborting sequence.");
+        if (launchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
             return BatchStatus.FAILED;
         }
 
-        //log.info("UpdateAgenciesJob completed successfully with status: {}", updateAgenciesJob.getStatus());
+        JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);
+        if (updateAgenciesJob.getStatus() != BatchStatus.COMPLETED) {
+            return BatchStatus.FAILED;
+        }
+
         JobParameters retryParams = addRetryTimestamp(jobParameters);
         JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", retryParams, runDailyUpdateJob);
-
-        return retryLaunchesUpdateJob.getStatus();
+        if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
+            return BatchStatus.FAILED;
+        }
+        return BatchStatus.COMPLETED;
     }
 
     public BatchStatus midnightJobExecution() {
@@ -59,32 +60,36 @@ public class JobExecutionDecider {
                 .toJobParameters();
 
         JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", jobParameters, runLaunchesUpdateJob);
-        if (launchesUpdateJob.getStatus() == BatchStatus.COMPLETED) {
-            return BatchStatus.COMPLETED;
+        if (launchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
+            return BatchStatus.FAILED;
         }
 
-        //log.warn("LaunchesUpdateJob did not complete on first run. Status: {}", launchesUpdateJob.getStatus());
         JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);
-        if (updateAgenciesJob.getStatus() == BatchStatus.FAILED) {
+        if (updateAgenciesJob.getStatus() != BatchStatus.COMPLETED) {
             log.error("UpdateAgenciesJob failed. Aborting sequence.");
             return BatchStatus.FAILED;
         }
 
-        //log.info("UpdateAgenciesJob completed successfully with status: {}", updateAgenciesJob.getStatus());
         JobParameters retryParams = addRetryTimestamp(jobParameters);
         JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", retryParams, runLaunchesUpdateJob);
-
-        return retryLaunchesUpdateJob.getStatus();
+        if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
+            return BatchStatus.FAILED;
+        }
+        return BatchStatus.COMPLETED;
     }
-     public void bulkInsertJobExecution() {
+     public BatchStatus bulkInsertJobExecution() {
          JobParameters jobParameters = JobParamsDTO.builder()
                  .skipCsv(false)
                  .skipJson(true)
                  .skipS3BucketUpload(true)
                  .build()
                  .toJobParameters();
-        jobExecutionService.jobLauncher("runBulkInsertJob", jobParameters, runBulkInsertJob);
-    }
+         JobExecution bulkInsertJob = jobExecutionService.jobLauncher("runBulkInsertJob", jobParameters, runBulkInsertJob);
+         if (bulkInsertJob.getStatus() != BatchStatus.COMPLETED) {
+             return BatchStatus.FAILED;
+         }
+         return BatchStatus.COMPLETED;
+     }
 
     private JobParameters addRetryTimestamp(JobParameters original) {
         return new JobParametersBuilder(original)

@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.service.s3;
+package com.moonkeyeu.etl.api.service.impl.s3;
 
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.ImageEntity;
@@ -6,7 +6,8 @@ import com.moonkeyeu.etl.api.model.images.*;
 import com.moonkeyeu.etl.api.model.images.SpacecraftImagesEntity;
 import com.moonkeyeu.etl.api.model.media.MissionPatchesEntity;
 import com.moonkeyeu.etl.api.model.pad.LaunchPadEntity;
-import com.moonkeyeu.etl.api.service.client.ClientS3CloudService;
+import com.moonkeyeu.etl.api.service.ClientS3CloudService;
+import com.moonkeyeu.etl.api.service.S3StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class S3StorageService {
+public class S3StorageServiceImpl implements S3StorageService {
 
     @Value("${aws.s3.buckets.root}")
     private String s3KeyValue;
@@ -35,12 +36,14 @@ public class S3StorageService {
             ProgramsImagesEntity.class, "/programs/"
     );
 
+    @Override
     public void saveMediaToS3(CsvEntity<?> item, String bucketName, boolean skipUpload) {
         if (item instanceof ImageEntity) {
             setImageUrl((ImageEntity) item, bucketName, skipUpload);
         }
     }
 
+    @Override
     public void setImageUrl(ImageEntity entity, String bucketName, boolean skipUpload) {
         try {
             String s3Key = entityToS3KeyMap.get(entity.getClass()) != null ? s3KeyValue + entityToS3KeyMap.get(entity.getClass()) : null;
