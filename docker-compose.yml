@@ -15,7 +15,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql-db-data:/var/lib/mysql
-      #- ./db:/docker-entrypoint-initdb.d
+      #- ./db/prod:/docker-entrypoint-initdb.d
     restart: always
     networks:
       - spring-backend-network
@@ -65,10 +65,11 @@ services:
         GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
         NASA_APOD_KEY: ${NASA_APOD_KEY}
+        PROJECT_PROFILE: ${PROJECT_PROFILE}
     volumes:
       - ./jwt-keys:/app/jwt-keys
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       mysqldb:
         condition: service_healthy
@@ -93,12 +94,13 @@ services:
       S3_REGION: ${S3_REGION}
       S3_BUCKET: ${S3_BUCKET}
       S3_BUCKET_ROOT: ${S3_BUCKET_ROOT}
-      INPUT_RAW_DIR: /app/raw_dataset
-      OUTPUT_CLEAN_DIR: /app/clean_dataset
+      CSV_DATASET: /app/data/csv-dataset
+      JSON_DATASET: /app/data/json-dataset
       DB_IMAGES_DIR: /app/db-images
+      PROJECT_PROFILE: ${PROJECT_PROFILE}
     volumes:
-      - ./etl-data/raw-dataset:/app/raw_dataset
-      - ./etl-data/clean-dataset:/app/clean_dataset
+      - ./data/csv-dataset:/app/data/csv-dataset
+      - ./data/json-dataset:/app/data/json-dataset
       - /home/moonkeyeu/.aws:/root/.aws
       #- ~/.aws:/root/.aws
     depends_on:
@@ -160,6 +162,6 @@ networks:
     driver: bridge
 volumes:
   mysql-db-data:
-    external: true
-  etl-data:
+    #external: true
+  data:
     driver: local

@@ -1,6 +1,8 @@
 package com.moonkeyeu.etl.api.model.crew;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -11,7 +13,8 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "role", schema = "moonkey_db")
-public class RoleEntity  {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RoleEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "role_id")
     private Long role_id;
@@ -19,4 +22,9 @@ public class RoleEntity  {
     @Column(name = "name")
     @JsonProperty("role")
     private String name;
+
+    @Override
+    public Object getPrimaryKey() {
+        return role_id;
+    }
 }

@@ -1,5 +1,8 @@
 package com.moonkeyeu.etl.api.model.launcher;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -10,11 +13,18 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "launcher_status", schema = "moonkey_db")
-public class LauncherStatusEntity  {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class LauncherStatusEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "status_id")
     private Long status_id;
     @Basic
     @Column(name = "name")
+    @JsonProperty("status_name")
     private String name;
+
+    @Override
+    public Object getPrimaryKey() {
+        return status_id;
+    }
 }

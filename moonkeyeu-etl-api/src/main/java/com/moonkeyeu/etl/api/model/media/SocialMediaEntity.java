@@ -1,6 +1,7 @@
 package com.moonkeyeu.etl.api.model.media;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "social_media", schema = "moonkey_db")
-public class SocialMediaEntity  {
+public class SocialMediaEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "social_id")
     private Long social_id;
@@ -24,6 +25,10 @@ public class SocialMediaEntity  {
     private String media_url;
     @Basic
     @Column(name = "astronaut_id")
-    @JsonProperty("astronaut_id")
-    private Integer astronaut_id;
+    private Long astronaut_id;
+
+    @Override
+    public Object getPrimaryKey() {
+        return social_id;
+    }
 }

@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleRateLimitExceededException(RateLimitExceededException ex, WebRequest request) {
         HttpStatus status = HttpStatus.TOO_MANY_REQUESTS;
         Map<String, Object> map = httpResponse("Rate Limit Exceeded", ex, request, status);
-        map.put("next_use_secs", ex.getNextUseSeconds());
+        map.put("next_use_secs", ex.getNextUseSeconds()); // Include the remaining time to wait
 
         return new ResponseEntity<>(map, status);
     }

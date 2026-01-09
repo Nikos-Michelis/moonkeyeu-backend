@@ -1,5 +1,6 @@
 package com.moonkeyeu.etl.api.configuration.mappers;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -19,7 +20,8 @@ public class MappersConfig {
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        JsonFactory jsonFactory = new JsonFactory();
+        ObjectMapper objectMapper = new ObjectMapper(jsonFactory);
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper;
     }

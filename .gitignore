@@ -2,7 +2,8 @@
 .my.cnf
 .idea
 db
-etl-data
+db-prod
+data
 backup-data
 moonkeyeu-etl-api/target
 moonkeyeu-core-api/target

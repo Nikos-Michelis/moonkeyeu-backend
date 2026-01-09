@@ -1,5 +1,6 @@
 package com.moonkeyeu.core.api;
 
+import com.moonkeyeu.core.api.security.model.SignUpProvider;
 import com.moonkeyeu.core.api.security.repository.PermissionRepository;
 import com.moonkeyeu.core.api.security.repository.RoleRepository;
 import com.moonkeyeu.core.api.user.model.*;
@@ -48,6 +49,15 @@ public class MoonkeyEuCoreApplication {
                     return roleRepository.save(newRole);
                 });
             }
+           /* for (SignUpProvider signUpProviderEnum : SignUpProvider.values()) {
+                permissionRepository.findByName(signUpProviderEnum.name()).orElseGet(() -> {
+                    Permission permission = Permission.builder()
+                            .name(permissionEnum)
+                            .description(permissionEnum.getPermission())
+                            .build();
+                    return permissionRepository.save(permission);
+                });
+            }*/
         };
     }
 }

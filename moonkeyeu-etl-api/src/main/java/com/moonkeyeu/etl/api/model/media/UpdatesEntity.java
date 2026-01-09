@@ -1,6 +1,8 @@
 package com.moonkeyeu.etl.api.model.media;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.utils.TimestampDeserializer;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -14,7 +16,8 @@ import java.sql.Timestamp;
 @Getter
 @Entity
 @Table(name = "updates", schema = "moonkey_db")
-public class UpdatesEntity  {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UpdatesEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "update_id")
     private Long update_id;
@@ -37,4 +40,9 @@ public class UpdatesEntity  {
     @Basic
     @Column(name = "launch_id")
     private String launch_id;
+
+    @Override
+    public Object getPrimaryKey() {
+        return update_id;
+    }
 }
