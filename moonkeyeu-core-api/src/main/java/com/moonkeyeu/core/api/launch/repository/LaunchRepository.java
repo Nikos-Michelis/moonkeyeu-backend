@@ -59,6 +59,7 @@ public interface LaunchRepository extends JpaRepository<Launch, String>, JpaSpec
             LEFT JOIN FETCH lds.landingZone lz
             LEFT JOIN FETCH lz.location
             LEFT JOIN FETCH l.missionPatches mp
+            LEFT JOIN FETCH l.netPrecision
             LEFT JOIN FETCH l.launchStatus
             LEFT JOIN FETCH l.infoUrls
             LEFT JOIN FETCH l.videoUrls
@@ -105,6 +106,7 @@ public interface LaunchRepository extends JpaRepository<Launch, String>, JpaSpec
       LEFT JOIN FETCH lds.landingZone lz
       LEFT JOIN FETCH lz.location
       LEFT JOIN FETCH l.missionPatches mp
+      LEFT JOIN FETCH l.netPrecision
       LEFT JOIN FETCH l.launchStatus
       LEFT JOIN FETCH l.infoUrls
       LEFT JOIN FETCH l.videoUrls
@@ -153,6 +155,7 @@ public interface LaunchRepository extends JpaRepository<Launch, String>, JpaSpec
         LEFT JOIN FETCH lds.landingZone lz
         LEFT JOIN FETCH lz.location
         LEFT JOIN FETCH l.missionPatches mp
+        LEFT JOIN FETCH l.netPrecision
         LEFT JOIN FETCH l.launchStatus
         LEFT JOIN FETCH l.infoUrls
         LEFT JOIN FETCH l.videoUrls
@@ -202,6 +205,7 @@ public interface LaunchRepository extends JpaRepository<Launch, String>, JpaSpec
         LEFT JOIN FETCH lds.landingZone lz
         LEFT JOIN FETCH lz.location
         LEFT JOIN FETCH l.missionPatches mp
+        LEFT JOIN FETCH l.netPrecision
         LEFT JOIN FETCH l.launchStatus
         LEFT JOIN FETCH l.infoUrls
         LEFT JOIN FETCH l.videoUrls
@@ -251,6 +255,7 @@ public interface LaunchRepository extends JpaRepository<Launch, String>, JpaSpec
         LEFT JOIN FETCH lds.landingZone lz
         LEFT JOIN FETCH lz.location
         LEFT JOIN FETCH l.missionPatches mp
+        LEFT JOIN FETCH l.netPrecision    
         LEFT JOIN FETCH l.launchStatus
         LEFT JOIN FETCH l.infoUrls
         LEFT JOIN FETCH l.videoUrls

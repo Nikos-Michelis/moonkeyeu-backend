@@ -16,7 +16,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonPropertyOrder({"id", "fullname", "agency", "net", "windowStart", "windowEnd", "status", "location", "image"})
+@JsonPropertyOrder({"id", "fullname", "agency", "net_precision", "net", "windowStart", "windowEnd", "status", "location", "image"})
 public class LaunchNormalDTO implements DTOEntity {
     @JsonProperty("id")
     private String launchId;
@@ -29,6 +29,8 @@ public class LaunchNormalDTO implements DTOEntity {
     @JsonProperty("net")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssX", timezone = "UTC")
     private Instant net;
+    @JsonProperty("net_precision")
+    private String netName;
     @JsonProperty("window_start")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssX", timezone = "UTC")
     private Instant windowStart;

@@ -17,7 +17,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonPropertyOrder({"id", "fullname", "net", "windowStart", "windowEnd", "status", "location", "agency", "image"})
+@JsonPropertyOrder({"id", "fullname", "net_precision", "net", "windowStart", "windowEnd", "status", "location", "agency", "image"})
 public class LaunchSummarizedDTO implements DTOEntity {
     @JsonProperty("id")
     private String launchId;
@@ -28,6 +28,8 @@ public class LaunchSummarizedDTO implements DTOEntity {
     @JsonProperty("net")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssX", timezone = "UTC")
     private Instant net;
+    @JsonProperty("net_precision")
+    private String netName;
     @JsonProperty("status")
     private String statusName;
     @JsonProperty("image")

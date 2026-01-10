@@ -26,6 +26,7 @@ import java.util.Set;
 @NamedEntityGraph(
         name = "launch-with-status-agency-images",
         attributeNodes = {
+                @NamedAttributeNode(value = "netPrecision", subgraph = "netPrecision"),
                 @NamedAttributeNode(value = "launchStatus", subgraph = "launchStatus"),
                 @NamedAttributeNode(value = "agencies", subgraph = "agencies"),
                 @NamedAttributeNode(value = "rocket", subgraph = "rocket"),
@@ -37,6 +38,14 @@ import java.util.Set;
                 @NamedAttributeNode(value = "bookmarks", subgraph = "bookmarks")
         },
         subgraphs = {
+                @NamedSubgraph(
+                        name = "netPrecision",
+                        attributeNodes = {
+                                @NamedAttributeNode("netName"),
+                                @NamedAttributeNode("netAbbrev"),
+                                @NamedAttributeNode("netDescription")
+                        }
+                ),
                 @NamedSubgraph(
                         name = "launchStatus",
                         attributeNodes = {
@@ -116,6 +125,9 @@ public class Launch {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssX", timezone = "UTC")
     @Column(name = "net")
     private Instant net;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "net_precision_id")
+    private NetPrecision netPrecision;
     @Basic
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssX", timezone = "UTC")
     @Column(name = "window_start")
