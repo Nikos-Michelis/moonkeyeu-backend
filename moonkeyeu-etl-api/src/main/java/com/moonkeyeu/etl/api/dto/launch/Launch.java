@@ -31,6 +31,8 @@ public class Launch implements Serializable {
     private String last_updated;
     @JsonProperty("net")
     private String net;
+    @JsonProperty("net_precision")
+    private NetPrecision net_precision;
     @JsonProperty("window_end")
     private String window_end;
     @JsonProperty("window_start")

@@ -17,6 +17,7 @@ import com.moonkeyeu.etl.api.model.landing.LandingZoneEntity;
 import com.moonkeyeu.etl.api.model.images.SpacecraftImagesEntity;
 import com.moonkeyeu.etl.api.model.launch.LaunchEntity;
 import com.moonkeyeu.etl.api.model.launch.LaunchStatusEntity;
+import com.moonkeyeu.etl.api.model.launch.NetPrecisionEntity;
 import com.moonkeyeu.etl.api.model.launcher.LauncherEntity;
 import com.moonkeyeu.etl.api.model.launcher.LauncherStageEntity;
 import com.moonkeyeu.etl.api.model.launcher.LauncherStatusEntity;
@@ -54,6 +55,7 @@ public enum CsvGroup {
     MISSIONS(12, MissionEntity.class, CsvSource.RAW_LAUNCHES_CSV),
     LAUNCH_STATUS(13, LaunchStatusEntity.class, CsvSource.RAW_LAUNCHES_CSV),
     LAUNCHES(14, LaunchEntity.class, CsvSource.RAW_LAUNCHES_CSV),
+    NET_PRECISION(0, NetPrecisionEntity.class, CsvSource.RAW_LAUNCHES_CSV),
     LAUNCH_PAD_IMAGES(45, PadImagesEntity.class, CsvSource.RAW_LAUNCHES_CSV),
 
     LANDING_TYPES_BOOSTERS(15, LandingTypeEntity.class, CsvSource.RAW_BOOSTERS_CSV),

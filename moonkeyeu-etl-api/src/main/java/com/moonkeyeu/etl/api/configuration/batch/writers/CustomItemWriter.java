@@ -64,6 +64,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
     @Override
     public void open(ExecutionContext executionContext) {
         try {
+            this.headerWritten = false;
             bufferedWriter = Files.newBufferedWriter(resource.getFile().toPath(),
                     StandardOpenOption.CREATE,
                     StandardOpenOption.APPEND
