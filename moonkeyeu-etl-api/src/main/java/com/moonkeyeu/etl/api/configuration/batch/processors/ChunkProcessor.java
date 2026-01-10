@@ -2,7 +2,8 @@ package com.moonkeyeu.etl.api.configuration.batch.processors;
 
 import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.service.S3StorageService;
+import com.moonkeyeu.etl.api.model.ImageEntity;
+import com.moonkeyeu.etl.api.service.S3MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -10,6 +11,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 @Slf4j
@@ -18,16 +20,24 @@ import java.lang.reflect.Field;
 @RequiredArgsConstructor
 public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>> {
     private static final String UNKNOWN_VALUE = "Unknown";
-    private final S3StorageService s3StorageService;
+    private final S3MediaService s3MediaService;
     private final S3Buckets s3Buckets;
     @Value("#{jobParameters['skipS3BucketUpload'] ?: 'false'}")
     private boolean skipS3BucketUpload;
+    @Value("#{jobParameters['localStorageEnabled'] ?: 'false'}")
+    private boolean localStorageEnabled;
 
     @Override
-    public CsvEntity<?> process(CsvEntity item) {
+    public CsvEntity<?> process(CsvEntity item) throws IOException {
         if (item.getPrimaryKey() == null) return null;
+
         cleanValuesByField(item);
-        s3StorageService.saveMediaToS3(item, s3Buckets.getBucketName(), skipS3BucketUpload);
+
+        if (item instanceof ImageEntity entity) {
+            String imageUrl = s3MediaService.saveMediaToS3(entity, s3Buckets.getBucketName(), skipS3BucketUpload);
+            entity.setImageUrl(imageUrl);
+        }
+
         return item;
     }
 

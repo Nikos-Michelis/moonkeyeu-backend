@@ -5,7 +5,7 @@ import com.moonkeyeu.etl.api.configuration.files.CsvSource;
 import com.moonkeyeu.etl.api.configuration.mappers.JsonObjectMapper;
 import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
-import com.moonkeyeu.etl.api.service.S3StorageService;
+import com.moonkeyeu.etl.api.service.S3MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -16,12 +16,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class ProcessorsConfig {
-    private final S3StorageService s3StorageService;
+    private final S3MediaService s3MediaService;
     private final S3Buckets s3Buckets;
 
     @Bean
     public ChunkProcessor chunkProcessor() {
-        return new ChunkProcessor(s3StorageService, s3Buckets);
+        return new ChunkProcessor(s3MediaService, s3Buckets);
     }
 
     @Bean
