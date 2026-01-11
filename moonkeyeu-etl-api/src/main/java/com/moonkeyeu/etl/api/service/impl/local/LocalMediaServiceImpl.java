@@ -9,15 +9,14 @@ import com.moonkeyeu.etl.api.model.pad.LaunchPadEntity;
 import com.moonkeyeu.etl.api.service.LocalMediaService;
 import com.moonkeyeu.etl.api.service.LocalStorageService;
 import com.moonkeyeu.etl.api.service.MediaDownloadService;
-import com.moonkeyeu.etl.api.settings.exceptions.InvalidPathMappingException;
 import com.moonkeyeu.etl.api.utils.ClientUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,33 +44,37 @@ public class LocalMediaServiceImpl implements LocalMediaService {
             ProgramsImagesEntity.class, "programs"
     );
 
-    public String saveMediaLocal(ImageEntity item, String localDir) throws IOException {
-        String basePath = entityToLocalKeyMap.get(item.getClass());
-        if (basePath == null) {
-            throw new InvalidPathMappingException(
-                    "No S3 path mapping for entity: " + item.getClass().getSimpleName()
-            );
-        }
-
-        String fileName = ClientUtils.extractImageNameFromURL(item.getImageUrl());
+    public String saveMediaLocal(ImageEntity imageEntity, String localDir) throws IOException {
+        String fileName = getFileName(imageEntity);
         Path filePath = Paths.get(localDir, fileName);
-
-        String localStorageUrl =
-                UriComponentsBuilder
-                        .fromUriString(localHostUrl)
-                        .pathSegment(basePath)
-                        .pathSegment(fileName)
-                        .toUriString();
-
+        String localStorageUrl = getLocalHostUrl(imageEntity);
 
         if (localStorageService.existsByKey(filePath)) {
             return localStorageUrl;
         }
 
         Files.createDirectories(Paths.get(localDir));
-        byte[] data = mediaDownloadService.download(item.getImageUrl());
+        byte[] data = mediaDownloadService.download(imageEntity.getImageUrl());
         localStorageService.save(data, filePath);
         return localStorageUrl;
 
+    }
+
+    public String getLocalHostUrl(ImageEntity imageEntity) throws MalformedURLException {
+        String basePath = getRootPath(imageEntity);
+        String fileName = getFileName(imageEntity);
+        return UriComponentsBuilder
+                .fromUriString(this.localHostUrl)
+                .pathSegment(basePath)
+                .pathSegment(fileName)
+                .toUriString();
+    }
+
+    private String getFileName(ImageEntity item) throws MalformedURLException {
+        return ClientUtils.extractImageNameFromURL(item.getImageUrl());
+    }
+
+    private String getRootPath(ImageEntity item) {
+        return entityToLocalKeyMap.get(item.getClass());
     }
 }

@@ -3,24 +3,21 @@ package com.moonkeyeu.etl.api.configuration.batch.processors;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
+import com.moonkeyeu.etl.api.dto.storage.StorageType;
+import com.moonkeyeu.etl.api.dto.storage.StoreOperation;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.ImageEntity;
 import com.moonkeyeu.etl.api.service.LocalMediaService;
 import com.moonkeyeu.etl.api.service.S3MediaService;
-import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreProviderException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 
 @Slf4j
-@StepScope
-@Component
 @RequiredArgsConstructor
 public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>> {
     private static final String UNKNOWN_VALUE = "Unknown";
@@ -29,10 +26,11 @@ public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
     private final RootConfig rootConfig;
     private final FilePathProvider filePathProvider;
     private final S3Buckets s3Buckets;
-    @Value("#{jobParameters['s3StorageEnabled'] ?: 'false'}")
-    private boolean s3StorageEnabled;
-    @Value("#{jobParameters['localStorageEnabled'] ?: 'false'}")
-    private boolean localStorageEnabled;
+    @Value("#{jobParameters['storage'] ?: null}")
+    private String storage;
+    @Value("#{jobParameters['operation'] ?: null}")
+    private String operation;
+
 
     @Override
     public CsvEntity<?> process(CsvEntity item) throws IOException {
@@ -49,16 +47,34 @@ public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
     }
 
     private String mediaStorageProvider(ImageEntity entity) throws IOException {
+        StorageType storageType = StorageType.from(storage);
+        return switch (storageType) {
+            case LOCAL -> saveToLocal(entity);
+            case S3 -> saveToS3(entity);
+            default -> throw new IOException("Unsupported storage type: " + storage);
+        };
+    }
 
-        if (localStorageEnabled) {
-            return localMediaService.saveMediaLocal(entity, filePathProvider.getImagesDir(rootConfig.getImagesRootFolder()));
-        }
+    private String saveToLocal(ImageEntity entity) throws IOException {
+        StoreOperation storeOperation = StoreOperation.from(operation);
+        return switch (storeOperation) {
+            case UPLOAD ->
+                    localMediaService.saveMediaLocal(entity, filePathProvider.getImagesDir(rootConfig.getImagesRootFolder()));
+            case GET_URL ->
+                    localMediaService.getLocalHostUrl(entity);
+            default -> throw new IllegalStateException("Unexpected value: " + storeOperation);
+        };
+    }
 
-        if (s3StorageEnabled) {
-            return s3MediaService.saveMediaToS3(entity, s3Buckets.getBucketName(), s3StorageEnabled);
-        }
-
-        throw new InvalidStoreProviderException("Unknown media store method.");
+    private String saveToS3(ImageEntity entity) throws IOException {
+        StoreOperation storeOperation = StoreOperation.from(operation);
+        return switch (storeOperation) {
+            case UPLOAD ->
+                    s3MediaService.saveMediaToS3(entity, s3Buckets.getBucketName());
+            case GET_URL ->
+                    s3MediaService.getCloudFrontUrl(entity);
+            default -> throw new IllegalStateException("Unexpected value: " + storeOperation);
+        };
     }
 
     private void cleanValuesByField(CsvEntity<?> item) {

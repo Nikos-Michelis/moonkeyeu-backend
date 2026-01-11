@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.configuration.batch;
+package com.moonkeyeu.etl.api.configuration.batch.jobs;
 
 import com.moonkeyeu.etl.api.configuration.batch.listeners.JobCompletionListener;
 import lombok.RequiredArgsConstructor;

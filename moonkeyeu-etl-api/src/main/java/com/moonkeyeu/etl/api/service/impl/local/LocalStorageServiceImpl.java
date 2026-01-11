@@ -3,6 +3,7 @@ import com.moonkeyeu.etl.api.service.LocalStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -21,8 +22,8 @@ public class LocalStorageServiceImpl implements LocalStorageService {
 
     @Override
     public void save(byte[] data, Path filePath) {
-        try {
-            Files.write(filePath, data);
+        try (OutputStream outputStream = Files.newOutputStream(filePath)) {
+            outputStream.write(data);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save image: " + e.getMessage(), e);
         }

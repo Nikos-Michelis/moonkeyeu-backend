@@ -2,7 +2,7 @@ package com.moonkeyeu.etl.api.configuration.batch.flows;
 
 import com.moonkeyeu.etl.api.configuration.batch.steps.StepConfig;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
-import com.moonkeyeu.etl.api.dto.EntityConfig;
+import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
