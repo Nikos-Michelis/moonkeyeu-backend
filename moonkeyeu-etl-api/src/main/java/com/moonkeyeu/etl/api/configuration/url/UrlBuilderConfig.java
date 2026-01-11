@@ -19,7 +19,7 @@ public class UrlBuilderConfig {
 
     private UriComponentsBuilder baseLaunchesUriBuilder() {
         return UriComponentsBuilder
-                .fromHttpUrl(baseUrl)
+                .fromUri(URI.create(baseUrl))
                 .pathSegment(version, "launches")
                 .path("/")
                 .queryParam("format=json")
@@ -29,7 +29,7 @@ public class UrlBuilderConfig {
 
     public UriComponentsBuilder baseAgenciesUriBuilder() {
         return UriComponentsBuilder
-                .fromHttpUrl(baseUrl)
+                .fromUri(URI.create(baseUrl))
                 .pathSegment(version, "agencies")
                 .path("/")
                 .queryParam("format=json")

@@ -17,8 +17,6 @@ public class JobExecutionDecider {
     private final Job runDailyUpdateJob;
     @Qualifier("runBulkInsertJob")
     private final Job runBulkInsertJob;
-    @Qualifier("runBulkInsertJob2")
-    private final Job runBulkInsertJob2;
     @Qualifier("runUpdateAgenciesJob")
     private final Job runUpdateAgenciesJob;
     private final JobExecutionService jobExecutionService;
@@ -28,7 +26,8 @@ public class JobExecutionDecider {
         JobParameters jobParameters = JobParamsDTO.builder()
                 .skipCsv(false)
                 .skipJson(false)
-                .skipS3BucketUpload(false)
+                .s3StorageEnabled(false)
+                .localStorageEnabled(false)
                 .build()
                 .toJobParameters();
 
@@ -55,7 +54,8 @@ public class JobExecutionDecider {
         JobParameters jobParameters = JobParamsDTO.builder()
                 .skipCsv(false)
                 .skipJson(false)
-                .skipS3BucketUpload(true)
+                .s3StorageEnabled(false)
+                .localStorageEnabled(false)
                 .build()
                 .toJobParameters();
 
@@ -81,7 +81,8 @@ public class JobExecutionDecider {
          JobParameters jobParameters = JobParamsDTO.builder()
                  .skipCsv(false)
                  .skipJson(true)
-                 .skipS3BucketUpload(true)
+                 .s3StorageEnabled(false)
+                 .localStorageEnabled(false)
                  .build()
                  .toJobParameters();
          JobExecution bulkInsertJob = jobExecutionService.jobLauncher("runBulkInsertJob", jobParameters, runBulkInsertJob);

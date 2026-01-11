@@ -9,6 +9,7 @@ import com.moonkeyeu.etl.api.model.pad.LaunchPadEntity;
 import com.moonkeyeu.etl.api.service.LocalMediaService;
 import com.moonkeyeu.etl.api.service.LocalStorageService;
 import com.moonkeyeu.etl.api.service.MediaDownloadService;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidPathMappingException;
 import com.moonkeyeu.etl.api.utils.ClientUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class LocalMediaServiceImpl implements LocalMediaService {
     public String saveMediaLocal(ImageEntity item, String localDir) throws IOException {
         String basePath = entityToLocalKeyMap.get(item.getClass());
         if (basePath == null) {
-            throw new IllegalStateException(
+            throw new InvalidPathMappingException(
                     "No S3 path mapping for entity: " + item.getClass().getSimpleName()
             );
         }

@@ -1,9 +1,13 @@
 package com.moonkeyeu.etl.api.configuration.batch.processors;
 
+import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
+import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.ImageEntity;
+import com.moonkeyeu.etl.api.service.LocalMediaService;
 import com.moonkeyeu.etl.api.service.S3MediaService;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreProviderException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -20,10 +24,13 @@ import java.lang.reflect.Field;
 @RequiredArgsConstructor
 public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>> {
     private static final String UNKNOWN_VALUE = "Unknown";
+    private final LocalMediaService localMediaService;
     private final S3MediaService s3MediaService;
+    private final RootConfig rootConfig;
+    private final FilePathProvider filePathProvider;
     private final S3Buckets s3Buckets;
-    @Value("#{jobParameters['skipS3BucketUpload'] ?: 'false'}")
-    private boolean skipS3BucketUpload;
+    @Value("#{jobParameters['s3StorageEnabled'] ?: 'false'}")
+    private boolean s3StorageEnabled;
     @Value("#{jobParameters['localStorageEnabled'] ?: 'false'}")
     private boolean localStorageEnabled;
 
@@ -34,11 +41,24 @@ public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
         cleanValuesByField(item);
 
         if (item instanceof ImageEntity entity) {
-            String imageUrl = s3MediaService.saveMediaToS3(entity, s3Buckets.getBucketName(), skipS3BucketUpload);
+            String imageUrl = mediaStorageProvider(entity);
             entity.setImageUrl(imageUrl);
         }
 
         return item;
+    }
+
+    private String mediaStorageProvider(ImageEntity entity) throws IOException {
+
+        if (localStorageEnabled) {
+            return localMediaService.saveMediaLocal(entity, filePathProvider.getImagesDir(rootConfig.getImagesRootFolder()));
+        }
+
+        if (s3StorageEnabled) {
+            return s3MediaService.saveMediaToS3(entity, s3Buckets.getBucketName(), s3StorageEnabled);
+        }
+
+        throw new InvalidStoreProviderException("Unknown media store method.");
     }
 
     private void cleanValuesByField(CsvEntity<?> item) {

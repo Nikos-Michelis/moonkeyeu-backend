@@ -8,6 +8,7 @@ import com.moonkeyeu.etl.api.model.pad.LaunchPadEntity;
 import com.moonkeyeu.etl.api.service.impl.MediaDownloadServiceImpl;
 import com.moonkeyeu.etl.api.service.S3StorageService;
 import com.moonkeyeu.etl.api.service.S3MediaService;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidPathMappingException;
 import com.moonkeyeu.etl.api.utils.ClientUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +43,11 @@ public class S3MediaServiceImpl implements S3MediaService {
     );
 
     @Override
-    public String saveMediaToS3(ImageEntity item, String bucketName, boolean skipUpload) throws IOException {
+    public String saveMediaToS3(ImageEntity item, String bucketName, boolean s3StorageEnabled) throws IOException {
         String basePath = entityToS3KeyMap.get(item.getClass());
         if (basePath == null) {
-            throw new IllegalStateException(
-                    "No S3 path mapping for entity: " + item.getClass().getSimpleName()
+            throw new InvalidPathMappingException(
+                    "No local path mapping for entity: " + item.getClass().getSimpleName()
             );
         }
 
@@ -68,7 +69,7 @@ public class S3MediaServiceImpl implements S3MediaService {
                         .toUriString();
 
 
-        if (skipUpload) {
+        if (!s3StorageEnabled) {
             return cloudFrontUrl;
         }
 

@@ -13,13 +13,15 @@ import java.util.UUID;
 public class JobParamsDTO {
     private boolean skipCsv;
     private boolean skipJson;
-    private boolean skipS3BucketUpload;
+    private boolean s3StorageEnabled;
+    private boolean localStorageEnabled;
 
     public JobParameters toJobParameters() {
         return new JobParametersBuilder()
                 .addString("skipCsv", Boolean.toString(skipCsv))
                 .addString("skipJson", Boolean.toString(skipJson))
-                .addString("skipS3BucketUpload", Boolean.toString(skipS3BucketUpload))
+                .addString("s3StorageEnabled", Boolean.toString(s3StorageEnabled))
+                .addString("localStorageEnabled", Boolean.toString(localStorageEnabled))
                 .addString("timestamp", Instant.now().toString())
                 .addString("uniqueId", UUID.randomUUID().toString())
                 .toJobParameters();
