@@ -26,7 +26,7 @@ public class JobExecutionDecider {
 
     public BatchStatus dailyJobExecution() {
         JobParameters jobParameters = JobParamsBuilder.builder()
-                .storage(StorageType.S3)
+                .storage(StorageType.S3_STORAGE)
                 .operation(StoreOperation.GET_URL)
                 .cleanup(CleanupType.ALL)
                 .build()
@@ -42,7 +42,7 @@ public class JobExecutionDecider {
             return BatchStatus.FAILED;
         }
 
-        JobParameters retryParams = addRetryTimestamp(jobParameters);
+        JobParameters retryParams = JobParamsBuilder.addRetryTimestamp(jobParameters);
         JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", retryParams, runDailyUpdateJob);
         if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
             return BatchStatus.FAILED;
@@ -52,8 +52,8 @@ public class JobExecutionDecider {
 
     public BatchStatus midnightJobExecution() {
         JobParameters jobParameters = JobParamsBuilder.builder()
-                .storage(StorageType.S3)
-                .operation(StoreOperation.UPLOAD)
+                .storage(StorageType.S3_STORAGE)
+                .operation(StoreOperation.S3_UPLOAD)
                 .cleanup(CleanupType.ALL)
                 .build()
                 .toJobParameters();
@@ -69,16 +69,17 @@ public class JobExecutionDecider {
             return BatchStatus.FAILED;
         }
 
-        JobParameters retryParams = addRetryTimestamp(jobParameters);
+        JobParameters retryParams = JobParamsBuilder.addRetryTimestamp(jobParameters);
         JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", retryParams, runLaunchesUpdateJob);
         if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
             return BatchStatus.FAILED;
         }
         return BatchStatus.COMPLETED;
     }
+
      public BatchStatus bulkInsertJobExecution() {
          JobParameters jobParameters = JobParamsBuilder.builder()
-                 .storage(StorageType.S3)
+                 .storage(StorageType.S3_STORAGE)
                  .operation(StoreOperation.GET_URL)
                  .cleanup(CleanupType.ONLY_JSON)
                  .build()
@@ -90,11 +91,5 @@ public class JobExecutionDecider {
          }
          return BatchStatus.COMPLETED;
      }
-
-    private JobParameters addRetryTimestamp(JobParameters original) {
-        return new JobParametersBuilder(original)
-                .addLong("retryTimestamp", System.currentTimeMillis())
-                .toJobParameters();
-    }
 
 }

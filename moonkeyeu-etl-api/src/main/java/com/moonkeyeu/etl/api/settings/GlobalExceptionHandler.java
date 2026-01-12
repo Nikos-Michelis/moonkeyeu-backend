@@ -1,42 +1,81 @@
 package com.moonkeyeu.etl.api.settings;
 
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidCleanupOperationException;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreOperationException;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreProviderException;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
-import org.springframework.boot.web.error.ErrorAttributeOptions;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
-import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.web.context.request.WebRequest;
-
-import java.util.Map;
+import static com.moonkeyeu.etl.api.settings.BusinessErrorCodes.*;
+import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private Map<String, Object> httpResponse(String message, Exception ex, WebRequest request, HttpStatus status) {
-        ErrorAttributes errorAttributes = new DefaultErrorAttributes();
-        Map<String, Object> map = errorAttributes.getErrorAttributes(request, ErrorAttributeOptions.defaults());
-        map.put("error", message + ": " + ex.getMessage());
-        map.put("status", status);
-        map.put("path", request.getDescription(false));
-        return map;
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ExceptionResponse> handleException(RateLimitExceededException exp, WebRequest request) {
+        return ResponseEntity
+                .status(TOO_MANY_REQUESTS)
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(RATE_LIMIT_EXCEED.getCode())
+                        .businessErrorDescription(RATE_LIMIT_EXCEED.getDescription())
+                        .delay(exp.getDelay())
+                        .error(exp.getMessage())
+                        .path(request.getDescription(false))
+                        .build()
+                );
     }
 
-    @ExceptionHandler(value = RateLimitExceededException.class)
-    public ResponseEntity<Map<String, Object>> handleRateLimitExceededException(RateLimitExceededException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.TOO_MANY_REQUESTS;
-        Map<String, Object> map = httpResponse("Rate Limit Exceeded", ex, request, status);
-        map.put("next_use_secs", ex.getNextUseSeconds()); // Include the remaining time to wait
-
-        return new ResponseEntity<>(map, status);
+    @ExceptionHandler(value = InvalidCleanupOperationException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidCleanupOperationException(InvalidCleanupOperationException ex, WebRequest request) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(UNSUPPORTED_OPERATION.getCode())
+                        .businessErrorDescription(UNSUPPORTED_OPERATION.getDescription())
+                        .error(ex.getMessage())
+                        .path(request.getDescription(false))
+                        .build()
+                );
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<Map<String, Object>> handleException(Exception ex, WebRequest request) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        Map<String, Object> map = httpResponse("Something Went Wrong", ex, request, status);
-        return new ResponseEntity<>(map, status);
+    @ExceptionHandler(value = InvalidStoreProviderException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidStoreProviderException(InvalidStoreProviderException ex, WebRequest request) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(UNSUPPORTED_PROVIDER.getCode())
+                        .businessErrorDescription(UNSUPPORTED_PROVIDER.getDescription())
+                        .error(ex.getMessage())
+                        .path(request.getDescription(false))
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(value = InvalidStoreOperationException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidStoreOperationException(InvalidStoreProviderException ex, WebRequest request) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(UNSUPPORTED_OPERATION.getCode())
+                        .businessErrorDescription(UNSUPPORTED_OPERATION.getDescription())
+                        .error(ex.getMessage())
+                        .path(request.getDescription(false))
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponse> handleException(Exception exp) {
+        exp.printStackTrace();
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(ExceptionResponse.builder()
+                        .businessErrorDescription("Oops! somthing went wrong, try again later.")
+                        .error(exp.getMessage())
+                        .build()
+                );
     }
 }

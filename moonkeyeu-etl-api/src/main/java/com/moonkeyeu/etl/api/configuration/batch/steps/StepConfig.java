@@ -8,6 +8,7 @@ import com.moonkeyeu.etl.api.configuration.batch.readers.JsonItemReader;
 import com.moonkeyeu.etl.api.configuration.batch.writers.ItemWriterRegistry;
 import com.moonkeyeu.etl.api.dto.storage.CleanupType;
 import com.moonkeyeu.etl.api.service.ClientDataService;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidCleanupOperationException;
 import com.moonkeyeu.etl.api.utils.CsvManager;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
@@ -126,7 +127,7 @@ public class StepConfig {
                             csvManager.deleteAllFiles(rootConfig.getCsvRootFolder());
                             csvManager.deleteAllFiles(rootConfig.getJsonRootFolder());
                         }
-                        default -> throw new IOException("Unsupported cleanup type: " + cleanup);
+                        default -> throw new InvalidCleanupOperationException("Unexpected operation: " + cleanup);
                     };
 
                     return RepeatStatus.FINISHED;

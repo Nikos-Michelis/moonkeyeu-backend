@@ -41,10 +41,10 @@ public class S3ManagerImpl implements S3Manager {
         } catch (NoSuchKeyException e) {
             return false;
         } catch (S3Exception e) {
-            log.error("Error checking object existence: " + e.awsErrorDetails().errorMessage());
+            log.error("Error checking object existence: {}", e.awsErrorDetails().errorMessage());
             return false;
         } catch (Exception e) {
-            log.error("Unexpected error: " + e.getMessage());
+            log.error("Unexpected error: {}", e.getMessage());
             return false;
         }
     }

@@ -89,7 +89,7 @@ public class ClientDataServiceImpl implements ClientDataService {
                             .flatMap(delay -> {
                                 if (delay > 0) {
                                     return Mono.delay(Duration.ofSeconds(delay))
-                                            .then(Mono.error(new RateLimitExceededException("Rate limit hit. Waiting for " + delay + " seconds...")));
+                                            .then(Mono.error(new RateLimitExceededException("Rate limit hit. Waiting for " + delay + " seconds...", delay)));
                                 }
                                 return Mono.empty();
                             });

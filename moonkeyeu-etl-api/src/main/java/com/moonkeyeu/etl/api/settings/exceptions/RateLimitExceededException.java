@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class RateLimitExceededException extends RuntimeException {
-    private long nextUseSeconds;
+    private long delay;
 
-    public RateLimitExceededException(String message, long nextUseSeconds) {
+    public RateLimitExceededException(String message, long delay) {
         super(message);
-        this.nextUseSeconds = nextUseSeconds;
+        this.delay = delay;
     }
     public RateLimitExceededException(String message) {
         super(message);
