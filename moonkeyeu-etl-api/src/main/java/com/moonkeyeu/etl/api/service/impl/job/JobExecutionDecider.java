@@ -81,7 +81,7 @@ public class JobExecutionDecider {
          JobParameters jobParameters = JobParamsBuilder.builder()
                  .storage(StorageType.S3_STORAGE)
                  .operation(StoreOperation.GET_URL)
-                 .cleanup(CleanupType.ONLY_JSON)
+                 .cleanup(CleanupType.ONLY_CSV)
                  .build()
                  .toJobParameters();
 

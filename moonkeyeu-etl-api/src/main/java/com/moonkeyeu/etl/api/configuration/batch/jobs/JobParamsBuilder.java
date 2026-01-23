@@ -14,7 +14,6 @@ import java.util.UUID;
 
 @Data
 @Builder
-@RequiredArgsConstructor
 public class JobParamsBuilder {
     private StorageType storage;
     private StoreOperation operation;

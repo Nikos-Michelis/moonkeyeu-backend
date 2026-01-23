@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum StorageType {
     LOCAL_STORAGE,
-    S3_STORAGE,;
+    S3_STORAGE;
 
     public static StorageType from(String value) {
         try {
