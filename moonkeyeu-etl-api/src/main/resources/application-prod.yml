@@ -33,7 +33,7 @@ aws:
       db-images: ${S3_BUCKET}
       root: ${S3_BUCKET_ROOT}
   cloudfront:
-    url: https://cdn.moonkeyeu.com/
+    url: https://cdn.moonkeyeu.com
 
 application:
   backend:

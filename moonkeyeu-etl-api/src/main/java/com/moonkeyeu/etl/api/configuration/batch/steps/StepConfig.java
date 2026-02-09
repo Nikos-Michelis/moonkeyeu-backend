@@ -6,17 +6,18 @@ import com.moonkeyeu.etl.api.configuration.batch.listeners.StepContextSetter;
 import com.moonkeyeu.etl.api.configuration.batch.processors.ChunkProcessor;
 import com.moonkeyeu.etl.api.configuration.batch.readers.JsonItemReader;
 import com.moonkeyeu.etl.api.configuration.batch.writers.ItemWriterRegistry;
+import com.moonkeyeu.etl.api.dto.storage.CleanupType;
 import com.moonkeyeu.etl.api.service.ClientDataService;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidCleanupOperationException;
 import com.moonkeyeu.etl.api.utils.CsvManager;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.configuration.url.UrlBuilderConfig;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
-import com.moonkeyeu.etl.api.dto.EntityConfig;
+import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -30,6 +31,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_AGENCIES;
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_LAUNCHES;
@@ -110,20 +112,24 @@ public class StepConfig {
         return new StepBuilder("cleanupStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     Map<String, Object> jobParametersMap = chunkContext.getStepContext().getJobParameters();
-                    boolean skipCsv = Boolean.parseBoolean((String) jobParametersMap.getOrDefault("skipCsv", "false"));
-                    boolean skipJson = Boolean.parseBoolean((String) jobParametersMap.getOrDefault("skipJson", "false"));
-                    if (!skipCsv) {
-                        boolean isDeleted = csvManager.deleteAllFiles(rootConfig.getCsvRootFolder());
-                        if (!isDeleted) {
-                            contribution.setExitStatus(ExitStatus.FAILED);
-                        }
+                    String cleanup = jobParametersMap.getOrDefault("cleanup", null).toString();
+
+                    if (cleanup == null) {
+                        throw new RuntimeException("Cleanup step requires parameters for cleanup");
                     }
-                    if (!skipJson) {
-                        boolean isDeleted = csvManager.deleteAllFiles(rootConfig.getJsonRootFolder());
-                        if (!isDeleted) {
-                            contribution.setExitStatus(ExitStatus.FAILED);
+
+                    CleanupType cleanupType = CleanupType.from(cleanup);
+
+                    switch (cleanupType) {
+                        case ONLY_CSV -> csvManager.deleteAllFiles(rootConfig.getCsvRootFolder());
+                        case ONLY_JSON -> csvManager.deleteAllFiles(rootConfig.getJsonRootFolder());
+                        case ALL -> {
+                            csvManager.deleteAllFiles(rootConfig.getCsvRootFolder());
+                            csvManager.deleteAllFiles(rootConfig.getJsonRootFolder());
                         }
-                    }
+                        default -> throw new InvalidCleanupOperationException("Unexpected operation: " + cleanup);
+                    };
+
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .listener(new StepCompletionListener())

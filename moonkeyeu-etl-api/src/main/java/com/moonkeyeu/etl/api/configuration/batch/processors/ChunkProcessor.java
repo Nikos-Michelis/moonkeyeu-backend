@@ -1,34 +1,99 @@
 package com.moonkeyeu.etl.api.configuration.batch.processors;
 
+import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
+import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
+import com.moonkeyeu.etl.api.dto.storage.StorageType;
+import com.moonkeyeu.etl.api.dto.storage.StoreOperation;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.service.S3StorageService;
+import com.moonkeyeu.etl.api.model.ImageEntity;
+import com.moonkeyeu.etl.api.service.LocalMediaService;
+import com.moonkeyeu.etl.api.service.S3MediaService;
+import com.moonkeyeu.etl.api.settings.exceptions.DataCleaningException;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreOperationException;
+import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreProviderException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
-@StepScope
-@Component
 @RequiredArgsConstructor
 public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>> {
     private static final String UNKNOWN_VALUE = "Unknown";
-    private final S3StorageService s3StorageService;
+    private final LocalMediaService localMediaService;
+    private final S3MediaService s3MediaService;
+    private final RootConfig rootConfig;
+    private final FilePathProvider filePathProvider;
     private final S3Buckets s3Buckets;
-    @Value("#{jobParameters['skipS3BucketUpload'] ?: 'false'}")
-    private boolean skipS3BucketUpload;
+    @Value("#{jobParameters['storage'] ?: null}")
+    private String storage;
+    @Value("#{jobParameters['operation'] ?: null}")
+    private String operation;
+
 
     @Override
-    public CsvEntity<?> process(CsvEntity item) {
+    public CsvEntity<?> process(CsvEntity item) throws IOException {
+
         if (item.getPrimaryKey() == null) return null;
+
         cleanValuesByField(item);
-        s3StorageService.saveMediaToS3(item, s3Buckets.getBucketName(), skipS3BucketUpload);
+
+        if (item instanceof ImageEntity entity) {
+                String imageUrl = mediaStorageProvider(entity);
+                entity.setImageUrl(imageUrl);
+        }
         return item;
+    }
+
+    private String mediaStorageProvider(ImageEntity entity) throws InvalidStoreProviderException, IOException {
+
+        if (storage == null || storage.isEmpty()) {
+            throw new InvalidStoreProviderException("storage is null");
+        }
+
+        StorageType storageType = StorageType.from(storage);
+        return switch (storageType) {
+            case LOCAL_STORAGE -> saveToLocal(entity);
+            case S3_STORAGE -> saveToS3(entity);
+        };
+    }
+
+    private String saveToLocal(ImageEntity entity) throws InvalidStoreOperationException, IOException {
+
+        if (storage == null) {
+            throw new InvalidStoreOperationException("operation is null");
+        }
+
+        StoreOperation storeOperation = StoreOperation.from(operation);
+        return switch (storeOperation) {
+            case LOCAL_SAVE ->
+                    localMediaService.saveMediaLocal(entity, filePathProvider.getImagesDir(rootConfig.getImagesRootFolder()));
+            case GET_URL ->
+                    localMediaService.getLocalHostUrl(entity);
+            default -> throw new InvalidStoreOperationException("Unexpected operation: " + storeOperation);
+        };
+    }
+
+    private String saveToS3(ImageEntity entity) throws InvalidStoreOperationException, IOException {
+
+        if (storage == null) {
+            throw new InvalidStoreOperationException("operation is null");
+        }
+
+        StoreOperation storeOperation = StoreOperation.from(operation);
+        return switch (storeOperation) {
+            case S3_UPLOAD ->
+                    s3MediaService.saveMediaToS3(entity, s3Buckets.getBucketName());
+            case GET_URL ->
+                    s3MediaService.getCloudFrontUrl(entity);
+            default -> throw new InvalidStoreOperationException("Unexpected operation: " + storeOperation);
+        };
     }
 
     private void cleanValuesByField(CsvEntity<?> item) {
@@ -40,18 +105,22 @@ public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
                 Object cleaned = handleSpecialCharacters(cleanedByNullOrEmpty);
                 field.set(item, cleaned);
             } catch (IllegalAccessException e) {
-                log.error("Error cleaning field '{}' for entity {}",
-                        field.getName(), item.getClass().getSimpleName(), e);
-                throw new RuntimeException("Error cleaning data", e);
+                throw new DataCleaningException("Error cleaning field " + field.getName() + " for entity " + item.getClass().getSimpleName());
             }
         }
+    }
+
+    public static boolean useRegex(String input) {
+        Pattern pattern = Pattern.compile("\\?{2,}");
+        final Matcher matcher = pattern.matcher(input);
+        return matcher.matches();
     }
 
     private Object handleSpecialCharacters(Object value) {
         if (value == null) {
             return null;
         }
-        return "???".equals(value) ? UNKNOWN_VALUE : value;
+        return useRegex(value.toString()) ? UNKNOWN_VALUE : value;
     }
 
     private Object handleNullEmptyValues(Object value) {

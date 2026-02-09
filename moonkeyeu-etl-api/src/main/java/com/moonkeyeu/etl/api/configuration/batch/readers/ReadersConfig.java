@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.configuration.batch.readers;
 
-import com.moonkeyeu.etl.api.dto.EntityConfig;
+import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;

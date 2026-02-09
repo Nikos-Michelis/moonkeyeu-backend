@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.dto;
+package com.moonkeyeu.etl.api.dto.storage;
 
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import lombok.AllArgsConstructor;

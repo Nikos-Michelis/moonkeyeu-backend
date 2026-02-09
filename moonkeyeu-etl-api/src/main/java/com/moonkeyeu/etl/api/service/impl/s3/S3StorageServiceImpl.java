@@ -1,58 +1,59 @@
 package com.moonkeyeu.etl.api.service.impl.s3;
 
-import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.model.ImageEntity;
-import com.moonkeyeu.etl.api.model.images.*;
-import com.moonkeyeu.etl.api.model.images.SpacecraftImagesEntity;
-import com.moonkeyeu.etl.api.model.media.MissionPatchesEntity;
-import com.moonkeyeu.etl.api.model.pad.LaunchPadEntity;
-import com.moonkeyeu.etl.api.service.ClientS3CloudService;
 import com.moonkeyeu.etl.api.service.S3StorageService;
-import lombok.RequiredArgsConstructor;
+import com.moonkeyeu.etl.api.service.S3Manager;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.sync.RequestBody;
 
-import java.io.IOException;
-import java.util.Map;
-
-@Service
 @Slf4j
-@RequiredArgsConstructor
+@Service
 public class S3StorageServiceImpl implements S3StorageService {
+     private final S3Manager s3Manager;
+    private final CacheManager cacheManager;
 
-    @Value("${aws.s3.buckets.root}")
-    private String s3KeyValue;
-    private final ClientS3CloudService clientS3CloudService;
 
-    private final Map<Class<?>, String> entityToS3KeyMap = Map.of(
-            RocketImageEntity.class, "/rockets/",
-            LaunchPadEntity.class, "/pads-locations/",
-            LauncherImagesEntity.class, "/launchers/",
-            SpacecraftImagesEntity.class, "/spacecraft/",
-            AstronautImagesEntity.class, "/astronauts/",
-            AgenciesImagesEntity.class, "/agencies/",
-            MissionPatchesEntity.class, "/missions-patches/",
-            ProgramsImagesEntity.class, "/programs/"
-    );
+    @Autowired
+    public S3StorageServiceImpl(S3Manager s3Manager, CacheManager cacheManager) {
+        this.s3Manager = s3Manager;
+        this.cacheManager = cacheManager;
+    }
 
     @Override
-    public void saveMediaToS3(CsvEntity<?> item, String bucketName, boolean skipUpload) {
-        if (item instanceof ImageEntity) {
-            setImageUrl((ImageEntity) item, bucketName, skipUpload);
+    public void save(byte[] data, String s3Key, String bucketName) {
+        upload(s3Key, bucketName, data);
+        Cache cache = cacheManager.getCache("processedImages");
+        if (cache != null) {
+            cache.put(s3Key, true);
         }
     }
 
     @Override
-    public void setImageUrl(ImageEntity entity, String bucketName, boolean skipUpload) {
+    public boolean existsByKey(String s3Key, String bucketName) {
+        Cache cache = cacheManager.getCache("processedImages");
+        if (cache != null && Boolean.TRUE.equals(cache.get(s3Key, Boolean.class))) {
+            return true;
+        }
+
+        boolean existsInS3 = s3Manager.isObjectExists(bucketName, s3Key);
+        if (existsInS3 && cache != null) {
+            cache.put(s3Key, true);
+        }
+
+        return existsInS3;
+    }
+
+    @Override
+    public void upload(String s3Key, String bucketName, byte[] data) {
         try {
-            String s3Key = entityToS3KeyMap.get(entity.getClass()) != null ? s3KeyValue + entityToS3KeyMap.get(entity.getClass()) : null;
-            if (s3Key != null) {
-                String imageUrl = clientS3CloudService.saveToS3(entity.getImageUrl(), bucketName, s3Key, skipUpload);
-                entity.setImageUrl(imageUrl);
-            }
-        } catch (IOException  e) {
-            log.error("Error processing batch: ", e);
+            RequestBody requestBody = RequestBody.fromBytes(data);
+            s3Manager.putObject(bucketName, s3Key, requestBody);
+            log.info("Uploaded {} to S3 bucket {}", s3Key, bucketName);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload " + s3Key + " to S3", e);
         }
     }
 }

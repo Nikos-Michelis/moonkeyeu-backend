@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.configuration.batch;
+package com.moonkeyeu.etl.api.configuration.batch.jobs;
 
 import com.moonkeyeu.etl.api.configuration.batch.listeners.JobCompletionListener;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +43,6 @@ public class JobConfig {
     @Bean
     public Job runBulkInsertJob() {
         return new JobBuilder("runBulkInsertJob", jobRepository)
-                .start(bulkInsertFlow).end().listener(jobCompletionListener).build();
-    }
-    @Bean
-    public Job runBulkInsertJob2() {
-        return new JobBuilder("runBulkInsertJob2", jobRepository)
                 .start(bulkInsertFlow).end().listener(jobCompletionListener).build();
     }
 }

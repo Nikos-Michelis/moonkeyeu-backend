@@ -16,7 +16,6 @@ import lombok.Data;
 public class NetPrecisionEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "net_precision_id", nullable = false)
-    @JsonProperty("net_precision_id")
     private Long net_precision_id;
 
     @Column(name = "name", length = 45)

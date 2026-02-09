@@ -1,6 +1,9 @@
 package com.moonkeyeu.etl.api.service.impl.job;
 
-import com.moonkeyeu.etl.api.dto.chunks.JobParamsDTO;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.JobParamsBuilder;
+import com.moonkeyeu.etl.api.dto.storage.CleanupType;
+import com.moonkeyeu.etl.api.dto.storage.StorageType;
+import com.moonkeyeu.etl.api.dto.storage.StoreOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
@@ -17,18 +20,15 @@ public class JobExecutionDecider {
     private final Job runDailyUpdateJob;
     @Qualifier("runBulkInsertJob")
     private final Job runBulkInsertJob;
-    @Qualifier("runBulkInsertJob2")
-    private final Job runBulkInsertJob2;
     @Qualifier("runUpdateAgenciesJob")
     private final Job runUpdateAgenciesJob;
     private final JobExecutionService jobExecutionService;
 
     public BatchStatus dailyJobExecution() {
-
-        JobParameters jobParameters = JobParamsDTO.builder()
-                .skipCsv(false)
-                .skipJson(false)
-                .skipS3BucketUpload(false)
+        JobParameters jobParameters = JobParamsBuilder.builder()
+                .storage(StorageType.S3_STORAGE)
+                .operation(StoreOperation.GET_URL)
+                .cleanup(CleanupType.ALL)
                 .build()
                 .toJobParameters();
 
@@ -42,7 +42,7 @@ public class JobExecutionDecider {
             return BatchStatus.FAILED;
         }
 
-        JobParameters retryParams = addRetryTimestamp(jobParameters);
+        JobParameters retryParams = JobParamsBuilder.addRetryTimestamp(jobParameters);
         JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", retryParams, runDailyUpdateJob);
         if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
             return BatchStatus.FAILED;
@@ -51,11 +51,10 @@ public class JobExecutionDecider {
     }
 
     public BatchStatus midnightJobExecution() {
-
-        JobParameters jobParameters = JobParamsDTO.builder()
-                .skipCsv(false)
-                .skipJson(false)
-                .skipS3BucketUpload(true)
+        JobParameters jobParameters = JobParamsBuilder.builder()
+                .storage(StorageType.S3_STORAGE)
+                .operation(StoreOperation.S3_UPLOAD)
+                .cleanup(CleanupType.ALL)
                 .build()
                 .toJobParameters();
 
@@ -70,31 +69,27 @@ public class JobExecutionDecider {
             return BatchStatus.FAILED;
         }
 
-        JobParameters retryParams = addRetryTimestamp(jobParameters);
+        JobParameters retryParams = JobParamsBuilder.addRetryTimestamp(jobParameters);
         JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", retryParams, runLaunchesUpdateJob);
         if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
             return BatchStatus.FAILED;
         }
         return BatchStatus.COMPLETED;
     }
+
      public BatchStatus bulkInsertJobExecution() {
-         JobParameters jobParameters = JobParamsDTO.builder()
-                 .skipCsv(false)
-                 .skipJson(true)
-                 .skipS3BucketUpload(true)
+         JobParameters jobParameters = JobParamsBuilder.builder()
+                 .storage(StorageType.S3_STORAGE)
+                 .operation(StoreOperation.GET_URL)
+                 .cleanup(CleanupType.ONLY_CSV)
                  .build()
                  .toJobParameters();
+
          JobExecution bulkInsertJob = jobExecutionService.jobLauncher("runBulkInsertJob", jobParameters, runBulkInsertJob);
          if (bulkInsertJob.getStatus() != BatchStatus.COMPLETED) {
              return BatchStatus.FAILED;
          }
          return BatchStatus.COMPLETED;
      }
-
-    private JobParameters addRetryTimestamp(JobParameters original) {
-        return new JobParametersBuilder(original)
-                .addLong("retryTimestamp", System.currentTimeMillis())
-                .toJobParameters();
-    }
 
 }

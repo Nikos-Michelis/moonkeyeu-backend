@@ -2,7 +2,6 @@ package com.moonkeyeu.etl.api.model.launch;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -14,7 +13,6 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "launch_status", schema = "moonkey_db")
-//@JsonPropertyOrder({"status_id", "name", "abbrev", "description"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LaunchStatusEntity implements CsvEntity<Object> {
     @Id

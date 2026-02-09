@@ -1,9 +1,7 @@
 package com.moonkeyeu.etl.api.service;
 
-import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.model.ImageEntity;
-
 public interface S3StorageService {
-    void saveMediaToS3(CsvEntity<?> item, String bucketName, boolean skipUpload);
-    void setImageUrl(ImageEntity entity, String bucketName, boolean skipUpload);
+    void save(byte[] resourceUrl, String s3Key, String bucketName);
+    boolean existsByKey(String s3Key, String bucketName);
+    void upload(String s3Key, String bucketName, byte[] data);
 }

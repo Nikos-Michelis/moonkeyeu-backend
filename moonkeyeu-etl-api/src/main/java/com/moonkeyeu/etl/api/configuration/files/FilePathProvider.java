@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.configuration.files;
 
-import com.moonkeyeu.etl.api.dto.EntityConfig;
+import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Paths;

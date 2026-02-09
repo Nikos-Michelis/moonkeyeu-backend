@@ -63,7 +63,7 @@ public class LaunchEntity implements CsvEntity<Object> {
     @Basic
     @Column(name = "status_id")
     private String status_id;
-    @Column(name = "net_precision_id", nullable = false)
+    @Column(name = "net_precision_id")
     private Long net_precision_id;
     @Override
     public Object getPrimaryKey() {

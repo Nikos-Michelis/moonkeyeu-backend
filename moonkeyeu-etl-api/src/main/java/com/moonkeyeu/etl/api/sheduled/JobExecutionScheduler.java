@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.service.sheduled;
+package com.moonkeyeu.etl.api.sheduled;
 
 import com.moonkeyeu.etl.api.service.impl.job.JobExecutionDecider;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,6 @@
 package com.moonkeyeu.etl.api.utils;
 
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -11,7 +12,7 @@ public class ClientUtils {
             throw new MalformedURLException("Image url should not be null or empty");
         }
 
-        URL url = new URL(imageUrl); // validates URL
+        URL url = new URL(imageUrl);
         String protocol = url.getProtocol();
 
         if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
@@ -20,4 +21,5 @@ public class ClientUtils {
 
         return Paths.get(url.getPath()).getFileName().toString();
     }
+
 }

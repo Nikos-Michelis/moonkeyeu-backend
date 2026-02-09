@@ -2,12 +2,16 @@ package com.moonkeyeu.etl.api.configuration.batch.processors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.configuration.files.CsvSource;
+import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
+import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.configuration.mappers.JsonObjectMapper;
 import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
-import com.moonkeyeu.etl.api.service.S3StorageService;
+import com.moonkeyeu.etl.api.service.LocalMediaService;
+import com.moonkeyeu.etl.api.service.S3MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +20,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class ProcessorsConfig {
-    private final S3StorageService s3StorageService;
+    private final S3MediaService s3MediaService;
+    private final LocalMediaService localMediaService;
     private final S3Buckets s3Buckets;
+    private final RootConfig rootConfig;
+    private final FilePathProvider filePathProvider;
 
     @Bean
+    @StepScope
     public ChunkProcessor chunkProcessor() {
-        return new ChunkProcessor(s3StorageService, s3Buckets);
+        return new ChunkProcessor(localMediaService, s3MediaService, rootConfig, filePathProvider, s3Buckets);
     }
 
     @Bean
