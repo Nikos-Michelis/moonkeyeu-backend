@@ -1,5 +1,6 @@
 package com.moonkeyeu.core.api.launch.model.launch;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.moonkeyeu.core.api.launch.model.Updates;
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
 import com.moonkeyeu.core.api.launch.model.info.InfoUrlEntity;
 import com.moonkeyeu.core.api.launch.model.info.VideoUrl;
@@ -9,7 +10,8 @@ import com.moonkeyeu.core.api.launch.model.astronaut.CrewMember;
 import com.moonkeyeu.core.api.launch.model.mission.Mission;
 import com.moonkeyeu.core.api.launch.model.mission.MissionPatches;
 import com.moonkeyeu.core.api.launch.model.program.Programs;
-import com.moonkeyeu.core.api.user.model.Bookmark;
+import com.moonkeyeu.core.api.ai.model.AiPrompt;
+import com.moonkeyeu.core.api.user.model.bookmark.Bookmark;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -165,6 +167,9 @@ public class Launch {
     private Set<VideoUrl> videoUrls;
     @OneToMany(mappedBy = "launch")
     @BatchSize(size = 20)
+    private Set<Updates> updates;
+    @OneToMany(mappedBy = "launch")
+    @BatchSize(size = 20)
     private Set<InfoUrlEntity> infoUrls;
     @OneToMany(mappedBy = "launch")
     @BatchSize(size = 20)
@@ -186,5 +191,9 @@ public class Launch {
     )
     @BatchSize(size = 20)
     private Set<Bookmark> bookmarks = new HashSet<>();
+
+    @ManyToMany(mappedBy = "launches")
+    @BatchSize(size = 20)
+    private Set<AiPrompt> aiPrompts;
 
 }

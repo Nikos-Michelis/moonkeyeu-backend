@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.user.reporitory;
 
-import com.moonkeyeu.core.api.user.model.BookmarkList;
+import com.moonkeyeu.core.api.user.model.bookmark.BookmarkList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,4 +1,4 @@
-package com.moonkeyeu.core.api.user.model;
+package com.moonkeyeu.core.api.user.model.bookmark;
 
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import jakarta.persistence.*;
@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.Instant;
 
 @Data
@@ -17,7 +16,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "bookmark_list")
 @EqualsAndHashCode(of = "bookmarkListId")
-public class BookmarkList {
+public class BookmarkLaunchRelation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookmark_list_id")

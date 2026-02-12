@@ -13,7 +13,7 @@ import com.moonkeyeu.core.api.user.dto.BookmarkDTO;
 import com.moonkeyeu.core.api.user.dto.request.RequestBookmark;
 import com.moonkeyeu.core.api.user.dto.request.RequestCreateBookmark;
 import com.moonkeyeu.core.api.user.dto.request.RequestEditBookmark;
-import com.moonkeyeu.core.api.user.model.Bookmark;
+import com.moonkeyeu.core.api.user.model.bookmark.Bookmark;
 import com.moonkeyeu.core.api.user.model.User;
 import com.moonkeyeu.core.api.user.reporitory.BookmarkListRepository;
 import com.moonkeyeu.core.api.user.reporitory.BookmarkRepository;

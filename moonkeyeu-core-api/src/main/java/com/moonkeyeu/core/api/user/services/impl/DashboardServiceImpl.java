@@ -7,6 +7,7 @@ import com.moonkeyeu.core.api.user.dto.BatchJobExecDTO;
 import com.moonkeyeu.core.api.user.dto.ContactDTO;
 import com.moonkeyeu.core.api.user.dto.UserDTO;
 import com.moonkeyeu.core.api.user.model.*;
+import com.moonkeyeu.core.api.user.model.batch.BatchJobExecution;
 import com.moonkeyeu.core.api.user.reporitory.BatchRepository;
 import com.moonkeyeu.core.api.user.reporitory.ContactRepository;
 import com.moonkeyeu.core.api.user.reporitory.UserRepository;
@@ -104,6 +105,7 @@ public class DashboardServiceImpl implements DashboardService, BatchService {
         return batchJobExecutions
                 .stream()
                 .map(batchJob -> dtoConverter.convertToDto(batchJob, BatchJobExecDTO.class))
+                .sorted((o2, o1)->o1.getCreateTime().compareTo(o2.getCreateTime()))
                 .collect(Collectors.toList());
     }
 }

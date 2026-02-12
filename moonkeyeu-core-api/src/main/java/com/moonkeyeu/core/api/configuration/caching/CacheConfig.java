@@ -54,7 +54,9 @@ public class CacheConfig {
                         CacheNames.BOOKMARKS_CACHE,
                         CacheNames.BOOKMARKED_ITEMS_CACHE,
                         CacheNames.CONTACT_MESSAGES_CACHE,
-                        CacheNames.MEMBERS_CACHE
+                        CacheNames.MEMBERS_CACHE,
+                        CacheNames.AI_CACHE,
+                        CacheNames.NASA_APOD_CACHE
                 )
         );
         return cacheManager;

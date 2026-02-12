@@ -34,17 +34,19 @@ public class SecurityConfig {
     private final CookieServiceProvider cookieServiceProvider;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http.csrf(csrf -> csrf
+       /* http.csrf(csrf -> csrf
                 .csrfTokenRepository(cookieServiceProvider.buildCsrfCookie())
                 .ignoringRequestMatchers(
-                        "/public/**", "/csrf/**", "/actuator/**", "/crawler/**"
+                        "/public/**", "/agent/**", "/csrf/**", "/actuator/**", "/crawler/**"
                 )
-        );
+        );*/
+        http.csrf().disable();
         http.cors(withDefaults())
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(
                                         "/csrf/token",
                                         "/public/**",
+                                        "/agent/**",
                                         "/auth/**",
                                         "/oauth2/**",
                                         "/images/**",

@@ -15,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "mission", schema = "moonkey_db")
 public class Mission {
     @Id
     @Column(name = "mission_id")

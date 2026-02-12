@@ -9,10 +9,7 @@ import com.moonkeyeu.core.api.launch.model.program.Programs;
 import com.moonkeyeu.core.api.launch.model.rocket.RocketConfiguration;
 import com.moonkeyeu.core.api.launch.model.spacecraft.SpacecraftConfiguration;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Set;

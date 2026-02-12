@@ -1,4 +1,4 @@
-package com.moonkeyeu.core.api.user.model;
+package com.moonkeyeu.core.api.user.model.batch;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

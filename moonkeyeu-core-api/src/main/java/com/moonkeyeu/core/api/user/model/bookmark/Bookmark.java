@@ -1,6 +1,7 @@
-package com.moonkeyeu.core.api.user.model;
+package com.moonkeyeu.core.api.user.model.bookmark;
 
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
+import com.moonkeyeu.core.api.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;

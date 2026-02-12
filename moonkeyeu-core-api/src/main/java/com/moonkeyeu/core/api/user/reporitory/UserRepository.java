@@ -1,5 +1,6 @@
 package com.moonkeyeu.core.api.user.reporitory;
 
+import com.moonkeyeu.core.api.subscription.model.Subscription;
 import com.moonkeyeu.core.api.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,6 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         INNER JOIN FETCH u.signUpMethods s
         INNER JOIN FETCH u.roles r
         LEFT JOIN FETCH r.permissions p
+        LEFT JOIN FETCH u.subscription
         WHERE u.email = :email
     """)
     Optional<User> findByEmail(@Param("email") String email);

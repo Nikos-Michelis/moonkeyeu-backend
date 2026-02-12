@@ -1,4 +1,4 @@
-package com.moonkeyeu.core.api.launch.services.impl.sheduled;
+package com.moonkeyeu.core.api.launch.sheduled;
 
 import com.moonkeyeu.core.api.launch.services.NasaApodService;
 import com.moonkeyeu.core.api.launch.services.ScheduledTasksService;
@@ -15,7 +15,7 @@ public class ScheduledTasksServiceImpl implements ScheduledTasksService {
 
     @PostConstruct
     public void initNasaApodCache() {
-       // refreshNasaApodCache();
+        nasaApodService.refreshNasaApod();
     }
 
     @Override

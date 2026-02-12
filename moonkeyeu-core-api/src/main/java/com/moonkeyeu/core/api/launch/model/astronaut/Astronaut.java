@@ -1,6 +1,7 @@
 package com.moonkeyeu.core.api.launch.model.astronaut;
 
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
+import com.moonkeyeu.core.api.ai.model.AiPrompt;
 import com.moonkeyeu.core.api.launch.model.country.Country;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +9,6 @@ import org.hibernate.annotations.BatchSize;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
@@ -137,6 +137,11 @@ public class Astronaut {
     @ManyToOne
     @JoinColumn(name = "agency_id")
     private Agencies agency;
+
+    @ManyToMany(mappedBy = "astronauts")
+    @BatchSize(size = 20)
+    private Set<AiPrompt> aiPrompts;
+
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;

@@ -7,7 +7,7 @@ import com.moonkeyeu.core.api.launch.model.rocket.RocketConfiguration;
 import com.moonkeyeu.core.api.launch.model.spacecraft.Spacecraft;
 import com.moonkeyeu.core.api.launch.model.spacecraft.SpacecraftConfiguration;
 import com.moonkeyeu.core.api.launch.model.spacecraft.SpacecraftStage;
-import com.moonkeyeu.core.api.user.model.Bookmark;
+import com.moonkeyeu.core.api.user.model.bookmark.Bookmark;
 import com.moonkeyeu.core.api.user.model.User;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;

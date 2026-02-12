@@ -49,6 +49,7 @@ import java.util.Set;
         }
 )
 @Entity
+@Table(name = "spacecraft", schema = "moonkey_db")
 public class Spacecraft {
     @Id
     @Column(name = "spacecraft_id")

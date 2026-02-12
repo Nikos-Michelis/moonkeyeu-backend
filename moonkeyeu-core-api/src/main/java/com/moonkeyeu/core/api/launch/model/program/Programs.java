@@ -79,10 +79,10 @@ public class Programs {
     )
     @BatchSize(size = 20)
     private Set<Agencies> agencies;
+
     @ManyToMany(mappedBy = "programs")
     @BatchSize(size = 20)
     private Set<Launch> launches;
-
 
     @Override
     public boolean equals(Object object) {

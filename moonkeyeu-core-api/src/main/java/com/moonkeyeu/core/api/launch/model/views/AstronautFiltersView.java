@@ -5,5 +5,4 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "astronauts_filters_view", schema = "moonkey_db")
-public class AstronautFiltersView extends BaseFilter{
-}
+public class AstronautFiltersView extends BaseFilter {}

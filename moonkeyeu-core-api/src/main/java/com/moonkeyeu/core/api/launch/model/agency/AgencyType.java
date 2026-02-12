@@ -1,9 +1,8 @@
 package com.moonkeyeu.core.api.launch.model.agency;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Objects;
@@ -23,6 +22,7 @@ public class AgencyType {
     private String typeName;
     @OneToMany(mappedBy = "agencyType")
     @BatchSize(size = 20)
+    @JsonIgnore
     private Set<Agencies> agencies;
 
     @Override

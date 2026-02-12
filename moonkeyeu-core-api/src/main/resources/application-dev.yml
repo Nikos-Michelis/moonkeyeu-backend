@@ -17,14 +17,23 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     encoding: UTF-8
+
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:${LOCAL_MYSQL_PORT}}/${MYSQL_DATABASE:${LOCAL_MYSQL_DATABASE}}
     username: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
     password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  batch:
+    jdbc:
+      table-prefix: BATCH_
+      initialize-schema: always
+
   jpa:
     hibernate:
       ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
     properties:
       hibernate:
@@ -35,6 +44,7 @@ spring:
         time_zone: UTC
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
   security:
     oauth2:
       client:
@@ -43,6 +53,14 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             client-name: Google
+
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: ${GEMINI_API_MODEL}
 
   mail:
     sender: ${MAIL_SENDER}
@@ -77,6 +95,11 @@ application:
       key: ${NASA_APOD_KEY}
       media:
         type: 'image'
+
+    news:
+      url: https://api.spaceflightnewsapi.net/
+      version: v4
+
 management:
   endpoints:
     web:
@@ -105,7 +128,7 @@ server:
   servlet:
     context-path: /api/v1/
   cors:
-    origins: http://localhost:3001
+    origins: http://localhost:3002
 
 logging:
   level:

@@ -1,10 +1,13 @@
 package com.moonkeyeu.core.api.user.model;
 
+import com.moonkeyeu.core.api.ai.model.AiUsage;
 import com.moonkeyeu.core.api.security.model.SignUpMethods;
 import com.moonkeyeu.core.api.security.model.otp.OtpResend;
 import com.moonkeyeu.core.api.security.model.otp.OtpToken;
 import com.moonkeyeu.core.api.security.model.token.jwt.Token;
 import com.moonkeyeu.core.api.security.model.token.reset.ResetToken;
+import com.moonkeyeu.core.api.subscription.model.Subscription;
+import com.moonkeyeu.core.api.user.model.bookmark.Bookmark;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -94,6 +97,13 @@ public class User implements UserDetails, Principal {
     @OneToMany(orphanRemoval = true, mappedBy = "user")
     @BatchSize(size = 20)
     private List<Bookmark> bookmarks;
+
+    @OneToMany(orphanRemoval = true, mappedBy = "user")
+    @BatchSize(size = 20)
+    private List<AiUsage> aiUsages;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Subscription subscription;
 
     public void addSignUpProvider(SignUpMethods signUpMethod) {
         this.signUpMethods.add(signUpMethod);
