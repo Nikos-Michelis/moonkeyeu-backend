@@ -100,6 +100,9 @@ application:
       url: https://api.spaceflightnewsapi.net/
       version: v4
 
+    stripe:
+      key: ${STRIPE_API_KEY}
+
 management:
   endpoints:
     web:
