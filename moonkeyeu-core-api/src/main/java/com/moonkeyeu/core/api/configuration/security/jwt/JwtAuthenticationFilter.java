@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        if (request.getRequestURI().matches("^/api/v1/(auth|oauth2|public|images|csrf|community)/.*")) {
+        if (request.getRequestURI().matches("^/api/v1/(auth|oauth2|public|images|csrf|community|payment)/.*")) {
             filterChain.doFilter(request, response);
             return;
         }

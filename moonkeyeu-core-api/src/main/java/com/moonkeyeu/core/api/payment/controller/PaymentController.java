@@ -3,6 +3,7 @@ package com.moonkeyeu.core.api.payment.controller;
 import com.moonkeyeu.core.api.payment.dto.PaymentRequestDTO;
 import com.moonkeyeu.core.api.payment.dto.PaymentResponseDTO;
 import com.moonkeyeu.core.api.payment.service.PaymentService;
+import com.stripe.exception.StripeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("/create-intent")
-    public ResponseEntity<PaymentResponseDTO> createPayment(@RequestBody PaymentRequestDTO paymentRequest) {
-        PaymentResponseDTO response = paymentService.createPayment(paymentRequest);
+    @PostMapping("/subscription/new")
+    public ResponseEntity<?> createPayment(@RequestBody PaymentRequestDTO paymentRequest) throws StripeException {
+        String response = paymentService.createSubscription(paymentRequest);
         return ResponseEntity.ok(response);
     }
 }

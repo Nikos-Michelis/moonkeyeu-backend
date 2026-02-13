@@ -48,6 +48,7 @@ public class SecurityConfig {
                                         "/public/**",
                                         "/agent/**",
                                         "/auth/**",
+                                        "/payment/**",
                                         "/oauth2/**",
                                         "/images/**",
                                         "/community/**",
