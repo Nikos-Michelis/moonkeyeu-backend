@@ -1,19 +1,13 @@
 package com.moonkeyeu.core.api.launch.model.launcher;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Set;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
 @NamedEntityGraph(
         name = "launcher-launcherStage-status-images",
         attributeNodes = {
@@ -54,10 +48,17 @@ import java.util.Set;
 
         }
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "launcher", schema = "moonkey_db")
 public class Launcher {
     @Id
     @Column(name = "launcher_id")
+    @EqualsAndHashCode.Include
     private Long launcherId;
     @Basic
     @Column(name = "details")
@@ -92,17 +93,4 @@ public class Launcher {
     @OneToMany(mappedBy = "launcher", fetch = FetchType.LAZY)
     @BatchSize(size = 20)
     private Set<LauncherImages> launcherImages;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Launcher launcher = (Launcher) object;
-        return Objects.equals(launcherId, launcher.launcherId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(launcherId);
-    }
 }

@@ -17,17 +17,12 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Entity
+
 @NamedEntityGraph(
-        name = "launch-with-status-agency-images",
+        name = "launch-all-joins",
         attributeNodes = {
-                @NamedAttributeNode(value = "netPrecision", subgraph = "netPrecision"),
-                @NamedAttributeNode(value = "launchStatus", subgraph = "launchStatus"),
+                @NamedAttributeNode(value = "netPrecision"),
+                @NamedAttributeNode(value = "launchStatus"),
                 @NamedAttributeNode(value = "agencies", subgraph = "agencies"),
                 @NamedAttributeNode(value = "rocket", subgraph = "rocket"),
                 @NamedAttributeNode(value = "launchPad", subgraph = "launchPad"),
@@ -35,24 +30,9 @@ import java.util.Set;
                 @NamedAttributeNode(value = "programs"),
                 @NamedAttributeNode(value = "videoUrls"),
                 @NamedAttributeNode(value = "infoUrls"),
-                @NamedAttributeNode(value = "bookmarks", subgraph = "bookmarks")
+                @NamedAttributeNode(value = "bookmarks")
         },
         subgraphs = {
-                @NamedSubgraph(
-                        name = "netPrecision",
-                        attributeNodes = {
-                                @NamedAttributeNode("netName"),
-                                @NamedAttributeNode("netAbbrev"),
-                                @NamedAttributeNode("netDescription")
-                        }
-                ),
-                @NamedSubgraph(
-                        name = "launchStatus",
-                        attributeNodes = {
-                                @NamedAttributeNode("statusName"),
-                                @NamedAttributeNode("abbrev")
-                        }
-                ),
                 @NamedSubgraph(
                         name = "agencies",
                         attributeNodes = {
@@ -69,44 +49,35 @@ import java.util.Set;
                         name = "rocketConfiguration",
                         attributeNodes = {
                                 @NamedAttributeNode(value = "rocketConfImages", subgraph = "rocketConfImages"),
-                                //@NamedAttributeNode(value = "agencies", subgraph = "agencies")
                         }
                 ),
                 @NamedSubgraph(
                         name = "rocketConfImages",
                         attributeNodes = {
-
+                                @NamedAttributeNode(value = "rocketConfigurations")
                         }
                 ),
                 @NamedSubgraph(
                         name = "launchPad",
                         attributeNodes = {
-                                @NamedAttributeNode(value = "location", subgraph = "location"),
-                               // @NamedAttributeNode(value = "agencies", subgraph = "agencies")
+                                @NamedAttributeNode(value = "location"),
                         }
                 ),
-                @NamedSubgraph(
-                        name = "location",
-                        attributeNodes = {
-                                @NamedAttributeNode("locationName")
-                        }
-                ),
-                @NamedSubgraph(
-                        name = "programs",
-                        attributeNodes = {}
-                ),
-                @NamedSubgraph(
-                        name = "bookmarks",
-                        attributeNodes = {}
-                )
 
         }
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder
+@Entity
 @Table(name = "launch", schema = "moonkey_db")
-@EqualsAndHashCode(of = "launchId")
 public class Launch {
     @Id
     @Column(name = "launch_id")
+    @EqualsAndHashCode.Include
     private String launchId;
     @Basic
     @Column(name = "slug")
@@ -125,7 +96,7 @@ public class Launch {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssX", timezone = "UTC")
     @Column(name = "net")
     private Instant net;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "net_precision_id")
     private NetPrecision netPrecision;
     @Basic

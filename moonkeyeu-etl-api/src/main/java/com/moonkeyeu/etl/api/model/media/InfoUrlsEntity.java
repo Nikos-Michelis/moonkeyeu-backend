@@ -3,18 +3,19 @@ package com.moonkeyeu.etl.api.model.media;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.PkBuilder;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "info_urls", schema = "moonkey_db")
 public class InfoUrlsEntity implements CsvEntity<Object>, PkBuilder {
     @Id
     @Column(name = "info_id")
+    @EqualsAndHashCode.Include
     private String info_id;
     @Basic
     @Column(name = "priority")

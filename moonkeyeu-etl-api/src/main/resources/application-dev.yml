@@ -4,10 +4,12 @@ spring:
     username: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
     password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  batch:
-    jdbc:
-      initialize-schema: ALWAYS
+
   jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: false
     properties:
       hibernate:
@@ -19,6 +21,14 @@ spring:
       order_updates: true
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  batch:
+    jdbc:
+      table-prefix: BATCH_
+      initialize-schema: always
+      platform: mysql
+    job:
+      enabled: false
 
   main:
     allow-bean-definition-overriding: true
@@ -33,11 +43,11 @@ aws:
       db-images: ${S3_BUCKET}
       root: ${S3_BUCKET_ROOT}
   cloudfront:
-    url: https://cdn.moonkeyeu.com/
+    url: ${CLOUDFRONT_URL}
 
 application:
   backend:
-    url: http://localhost:8080/api/v1/
+    url: ${CORE_API_URL}
   path:
     root:
       data:
@@ -47,14 +57,15 @@ application:
           images: ${user.home}/${LOCAL_PROJECT_PATH}/backend/data/images
   api:
     the-space-devs:
-      url: https://ll.thespacedevs.com
-      version: 2.3.0
+      url: ${THE_SPACE_DEVS_URL}
+      version: ${THE_SPACE_DEVS_VERSION}
 
 management:
   endpoints:
     web:
       exposure:
         include: [ "health", "prometheus", "metrics" ]
+
   endpoint:
     health:
       show-details: always
@@ -70,9 +81,9 @@ management:
         enabled: true
 
 server:
-  port: 8081
+  port: ${ETL_API_PORT}
   servlet:
-    context-path: /api/v1/
+    context-path: ${API_CONTEXT_PATH}
 
 logging:
   level:

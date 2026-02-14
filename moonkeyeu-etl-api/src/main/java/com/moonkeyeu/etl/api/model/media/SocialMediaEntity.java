@@ -3,18 +3,19 @@ package com.moonkeyeu.etl.api.model.media;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "social_media", schema = "moonkey_db")
 public class SocialMediaEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "social_id")
+    @EqualsAndHashCode.Include
     private Long social_id;
     @Basic
     @Column(name = "name")

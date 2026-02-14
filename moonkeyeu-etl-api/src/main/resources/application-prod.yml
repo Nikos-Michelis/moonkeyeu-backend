@@ -4,21 +4,30 @@ spring:
     username: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
     password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  batch:
-    jdbc:
-      initialize-schema: always
+
   jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: false
     properties:
       hibernate:
-        format_sql: false
-        generate_statistics: false
-        jdbc:
-          batch_size: 500
-      order_inserts: true
-      order_updates: true
+        format_sql: true
+        default_batch_fetch_size: 50
+      jdbc:
+        batch_size: 50
+        time_zone: UTC
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  batch:
+    jdbc:
+      table-prefix: BATCH_
+      initialize-schema: always
+      platform: mysql
+    job:
+      enabled: false
 
   main:
     allow-bean-definition-overriding: true
@@ -33,11 +42,11 @@ aws:
       db-images: ${S3_BUCKET}
       root: ${S3_BUCKET_ROOT}
   cloudfront:
-    url: https://cdn.moonkeyeu.com
+    url: ${CLOUDFRONT_URL}
 
 application:
   backend:
-    url: http://localhost:8080/api/v1/
+    url: ${CORE_API_URL}
   path:
     root:
       data:
@@ -51,8 +60,8 @@ application:
         folder: ${INPUT_RAW_DIR}
   api:
     the-space-devs:
-      url: https://ll.thespacedevs.com
-      version: 2.3.0
+      url: ${THE_SPACE_DEVS_URL}
+      version: ${THE_SPACE_DEVS_VERSION}
 
 management:
   endpoints:
@@ -74,9 +83,9 @@ management:
         enabled: true
 
 server:
-  port: 8081
+  port: ${ETL_API_PORT}
   servlet:
-    context-path: /api/v1/
+    context-path: ${API_CONTEXT_PATH}
 
 logging:
   level:

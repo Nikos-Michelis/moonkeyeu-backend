@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "mission_patches", schema = "moonkey_db")
 @JsonPropertyOrder({"launch_id", "patch_id", "priority", "name", "image_url"})
@@ -19,6 +19,7 @@ import lombok.Setter;
 public class MissionPatchesEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "patch_id")
+    @EqualsAndHashCode.Include
     private Long patch_id;
     @Column(name = "priority")
     private String priority;

@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-@EnableBatchProcessing
 public class JobConfig {
     private final JobRepository jobRepository;
     private final Flow agenciesFlow;

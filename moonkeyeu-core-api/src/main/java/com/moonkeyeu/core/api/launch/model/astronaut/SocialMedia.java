@@ -2,20 +2,21 @@ package com.moonkeyeu.core.api.launch.model.astronaut;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "social_media", schema = "moonkey_db")
 public class SocialMedia {
     @Id
     @Column(name = "social_id")
+    @EqualsAndHashCode.Include
     private Long socialId;
     @Basic
     @Column(name = "name")
@@ -27,17 +28,4 @@ public class SocialMedia {
     @JoinColumn(name = "astronaut_id")
     @JsonBackReference
     private Astronaut astronaut;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        SocialMedia that = (SocialMedia) object;
-        return Objects.equals(socialId, that.socialId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(socialId);
-    }
 }

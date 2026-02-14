@@ -4,22 +4,23 @@ import com.moonkeyeu.core.api.launch.model.astronaut.CrewMember;
 import com.moonkeyeu.core.api.launch.model.landing.Landing;
 import com.moonkeyeu.core.api.launch.model.rocket.Rocket;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Objects;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "spacecraft_stage", schema = "moonkey_db")
 public class SpacecraftStage {
     @Id
     @Column(name = "spacecraft_stage_id")
+    @EqualsAndHashCode.Include
     private Long spacecraftStageId;
     @Basic
     @Column(name = "mission_end")
@@ -39,17 +40,4 @@ public class SpacecraftStage {
     @OneToMany(mappedBy = "spacecraftStage")
     @BatchSize(size = 10)
     private Set<CrewMember> crewMembers;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        SpacecraftStage that = (SpacecraftStage) object;
-        return Objects.equals(spacecraftStageId, that.spacecraftStageId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(spacecraftStageId);
-    }
 }

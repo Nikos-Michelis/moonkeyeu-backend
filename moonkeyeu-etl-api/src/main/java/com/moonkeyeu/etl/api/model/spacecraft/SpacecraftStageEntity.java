@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "spacecraft_stage", schema = "moonkey_db")
 @JsonPropertyOrder({"spacecraft_stage_id", "mission_end", "destination", "rocket_id", "spacecraft_id", "landing_id"})
@@ -18,6 +18,7 @@ import lombok.Setter;
 public class SpacecraftStageEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "spacecraft_stage_id")
+    @EqualsAndHashCode.Include
     private Long spacecraft_stage_id;
     @Basic
     @Column(name = "mission_end")
