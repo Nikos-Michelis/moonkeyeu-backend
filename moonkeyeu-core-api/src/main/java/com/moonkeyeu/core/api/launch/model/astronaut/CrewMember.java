@@ -4,20 +4,19 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import com.moonkeyeu.core.api.launch.model.spacecraft.SpacecraftStage;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.Objects;
-
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "crew_member", schema = "moonkey_db")
 public class CrewMember {
     @Id
     @Column(name = "crew_member_id")
+    @EqualsAndHashCode.Include
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "astronaut_id")
@@ -32,17 +31,4 @@ public class CrewMember {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "launch_id")
     private Launch launch;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        CrewMember that = (CrewMember) object;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

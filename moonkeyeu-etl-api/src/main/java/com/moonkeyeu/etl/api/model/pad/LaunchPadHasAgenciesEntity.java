@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.PkBuilder;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "pad_has_agencies", schema = "moonkey_db", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"launch_pad_id", "agency_id"})
@@ -19,6 +19,7 @@ import lombok.Setter;
 public class LaunchPadHasAgenciesEntity implements CsvEntity<Object>, PkBuilder {
     @Id
     @Column(name = "pad_agency_id")
+    @EqualsAndHashCode.Include
     private Long id;
     @Basic
     @Column(name = "launch_pad_id")

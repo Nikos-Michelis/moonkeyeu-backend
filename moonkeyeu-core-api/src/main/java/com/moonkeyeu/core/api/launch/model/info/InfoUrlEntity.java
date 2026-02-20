@@ -1,16 +1,19 @@
 package com.moonkeyeu.core.api.launch.model.info;
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "info_urls", schema = "moonkey_db")
 public class InfoUrlEntity {
     @Id
     @Column(name = "info_id")
+    @EqualsAndHashCode.Include
     private String infoId;
     @Basic
     @Column(name = "priority")

@@ -6,17 +6,15 @@ import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
-import java.util.Objects;
 import java.util.Set;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @NamedEntityGraph(
         name = "rocket-images-agency",
         attributeNodes = {
                 @NamedAttributeNode(value = "rocketConfiguration", subgraph = "rocketConfiguration"),
+                @NamedAttributeNode(value = "spacecraftStages"),
+                @NamedAttributeNode(value = "launcherStages"),
+                @NamedAttributeNode(value = "launches"),
         },
         subgraphs = {
                 @NamedSubgraph(
@@ -29,19 +27,21 @@ import java.util.Set;
                 @NamedSubgraph(
                         name = "rocketConfiguration",
                         attributeNodes = {
-                                @NamedAttributeNode(value = "rocketConfId"),
-                                @NamedAttributeNode(value = "rocketName"),
-                                @NamedAttributeNode(value = "fullname"),
-                                @NamedAttributeNode(value = "maidenFlight"),
-
+                                @NamedAttributeNode(value = "rocketConfImages"),
                         }
                 ),
         }
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class Rocket {
     @Id
     @Column(name = "rocket_id")
+    @EqualsAndHashCode.Include
     private Long rocketId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rocket_conf_id")
@@ -55,17 +55,4 @@ public class Rocket {
     @OneToMany(mappedBy = "rocket", fetch = FetchType.LAZY)
     @BatchSize(size = 20)
     private Set<Launch> launches;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Rocket rocket = (Rocket) object;
-        return Objects.equals(rocketId, rocket.rocketId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(rocketId);
-    }
 }

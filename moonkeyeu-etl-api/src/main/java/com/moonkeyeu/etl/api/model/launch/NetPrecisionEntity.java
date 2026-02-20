@@ -7,15 +7,20 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "net_precision")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NetPrecisionEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "net_precision_id", nullable = false)
+    @EqualsAndHashCode.Include
     private Long net_precision_id;
 
     @Column(name = "name", length = 45)

@@ -5,20 +5,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.ImageEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "launch_pad", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LaunchPadEntity implements CsvEntity<Object>, ImageEntity {
     @Id
     @Column(name = "launch_pad_id")
+    @EqualsAndHashCode.Include
     private Long launch_pad_id;
     @Basic
     @Column(name = "active", columnDefinition = "TINYINT(1)")

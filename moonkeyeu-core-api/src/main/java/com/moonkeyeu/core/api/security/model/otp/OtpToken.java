@@ -11,9 +11,9 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "otp", schema = "moonkey_db")

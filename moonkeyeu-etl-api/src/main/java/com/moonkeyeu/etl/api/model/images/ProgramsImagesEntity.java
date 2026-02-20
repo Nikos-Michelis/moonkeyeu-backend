@@ -4,19 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.ImageEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "programs_images", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProgramsImagesEntity implements CsvEntity<Object>, ImageEntity {
     @Id
     @Column(name = "image_id")
+    @EqualsAndHashCode.Include
     private Long image_id;
     @Basic
     @Column(name = "image_name")

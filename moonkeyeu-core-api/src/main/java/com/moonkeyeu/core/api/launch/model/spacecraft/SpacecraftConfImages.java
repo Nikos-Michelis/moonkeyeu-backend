@@ -1,22 +1,21 @@
 package com.moonkeyeu.core.api.launch.model.spacecraft;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
 @Getter
-@Data
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "spacecraft_conf_images", schema = "moonkey_db")
 public class SpacecraftConfImages {
     @Id
     @Column(name = "image_id")
+    @EqualsAndHashCode.Include
     private Long imageId;
     @Basic
     @Column(name = "image_name")
@@ -33,17 +32,4 @@ public class SpacecraftConfImages {
     @ManyToOne
     @JoinColumn(name = "spacecraft_conf_id")
     private SpacecraftConfiguration spacecraftConfiguration;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        SpacecraftConfImages that = (SpacecraftConfImages) object;
-        return Objects.equals(imageId, that.imageId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(imageId);
-    }
 }

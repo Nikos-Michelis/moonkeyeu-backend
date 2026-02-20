@@ -1,20 +1,21 @@
 package com.moonkeyeu.core.api.launch.model.launcher;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "launcher_images", schema = "moonkey_db")
 public class LauncherImages {
     @Id
     @Column(name = "image_id")
+    @EqualsAndHashCode.Include
     private Long imageId;
     @Basic
     @Column(name = "image_name")
@@ -31,17 +32,4 @@ public class LauncherImages {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "launcher_id")
     private Launcher launcher;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        LauncherImages that = (LauncherImages) object;
-        return Objects.equals(imageId, that.imageId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(imageId);
-    }
 }

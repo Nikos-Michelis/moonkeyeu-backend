@@ -3,21 +3,22 @@ package com.moonkeyeu.core.api.launch.model.mission;
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Objects;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class Mission {
     @Id
     @Column(name = "mission_id")
+    @EqualsAndHashCode.Include
     private Long missionId;
     @Basic
     @Column(name = "name")
@@ -41,16 +42,4 @@ public class Mission {
             inverseJoinColumns = @JoinColumn(name = "agency_id")
     )
     private Set<Agencies> agencies;
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Mission mission = (Mission) object;
-        return Objects.equals(missionId, mission.missionId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(missionId);
-    }
 }

@@ -2,20 +2,21 @@ package com.moonkeyeu.core.api.launch.model.launch;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "net_precision")
-@EqualsAndHashCode(of = "netPrecisionId")
 public class NetPrecision {
     @Id
     @Column(name = "net_precision_id", nullable = false)
+    @EqualsAndHashCode.Include
     private Integer netPrecisionId;
     @Size(max = 45)
     @Column(name = "name", length = 45)

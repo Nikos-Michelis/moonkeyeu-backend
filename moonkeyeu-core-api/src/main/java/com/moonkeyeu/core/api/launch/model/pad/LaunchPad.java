@@ -3,19 +3,13 @@ package com.moonkeyeu.core.api.launch.model.pad;
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
 @NamedEntityGraph(
         name = "launch-pad-with-agencies-location-launches-images",
         attributeNodes = {
@@ -43,6 +37,12 @@ import java.util.Set;
                 ),
         }
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "launch_pad", schema = "moonkey_db")
 public class LaunchPad {
     @Id
@@ -98,16 +98,4 @@ public class LaunchPad {
     )
     @BatchSize(size = 20)
     private Set<Agencies> agencies;
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        LaunchPad launchPad = (LaunchPad) object;
-        return Objects.equals(launchPadId, launchPad.launchPadId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(launchPadId);
-    }
 }

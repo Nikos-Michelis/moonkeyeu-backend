@@ -2,18 +2,19 @@ package com.moonkeyeu.core.api.launch.model.info;
 
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "video_url", schema = "moonkey_db")
 public class VideoUrl {
     @Id
     @Column(name = "video_id")
+    @EqualsAndHashCode.Include
     private String videoId;
     @Basic
     @Column(name = "priority")
@@ -36,7 +37,7 @@ public class VideoUrl {
     @Basic
     @Column(name = "video_url")
     private String videoUrl;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "launch_id")
     private Launch launch;
 }

@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "location", schema = "moonkey_db")
 @JsonPropertyOrder({"location_id", "name", "country_code", "description", "map_image", "location_timezone", "total_launch_count", "total_landing_count"})
@@ -18,6 +18,7 @@ import lombok.Setter;
 public class LocationEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "location_id")
+    @EqualsAndHashCode.Include
     private Long location_id;
     @Basic
     @Column(name = "name")

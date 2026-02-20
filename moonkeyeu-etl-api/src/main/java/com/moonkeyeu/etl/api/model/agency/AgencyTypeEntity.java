@@ -8,13 +8,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
-@Data
+import lombok.*;
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "agency_type", schema = "moonkey_db")
 @JsonPropertyOrder({"agency_type_id", "agency_type"})
@@ -23,6 +22,7 @@ public class AgencyTypeEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "type_id", nullable = false)
     @JsonProperty("agency_type_id")
+    @EqualsAndHashCode.Include
     private Long type_id;
 
     @Column(name = "name", nullable = false, length = 45)

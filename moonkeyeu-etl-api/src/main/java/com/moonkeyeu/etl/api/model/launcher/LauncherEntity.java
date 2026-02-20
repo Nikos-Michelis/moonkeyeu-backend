@@ -4,21 +4,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "launcher", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LauncherEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "launcher_id")
+    @EqualsAndHashCode.Include
     private Long launcher_id;
     @Basic
     @Column(name = "details")

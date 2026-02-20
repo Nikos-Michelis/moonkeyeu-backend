@@ -3,19 +3,13 @@ package com.moonkeyeu.core.api.launch.model.program;
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
 @NamedEntityGraph(
         name = "programs-agencies-launches",
         attributeNodes = {
@@ -44,11 +38,17 @@ import java.util.Set;
 
         }
 )
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "programs", schema = "moonkey_db")
 public class Programs {
     @Id
     @Column(name = "program_id")
+    @EqualsAndHashCode.Include
     private Long programId;
     @Basic
     @Column(name = "name")
@@ -82,18 +82,4 @@ public class Programs {
     @ManyToMany(mappedBy = "programs")
     @BatchSize(size = 20)
     private Set<Launch> launches;
-
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Programs that = (Programs) object;
-        return Objects.equals(programId, that.programId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(programId);
-    }
 }

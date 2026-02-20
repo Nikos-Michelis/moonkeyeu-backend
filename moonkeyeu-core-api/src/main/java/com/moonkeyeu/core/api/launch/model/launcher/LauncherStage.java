@@ -5,14 +5,17 @@ import com.moonkeyeu.core.api.launch.model.rocket.Rocket;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "launcher_stage", schema = "moonkey_db")
 public class LauncherStage {
     @Id
     @Column(name = "launcher_stage_id")
+    @EqualsAndHashCode.Include
     private Long launcherStageId;
     @Basic
     @Column(name = "type")
@@ -32,5 +35,4 @@ public class LauncherStage {
     @ManyToOne
     @JoinColumn(name = "landing_id")
     private Landing landing;
-
 }

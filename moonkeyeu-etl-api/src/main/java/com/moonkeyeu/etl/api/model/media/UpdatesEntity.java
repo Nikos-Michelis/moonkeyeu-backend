@@ -5,21 +5,22 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.utils.TimestampDeserializer;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 
-@Data
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "updates", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdatesEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "update_id")
+    @EqualsAndHashCode.Include
     private Long update_id;
     @Basic
     @Column(name = "profile_image")

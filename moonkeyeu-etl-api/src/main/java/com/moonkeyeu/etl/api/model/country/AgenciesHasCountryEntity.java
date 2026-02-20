@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.PkBuilder;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "agencies_has_country", schema = "moonkey_db", uniqueConstraints = {
         @UniqueConstraint(name = "UniqueNumberAndStatus", columnNames = {"agency_id", "country_id"})
@@ -19,6 +19,7 @@ import lombok.Setter;
 public class AgenciesHasCountryEntity implements CsvEntity<Object>, PkBuilder {
     @Id
     @Column(name = "agencies_country_id")
+    @EqualsAndHashCode.Include
     private Long id;
     @Basic
     @Column(name = "agency_id")

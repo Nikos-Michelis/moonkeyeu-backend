@@ -4,19 +4,12 @@ package com.moonkeyeu.core.api.launch.model.rocket;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Set;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
 @NamedEntityGraph(
         name = "rocket-configuration-images-agency",
         attributeNodes = {
@@ -41,10 +34,17 @@ import java.util.Set;
                 )
         }
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "rocket_configuration", schema = "moonkey_db")
 public class RocketConfiguration {
     @Id
     @Column(name = "rocket_conf_id")
+    @EqualsAndHashCode.Include
     private Long rocketConfId;
     @Basic
     @Column(name = "name")
@@ -140,27 +140,13 @@ public class RocketConfiguration {
     @Basic
     @Column(name = "consecutive_successful_landings")
     private Integer consecutiveSuccessfulLandings;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agency_id")
     private Agencies agencies;
-
     @OneToMany(mappedBy = "rocketConfiguration")
     @BatchSize(size = 20)
     private Set<Rocket> rockets;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id")
     private RocketConfImages rocketConfImages;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        RocketConfiguration that = (RocketConfiguration) object;
-        return Objects.equals(rocketConfId, that.rocketConfId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(rocketConfId);
-    }
 }
