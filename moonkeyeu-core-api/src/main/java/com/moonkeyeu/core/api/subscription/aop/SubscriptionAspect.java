@@ -26,7 +26,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -86,14 +85,14 @@ public class SubscriptionAspect {
         System.out.println(Arrays.asList(annotation.products()));
         return Optional.ofNullable(user.getSubscription())
                 .filter(sub -> sub.getStatus() != SubscriptionStatus.CANCELED)
-                .filter(sub -> Arrays.asList(annotation.products()).contains(sub.getProduct()))
-                .filter(sub -> sub.getExpirationAt().isAfter(LocalDateTime.now()))
+                .filter(sub -> Arrays.asList(annotation.products()).contains(sub.getSubscriptionPlan().getProductType()))
+                .filter(sub -> sub.getExpirationAt().isAfter(Instant.now()))
                 .orElseThrow(SubscriptionRequiredException::new);
     }
 
     private void checkIntervalTokenLimit(Subscription subscription, long tokenUsage) {
         long usage = subscriptionUsageService.getUsageByInterval(subscription, Instant.now());
-        if ((usage + tokenUsage) > subscription.getTokenLimit()) {
+        if ((usage + tokenUsage) > subscription.getSubscriptionPlan().getTokenLimit()) {
             throw new SubscriptionTokenLimitReachedException();
         }
     }

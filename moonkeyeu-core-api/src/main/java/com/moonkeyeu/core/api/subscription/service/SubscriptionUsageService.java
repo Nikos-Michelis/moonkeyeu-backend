@@ -29,7 +29,7 @@ public class SubscriptionUsageService {
     }
 
     public long getUsageByInterval(Subscription subscription, Instant now) {
-        Instant startDate = now.atZone(UTC).minusHours(subscription.getTokenResetMinutesInterval()).toInstant();
+        Instant startDate = now.atZone(UTC).minusHours(subscription.getSubscriptionPlan().getTkResetHoursInterval()).toInstant();
         Long usage = subscriptionUsageRepository.sumUsageBySubscriptionAndDateRange(subscription, startDate, now);
         return (usage == null) ? 0 : usage;
     }

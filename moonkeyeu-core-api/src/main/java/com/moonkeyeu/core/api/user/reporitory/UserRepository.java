@@ -24,6 +24,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     """)
     Optional<User> findByEmail(@Param("email") String email);
     @Query("""
+        SELECT u
+        FROM User u
+        INNER JOIN FETCH u.signUpMethods s
+        INNER JOIN FETCH u.roles r
+        LEFT JOIN FETCH r.permissions p
+        LEFT JOIN FETCH u.subscription
+        WHERE u.customerId = :customerId
+    """)
+    Optional<User> findByCustomerId(@Param("customerId") String customerId);
+    @Query("""
         SELECT COUNT(u) > 0
         FROM User u
         WHERE u.email = :email

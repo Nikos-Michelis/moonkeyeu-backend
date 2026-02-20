@@ -1,9 +1,9 @@
 package com.moonkeyeu.core.api.subscription.service;
 
+import com.moonkeyeu.core.api.subscription.dto.SubscriptionRequestDTO;
 import com.moonkeyeu.core.api.subscription.model.Subscription;
 import com.moonkeyeu.core.api.subscription.repository.SubscriptionRepository;
 import com.moonkeyeu.core.api.user.model.User;
-import com.moonkeyeu.core.api.user.services.UserService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,18 +20,18 @@ public class SubscriptionService {
     }
     
 
-    /*@Transactional
-    public Subscription createOrUpdate(String userId, SubscriptionRequest request) {
-        User user = (User) userDetailsService.loadUserByUsername(userId);
+    @Transactional
+    public Subscription createOrUpdate(User user, SubscriptionRequestDTO request) {
+        //User user = (User) userDetailsService.loadUserByUsername(userId);
         Subscription subscription = subscriptionRepository.findByUser(user)
                 .orElseGet(() -> Subscription.builder()
                         .user(user)
                         .build());
-        subscription.setProduct(request.getProductType());
+        subscription.getSubscriptionPlan().setProductType(request.getProductType());
         subscription.setStatus(request.getStatus());
-        subscription.setTokenResetMinutesInterval(request.getTokenResetMinutesInterval());
+        //subscription.getPlan().setTkResetHoursInterval(request.getTokenResetMinutesInterval());
         subscription.setPurchasedAt(request.getPurchasedAt());
         subscription.setExpirationAt(request.getSubscriptionExpireDate());
         return subscriptionRepository.saveAndFlush(subscription);
-    }*/
+    }
 }

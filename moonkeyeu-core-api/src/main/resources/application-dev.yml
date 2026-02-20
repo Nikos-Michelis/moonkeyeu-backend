@@ -101,7 +101,12 @@ application:
       version: v4
 
     stripe:
+      webhook:
+        key: ${STRIPE_WEBHOOK_API_KEY}
       key: ${STRIPE_API_KEY}
+      tier:
+        trial:
+          period: 30
 
 management:
   endpoints:

@@ -28,8 +28,8 @@ public interface SubscriptionUsageRepository extends JpaRepository<SubscriptionU
     SELECT new com.moonkeyeu.core.api.subscription.dto.SubscriptionUsageDTO(u.subscription_usage_id, u.usageDate)
         FROM SubscriptionUsage u
         INNER JOIN u.subscription s
-        GROUP BY u.subscription_usage_id, u.usageDate, s.tokenResetMinutesInterval
-        HAVING MAX(u.usageDate) <= CURRENT_TIMESTAMP() - s.tokenResetMinutesInterval MINUTE
+        GROUP BY u.subscription_usage_id, u.usageDate, s.subscriptionPlan.tkResetHoursInterval
+        HAVING MAX(u.usageDate) <= CURRENT_TIMESTAMP() - s.subscriptionPlan.tkResetHoursInterval MINUTE
     """)
     List<SubscriptionUsageDTO> findAllExpiredUsages();
 }

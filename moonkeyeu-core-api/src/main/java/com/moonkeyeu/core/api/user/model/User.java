@@ -40,6 +40,8 @@ public class User implements UserDetails, Principal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
+    @Column(name = "customer_id")
+    private String customerId;
     @Column(name = "username", unique = true)
     private String username;
     @Column(name="email", unique = true)

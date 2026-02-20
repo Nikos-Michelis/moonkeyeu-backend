@@ -2,57 +2,48 @@ package com.moonkeyeu.core.api.payment.repository;
 
 import com.stripe.model.Price;
 import com.stripe.model.Product;
-
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProductDAO {
 
-    static Product[] products;
+    static Product[] products = new Product[3];
 
     static {
-        products = new Product[4];
 
-        Product sampleProduct = new Product();
-        Price samplePrice = new Price();
+        // 2. Basic Tier (Basic)
+        products[0] = createProduct("prod_Tzm0z1oN8ouFSi", "MoonkeyEU - Basic", "price_1T1mShGrKq02A5TNFXOnBdej",250, "BASIC",
+                "Standard comfort. Includes access to the Basic rewards shop.");
 
-        sampleProduct.setName("Puma Shoes");
-        sampleProduct.setId("shoe");
-        samplePrice.setCurrency("usd");
-        samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(2000));
-        sampleProduct.setDefaultPriceObject(samplePrice);
-        products[0] = sampleProduct;
+        // 3.  Pro Tier (Pro)
+        products[1] = createProduct("prod_Tzm2u3xWKo48RB", "MoonkeyEU - Pro", "price_1T1mTwGrKq02A5TNanGKroT3",450, "PRO",
+                "Lossless audio and offline downloads. EXCLUSIVE to Pro members.");
+    }
 
-        sampleProduct = new Product();
-        samplePrice = new Price();
+    private static Product createProduct(String id, String name, String priceId, long amount, String tier, String description) {
+        Product p = new Product();
+        p.setId(id);
+        p.setName(name);
+        p.setDescription(description);
 
-        sampleProduct.setName("Nike Sliders");
-        sampleProduct.setId("slippers");
-        samplePrice.setCurrency("usd");
-        samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(1000));
-        sampleProduct.setDefaultPriceObject(samplePrice);
-        products[1] = sampleProduct;
+        // Tag product with the minimum tier level needed to see it
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("app_tier", tier);
+        p.setMetadata(metadata);
 
-        sampleProduct = new Product();
-        samplePrice = new Price();
-
-        sampleProduct.setName("Apple Music+");
-        sampleProduct.setId("music");
-        samplePrice.setCurrency("usd");
-        samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(499));
-        sampleProduct.setDefaultPriceObject(samplePrice);
-        products[2] = sampleProduct;
-
+        Price price = new Price();
+        price.setId(priceId);
+        price.setCurrency("EUR");
+        price.setUnitAmountDecimal(BigDecimal.valueOf(amount));
+        p.setDefaultPriceObject(price);
+        return p;
     }
 
     public static Product getProduct(String id) {
-
-        if ("shoe".equals(id)) {
-            return products[0];
-        } else if ("slippers".equals(id)) {
-            return products[1];
-        } else if ("music".equals(id)) {
-            return products[2];
-        } else return new Product();
-
+        for (Product p : products) {
+            if (p.getId().equals(id)) return p;
+        }
+        return new Product();
     }
 }
