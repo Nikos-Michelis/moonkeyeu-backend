@@ -2,16 +2,17 @@ package com.moonkeyeu.core.api.security.model.token.reset;
 
 import com.moonkeyeu.core.api.user.model.User;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
 
-@Data
-@Entity
+@Getter
+@Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(name = "reset_token")
 public class ResetToken {
     @Id

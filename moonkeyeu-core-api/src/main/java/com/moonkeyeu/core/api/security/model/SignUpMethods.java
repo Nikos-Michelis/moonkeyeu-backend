@@ -11,10 +11,11 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
-@Builder
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "entry_methods")
 @EqualsAndHashCode(of = "id")

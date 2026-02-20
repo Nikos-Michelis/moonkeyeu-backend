@@ -7,9 +7,9 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "otp_resend", schema = "moonkey_db")
 public class OtpResend {

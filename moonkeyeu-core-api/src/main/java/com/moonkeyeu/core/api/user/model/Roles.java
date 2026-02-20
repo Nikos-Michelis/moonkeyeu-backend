@@ -14,10 +14,11 @@ import java.util.List;
 import java.util.Set;
 
 
-@Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "roles")
