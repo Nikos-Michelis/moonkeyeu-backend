@@ -1,4 +1,4 @@
-package com.moonkeyeu.core.api.configuration.utils;
+package com.moonkeyeu.core.api.utils.mapper;
 
 import com.moonkeyeu.core.api.launch.dto.CountryDTO;
 import com.moonkeyeu.core.api.launch.model.country.Country;
