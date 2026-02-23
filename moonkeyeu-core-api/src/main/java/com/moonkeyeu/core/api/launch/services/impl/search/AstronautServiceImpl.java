@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.launch.services.impl.search;
 
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import com.moonkeyeu.core.api.launch.dto.astronaut.AstronautDetailedDTO;
 import com.moonkeyeu.core.api.launch.dto.astronaut.AstronautNormalDTO;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
@@ -9,7 +9,7 @@ import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.repository.AstronautsRepository;
 import com.moonkeyeu.core.api.launch.repository.specifications.AstronautSpecification;
 import com.moonkeyeu.core.api.launch.services.AstronautService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -17,10 +17,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class AstronautServiceImpl implements AstronautService {
@@ -35,7 +35,7 @@ public class AstronautServiceImpl implements AstronautService {
     @Override
     @Cacheable(value = CacheNames.ASTRONAUT_CACHE,  key = "'astronaut-pagination-' + #requestParams + '-' + #pageSortingDTO", sync = true)
     public Page<DTOEntity> searchAstronaut(Map<String, String> requestParams, PageSortingDTO pageSortingDTO) {
-        Specification<Astronaut> spec = Specification.where(null);
+        Specification<Astronaut> spec = Specification.unrestricted();
         if (requestParams != null && !requestParams.isEmpty()) {
             if (requestParams.containsKey("nationality") && !requestParams.get("nationality").isEmpty()) {
                 spec = spec.and(AstronautSpecification.hasNationality(requestParams.get("nationality")));
@@ -61,9 +61,9 @@ public class AstronautServiceImpl implements AstronautService {
     }
     @Override
     @Cacheable(value = CacheNames.ASTRONAUT_CACHE,  key = "'astronaut-' + #astronautId", sync = true)
-    public Optional<DTOEntity> getAstronautById(Integer astronautId) {
-        Optional<Astronaut> astronaut = astronautsRepository.findAstronautAndLaunchByAstronautId(astronautId);
-        return astronaut.map(a -> dtoConverter.convertToDto(a, AstronautDetailedDTO.class));
+    public DTOEntity getAstronautById(Integer astronautId) {
+        Astronaut astronaut = astronautsRepository.findAstronautByAstronautId(astronautId)
+                .orElseThrow(() -> new ResourceNotFoundException("Astronaut not found with id: " + astronautId));
+        return dtoConverter.convertToDto(astronaut, AstronautDetailedDTO.class);
     }
-
 }

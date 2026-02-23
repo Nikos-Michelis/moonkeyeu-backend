@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.launch.services.impl.search;
 
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import com.moonkeyeu.core.api.launch.dto.launcher.LauncherDTO;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.launch.model.launcher.Launcher;
@@ -8,7 +8,7 @@ import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.repository.LauncherRepository;
 import com.moonkeyeu.core.api.launch.repository.specifications.LauncherSpecification;
 import com.moonkeyeu.core.api.launch.services.LauncherService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -35,7 +35,7 @@ public class LauncherServiceImpl implements LauncherService {
     @Override
     @Cacheable(value = CacheNames.LAUNCHER_CACHE,  key = "'launcher-pagination-' + #requestParams + '-' + #pageSortingDTO", sync = true)
     public Page<DTOEntity> searchLauncher(Map<String, String> requestParams, PageSortingDTO pageSortingDTO) {
-        Specification<Launcher> spec = Specification.where(null);
+        Specification<Launcher> spec = Specification.unrestricted();
         if (requestParams != null && !requestParams.isEmpty()) {
             if (requestParams.containsKey("search")) {
                 String searchKey = requestParams.get("search");

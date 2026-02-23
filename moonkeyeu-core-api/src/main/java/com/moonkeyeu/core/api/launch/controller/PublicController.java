@@ -45,8 +45,7 @@ public class PublicController {
     @GetMapping("/launch/{launchId}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<DTOEntity> getLaunchById(@PathVariable String launchId) {
-        DTOEntity dtoEntity = launchService.getLaunchById(launchId)
-                .orElseThrow(() -> new ResourceNotFoundException("Launch not found with id: " + launchId));
+        DTOEntity dtoEntity = launchService.getLaunchById(launchId);
         return ResponseEntity.ok(dtoEntity);
     }
     @GetMapping("/launches")
@@ -90,8 +89,7 @@ public class PublicController {
     @GetMapping("/astronaut/{astronautId}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<DTOEntity> getAstronautById(@PathVariable Integer astronautId) {
-        DTOEntity dtoEntity = astronautService.getAstronautById(astronautId)
-                .orElseThrow(() -> new ResourceNotFoundException("Astronaut not found with id: " + astronautId));
+        DTOEntity dtoEntity = astronautService.getAstronautById(astronautId);
         return ResponseEntity.ok(dtoEntity);
     }
     @GetMapping("/rockets")
@@ -115,16 +113,14 @@ public class PublicController {
     @GetMapping("/rocket/{rocketId}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<DTOEntity> getRocketById(@PathVariable Integer rocketId) {
-        DTOEntity dtoEntity = rocketService.getRocketById(rocketId)
-                .orElseThrow(() -> new ResourceNotFoundException("Rocket not found with id: " + rocketId));
+        DTOEntity dtoEntity = rocketService.getRocketById(rocketId);
         return ResponseEntity.ok(dtoEntity);
     }
 
     @GetMapping("/spacecraft/{spacecraftId}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<DTOEntity> getSpacecraftStageById(@PathVariable Integer spacecraftId) {
-        DTOEntity dtoEntity =  spacecraftService.getSpacecraftById(spacecraftId)
-                .orElseThrow(() -> new ResourceNotFoundException("Spacecraft not found with id: " + spacecraftId));
+        DTOEntity dtoEntity = spacecraftService.getSpacecraftById(spacecraftId);
         return ResponseEntity.ok(dtoEntity);
     }
 
@@ -167,8 +163,7 @@ public class PublicController {
     @GetMapping("/program/{programId}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<DTOEntity> getProgramById(@PathVariable Integer programId) {
-        DTOEntity dtoEntity =  programsService.getProgramById(programId)
-                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id: " + programId));
+        DTOEntity dtoEntity =  programsService.getProgramById(programId);
         return ResponseEntity.ok(dtoEntity);
     }
     @GetMapping("/agencies")
@@ -184,8 +179,7 @@ public class PublicController {
     @GetMapping("/agency/{agencyId}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<DTOEntity> getAgencyById(@PathVariable Integer agencyId) {
-        DTOEntity dtoEntity =  agenciesService.getAgencyById(agencyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Agency not found with id: " + agencyId));
+        DTOEntity dtoEntity = agenciesService.getAgencyById(agencyId);
         return ResponseEntity.ok(dtoEntity);
     }
     @GetMapping("/launch-pads")
@@ -201,8 +195,7 @@ public class PublicController {
     @GetMapping("/launch-pad/{launchPadId}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<DTOEntity> getLaunchPadById(@PathVariable Integer launchPadId) {
-        DTOEntity dtoEntity = launchPadService.getLaunchPadById(launchPadId)
-                .orElseThrow(() -> new ResourceNotFoundException("LaunchPad not found with id: " + launchPadId));
+        DTOEntity dtoEntity = launchPadService.getLaunchPadById(launchPadId);
         return ResponseEntity.ok(dtoEntity);
     }
 

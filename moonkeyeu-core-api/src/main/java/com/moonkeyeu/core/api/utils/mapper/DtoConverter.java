@@ -1,4 +1,4 @@
-package com.moonkeyeu.core.api.configuration.utils;
+package com.moonkeyeu.core.api.utils.mapper;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +15,9 @@ public class DtoConverter {
     }
 
     public <D> D convertToDto(Object obj, Class<D> dtoClass) {
-            return modelMapper.map(obj, dtoClass);
+        return modelMapper.map(obj, dtoClass);
     }
     public <E> E convertToEntity(Object obj, Class<E> entityClass) {
-            return modelMapper.map(obj, entityClass);
-        }
+        return modelMapper.map(obj, entityClass);
+    }
 }

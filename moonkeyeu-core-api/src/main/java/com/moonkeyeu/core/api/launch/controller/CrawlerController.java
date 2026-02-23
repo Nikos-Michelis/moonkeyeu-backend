@@ -39,7 +39,7 @@ public class CrawlerController {
         return crawlerService.getDefaultPreview(userAgent, "",
                 CrawlerDTO.builder()
                         .description(DEFAULT_DESCRIPTION)
-                        .image("https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg")
+                        .image(DEFAULT_IMG_URL)
                         .datePublished(Instant.now())
                         .dateModified(Instant.now())
                         .build());
@@ -54,7 +54,7 @@ public class CrawlerController {
                 CrawlerDTO.builder()
                         .title(segment.toLowerCase())
                         .description(DEFAULT_DESCRIPTION)
-                        .image("https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg")
+                        .image(DEFAULT_IMG_URL)
                         .datePublished(Instant.now())
                         .dateModified(Instant.now())
                         .build());
@@ -66,8 +66,7 @@ public class CrawlerController {
             @PathVariable String id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        LaunchDTO launchDTO = (LaunchDTO) launchService.getLaunchById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Launch not found with id: " + id));
+        LaunchDTO launchDTO = (LaunchDTO) launchService.getLaunchById(id);
         String launchDescription = launchDTO.getRocket().getRocketConfiguration().getDescription();
         return crawlerService.handlePreview(userAgent, id, "launches",
                 CrawlerDTO.builder()
@@ -90,10 +89,9 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        AstronautDetailedDTO astronautDetailedDTO = (AstronautDetailedDTO) astronautService.getAstronautById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Astronaut not found with id: " + id));
+        AstronautDetailedDTO astronautDetailedDTO = (AstronautDetailedDTO) astronautService.getAstronautById(id);
         Optional<ImageDTO> imageUrls = astronautDetailedDTO.getAstronautImages().stream().findFirst();
-        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse("https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg");
+        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
         return crawlerService.handlePreview(userAgent, id, "astronauts",
                 CrawlerDTO.builder()
                         .title(astronautDetailedDTO.getName())
@@ -113,10 +111,9 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        ProgramDetailedDTO programDetailedDTO = (ProgramDetailedDTO) programsService.getProgramById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id: " + id));
+        ProgramDetailedDTO programDetailedDTO = (ProgramDetailedDTO) programsService.getProgramById(id);
         Optional<ImageDTO> imageUrls = programDetailedDTO.getProgramImages().stream().findFirst();
-        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse("https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg");
+        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
         return crawlerService.handlePreview(userAgent, id, "programs",
                 CrawlerDTO.builder()
                         .title(programDetailedDTO.getTypeName())
@@ -136,10 +133,9 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        SpacecraftConfigurationDTO spacecraftDTO = spacecraftService.getSpacecraftById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Spacecraft not found with id: " + id));
+        SpacecraftConfigurationDTO spacecraftDTO = spacecraftService.getSpacecraftById(id);
         Optional<ImageDTO> imageUrls = spacecraftDTO.getSpacecraftConfImages().stream().findFirst();
-        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse("https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg");
+        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
         return crawlerService.handlePreview(userAgent, id, "vehicles/spacecraft",
                 CrawlerDTO.builder()
                         .title(spacecraftDTO.getSpacecraftConfName())
@@ -159,9 +155,8 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        LaunchPadDetailedDTO launchPadDTO = (LaunchPadDetailedDTO) launchPadService.getLaunchPadById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("LaunchPad not found with id: " + id));
-        String imageUrl = launchPadDTO.getMapImage() != null ? launchPadDTO.getMapImage() : "https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg";
+        LaunchPadDetailedDTO launchPadDTO = (LaunchPadDetailedDTO) launchPadService.getLaunchPadById(id);
+        String imageUrl = launchPadDTO.getMapImage() != null ? launchPadDTO.getMapImage() : DEFAULT_IMG_URL;
         return crawlerService.handlePreview(userAgent, id, "locations",
                 CrawlerDTO.builder()
                         .title(launchPadDTO.getLaunchPadName())
@@ -181,10 +176,9 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        AgencyDetailedDTO agencyDetailedDTO = (AgencyDetailedDTO) agenciesService.getAgencyById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Agency not found with id: " + id));
+        AgencyDetailedDTO agencyDetailedDTO = (AgencyDetailedDTO) agenciesService.getAgencyById(id);
         Optional<ImageDTO> imageUrls = agencyDetailedDTO.getAgenciesImages().stream().findFirst();
-        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse("https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg");
+        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
         return crawlerService.handlePreview(userAgent, id, "agencies",
                 CrawlerDTO.builder()
                         .title(agencyDetailedDTO.getAgencyName())

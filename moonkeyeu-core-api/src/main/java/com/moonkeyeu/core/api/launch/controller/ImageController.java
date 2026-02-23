@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.launch.controller;
 
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import com.moonkeyeu.core.api.security.limiter.RateLimited;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 @Profile({"local"})
 @RestController
 @RequestMapping("images")
+@Deprecated
 public class ImageController {
     private String agenciesImage;
     private String rocketsImage;

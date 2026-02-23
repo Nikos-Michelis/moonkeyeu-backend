@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.user.services.impl;
 
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchNormalDTO;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchSummarizedDTO;
@@ -18,7 +18,7 @@ import com.moonkeyeu.core.api.user.model.User;
 import com.moonkeyeu.core.api.user.reporitory.BookmarkListRepository;
 import com.moonkeyeu.core.api.user.reporitory.BookmarkRepository;
 import com.moonkeyeu.core.api.user.services.BookmarkService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

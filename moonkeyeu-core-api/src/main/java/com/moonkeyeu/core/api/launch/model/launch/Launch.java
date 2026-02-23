@@ -71,7 +71,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Builder
 @Entity
 @Table(name = "launch", schema = "moonkey_db")
 public class Launch {

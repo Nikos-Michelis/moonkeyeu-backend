@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.launch.services.impl.search;
 
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchNormalDTO;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.launch.dto.program.ProgramDetailedDTO;
@@ -12,7 +12,7 @@ import com.moonkeyeu.core.api.launch.repository.LaunchRepository;
 import com.moonkeyeu.core.api.launch.repository.ProgramsRepository;
 import com.moonkeyeu.core.api.launch.repository.specifications.ProgramSpecification;
 import com.moonkeyeu.core.api.launch.services.ProgramsService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -41,7 +42,7 @@ public class ProgramsServiceImpl implements ProgramsService {
     @Override
     @Cacheable(value = CacheNames.PROGRAM_CACHE, key = "'program-pagination-' + #requestParams + '-' + #pageSortingDTO", sync = true)
     public Page<DTOEntity> searchProgram(Map<String, String> requestParams, PageSortingDTO pageSortingDTO) {
-        Specification<Programs> spec = Specification.where(null);
+        Specification<Programs> spec = Specification.unrestricted();
         if (requestParams != null && !requestParams.isEmpty()) {
             if (requestParams.containsKey("search")) {
                 String searchKey = requestParams.get("search");
@@ -58,16 +59,19 @@ public class ProgramsServiceImpl implements ProgramsService {
     }
     @Override
     @Cacheable(value = CacheNames.PROGRAM_CACHE, key = "'program-' + #programId", sync = true)
-    public Optional<DTOEntity> getProgramById(Integer programId) {
-        Optional<Programs> programs = programsRepository.findProgramById(programId);
+    public DTOEntity getProgramById(Integer programId) {
+        Programs program = programsRepository.findProgramById(programId)
+                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id: " + programId));
+
         Optional<Launch> launch = launchRepository.findUpcomingLaunchesByProgramId(programId);
-        return programs.map(org -> {
-            ProgramDetailedDTO dto = dtoConverter.convertToDto(org, ProgramDetailedDTO.class);
-            launch.ifPresent(l -> {
-                LaunchNormalDTO launchDTO = dtoConverter.convertToDto(l, LaunchNormalDTO.class);
-                dto.setUpcomingLaunches(launchDTO);
-            });
-            return dto;
-        });
+
+        ProgramDetailedDTO programDetailedDTO = dtoConverter.convertToDto(program, ProgramDetailedDTO.class);
+
+        if (launch.isPresent()) {
+            LaunchNormalDTO launchDTO = dtoConverter.convertToDto(launch, LaunchNormalDTO.class);
+            programDetailedDTO.setUpcomingLaunches(launchDTO);
+        }
+
+        return programDetailedDTO;
     }
 }

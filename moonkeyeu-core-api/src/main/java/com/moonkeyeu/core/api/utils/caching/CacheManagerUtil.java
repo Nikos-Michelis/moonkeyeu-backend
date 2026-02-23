@@ -1,25 +1,24 @@
-package com.moonkeyeu.core.api.launch.services.impl.caching;
+package com.moonkeyeu.core.api.utils.caching;
 
 
-import com.moonkeyeu.core.api.launch.services.CacheManagerService;
 import com.moonkeyeu.core.api.settings.exceptions.CacheInitializationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
+@Component
 @Slf4j
-public class CacheManagerServiceImpl implements CacheManagerService {
+public class CacheManagerUtil {
 
     private final CacheManager cacheManager;
 
-    public CacheManagerServiceImpl(CacheManager cacheManager) {
+    public CacheManagerUtil(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
-    @Override
     public void evictAll(String cacheName) {
         Cache cache = cacheManager.getCache(cacheName);
         if (cache != null) {
@@ -29,7 +28,6 @@ public class CacheManagerServiceImpl implements CacheManagerService {
             log.warn("Cache '{}' not found", cacheName);
         }
     }
-    @Override
     public void evictById(String cacheName, String cacheKey) {
         Cache cache = cacheManager.getCache(cacheName);
         if (cache != null) {
@@ -39,7 +37,6 @@ public class CacheManagerServiceImpl implements CacheManagerService {
             log.warn("Cache '{}' not found", cacheName);
         }
     }
-    @Override
     public <T> Optional<T> getByCacheNameAndKey(String cacheName, String cacheKey, Class<T> type){
         Cache cache = cacheManager.getCache(cacheName);
 
@@ -49,7 +46,6 @@ public class CacheManagerServiceImpl implements CacheManagerService {
 
         return Optional.ofNullable(cache.get(cacheKey, type));
     }
-    @Override
     public Cache getCacheByName(String cacheName){
         Cache cache = cacheManager.getCache(cacheName);
 

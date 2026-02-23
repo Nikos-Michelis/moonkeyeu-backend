@@ -1,0 +1,207 @@
+package com.moonkeyeu.core.api.launch.services.impl.search;
+
+import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
+import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.launch.dto.astronaut.AstronautDetailedDTO;
+import com.moonkeyeu.core.api.launch.dto.astronaut.AstronautNormalDTO;
+import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
+import com.moonkeyeu.core.api.launch.model.astronaut.Astronaut;
+import com.moonkeyeu.core.api.launch.repository.AstronautsRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("AstronautServiceImpl Unit Tests")
+class AstronautServiceImplTest {
+    @Mock
+    private AstronautsRepository astronautsRepository;
+    @Mock
+    private DtoConverter dtoConverter;
+    @InjectMocks
+    private AstronautServiceImpl astronautService;
+    private PageSortingDTO testPageSortingDTO;
+    private Map<String, String> testRequestParams;
+    private Astronaut testAstronaut;
+    private AstronautNormalDTO testAstronautNormalDTO;
+    private AstronautDetailedDTO testAstronautDetailedDTO;
+
+    @BeforeEach
+    void setUp() {
+        this.testPageSortingDTO = PageSortingDTO.builder()
+                .page(0)
+                .limit(12)
+                .field("name")
+                .sort("asc")
+                .build();
+
+        this.testRequestParams = new HashMap<>();
+        this.testRequestParams.put("upcoming", "true");
+        this.testRequestParams.put("agency", "121");
+
+        this.testAstronaut = new Astronaut();
+        this.testAstronaut.setAstronautId(1L);
+        this.testAstronaut.setName("Abdul Ahad Mohmand");
+        this.testAstronaut.setInSpace(false);
+
+        this.testAstronautNormalDTO = new AstronautNormalDTO();
+        this.testAstronautNormalDTO.setAstronautId(testAstronaut.getAstronautId());
+        this.testAstronautNormalDTO.setName(testAstronaut.getName());
+        this.testAstronautNormalDTO.setInSpace(testAstronaut.getInSpace());
+
+        this.testAstronautDetailedDTO = new AstronautDetailedDTO();
+        this.testAstronautDetailedDTO.setAstronautId(testAstronaut.getAstronautId());
+        this.testAstronautDetailedDTO.setName(testAstronaut.getName());
+        this.testAstronautDetailedDTO.setInSpace(testAstronaut.getInSpace());
+    }
+
+    @Nested
+    @DisplayName("Search Astronaut by filters tests")
+    class SearchAstronautByParamsTest {
+
+        @Test
+        @DisplayName("Should return paged AstronautNormalDTOs without filters")
+        void shouldReturnPagedAstronautsWithoutFilters() {
+
+            // given: service method going to test
+            Page<Astronaut> astroanutPage = new PageImpl<>(List.of(testAstronaut));
+
+            when(astronautsRepository.findAll(any(Specification.class), any(Pageable.class)))
+                    .thenReturn(astroanutPage);
+
+            when(dtoConverter.convertToDto(eq(testAstronaut), eq(AstronautNormalDTO.class)))
+                    .thenReturn(testAstronautNormalDTO);
+
+            // when: when test runs
+            Page<DTOEntity> result =
+                    astronautService.searchAstronaut(Collections.emptyMap(), testPageSortingDTO);
+
+            // then: result of test
+            assertNotNull(result);
+            assertEquals(1, result.getTotalElements());
+            assertEquals(testAstronautNormalDTO, result.getContent().get(0));
+
+            verify(astronautsRepository, times(1))
+                    .findAll(any(Specification.class), any(Pageable.class));
+
+            verify(dtoConverter, times(result.getSize()))
+                    .convertToDto(testAstronaut, AstronautNormalDTO.class);
+        }
+    }
+
+    @Test
+    @DisplayName("Should return paged AstroanutNormalDTOs with filters")
+    void shouldReturnPagedLaunchesWithFilters() {
+
+        // given: service method going to test
+        Page<Astronaut> astroanutPage = new PageImpl<>(List.of(testAstronaut));
+
+        when(astronautsRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(astroanutPage);
+
+        when(dtoConverter.convertToDto(eq(testAstronaut), eq(AstronautNormalDTO.class)))
+                .thenReturn(testAstronautNormalDTO);
+
+        // when: when test runs
+        Page<DTOEntity> result =
+                astronautService.searchAstronaut(testRequestParams, testPageSortingDTO);
+
+        // then: result of test
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertSame(testAstronautNormalDTO, result.getContent().get(0));
+
+        verify(astronautsRepository, times(1))
+                .findAll(any(Specification.class), any(Pageable.class));
+
+        verify(dtoConverter, times(result.getSize()))
+                .convertToDto(testAstronaut, AstronautNormalDTO.class);
+    }
+
+    @Nested
+    @DisplayName("find astronaut by id tests")
+    class FindAstronautById {
+        @Test
+        @DisplayName("Should return astronaut by id")
+        void shouldReturnLaunchById() {
+
+            // given
+            Integer astronautId = 123;
+
+            when(astronautsRepository.findAstronautByAstronautId(astronautId))
+                    .thenReturn(Optional.of(testAstronaut));
+
+            when(dtoConverter.convertToDto(testAstronaut, AstronautDetailedDTO.class))
+                    .thenReturn(testAstronautDetailedDTO);
+
+            // when
+            DTOEntity result = astronautService.getAstronautById(astronautId);
+
+            // then
+            assertNotNull(result);
+            assertEquals(testAstronautDetailedDTO, result);
+
+            verify(astronautsRepository).findAstronautByAstronautId(astronautId);
+            verify(dtoConverter).convertToDto(testAstronaut, AstronautDetailedDTO.class);
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when astronautId is null")
+        void shouldHandleNullAstronautId() {
+
+            // given
+            final Integer astronautId = null;
+
+            when(astronautsRepository.findAstronautByAstronautId(astronautId))
+                    .thenReturn(Optional.empty());
+
+            // when & Then
+            final ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    ()-> astronautService.getAstronautById(astronautId));
+
+            assertNotNull(exception);
+            assertEquals("Astronaut not found with id: " + astronautId, exception.getMessage());
+            verify(astronautsRepository, times(1)).findAstronautByAstronautId(astronautId);
+            verifyNoInteractions(dtoConverter);
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when astronaut not found")
+        void shouldThrowResourceNotFoundException() {
+
+            // given
+            final Integer astronautId = 123;
+
+            when(astronautsRepository.findAstronautByAstronautId(astronautId))
+                    .thenReturn(Optional.empty());
+
+            // when & Then
+            final ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    ()-> astronautService.getAstronautById(astronautId));
+
+            assertNotNull(exception);
+            assertEquals("Astronaut not found with id: " + astronautId, exception.getMessage());
+            verify(astronautsRepository, times(1)).findAstronautByAstronautId(astronautId);
+            verifyNoInteractions(dtoConverter);
+        }
+    }
+}
