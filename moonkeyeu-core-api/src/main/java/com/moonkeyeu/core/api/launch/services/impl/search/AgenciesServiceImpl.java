@@ -42,7 +42,7 @@ public class AgenciesServiceImpl implements AgenciesService {
     @Override
     @Cacheable(value = CacheNames.AGENCIES_CACHE, key = "'agency-' + #agencyId", sync = true)
     public DTOEntity getAgencyById(Integer agencyId) {
-        Agencies agency = agenciesRepository.findAgenciesById(agencyId)
+        Agencies agency = agenciesRepository.findAgencyById(agencyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency not found with id: " + agencyId));
         Optional<Launch> launch = launchRepository.findUpcomingLaunchesByAgencyId(agencyId);
 

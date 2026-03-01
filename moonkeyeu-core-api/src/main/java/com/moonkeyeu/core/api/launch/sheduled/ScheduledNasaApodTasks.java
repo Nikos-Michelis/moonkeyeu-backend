@@ -14,7 +14,7 @@ public class ScheduledNasaApodTasks {
 
     @PostConstruct
     public void initNasaApodCache() {
-        nasaApodService.refreshNasaApod();
+        //nasaApodService.refreshNasaApod();
     }
 
     @Scheduled(cron = "0 0 */4 * * *")

@@ -1,4 +1,4 @@
-package com.moonkeyeu.core.api.launch.services;
+package com.moonkeyeu.core.api.launch.services.impl.crawler;
 
 import com.moonkeyeu.core.api.launch.dto.CrawlerDTO;
 import com.moonkeyeu.core.api.launch.model.SocialMediaCrawler;

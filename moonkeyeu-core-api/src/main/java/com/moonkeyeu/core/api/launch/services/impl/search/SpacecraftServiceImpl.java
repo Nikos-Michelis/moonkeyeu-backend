@@ -35,7 +35,7 @@ public class SpacecraftServiceImpl implements SpacecraftService {
     }
 
     @Override
-    @Cacheable(value = CacheNames.SPACECRAFT_CACHE,  key = "'spacecraft-pagination-' + #requestParams + '-' + #pageSortingDTO", sync = true)
+    @Cacheable(value = CacheNames.SPACECRAFT_CACHE, key = "'spacecraft-pagination-' + #requestParams + '-' + #pageSortingDTO", sync = true)
     public Page<DTOEntity> searchSpacecraft(Map<String, String> requestParams, PageSortingDTO pageSortingDTO) {
         Specification<SpacecraftConfiguration> spec = Specification.unrestricted();
         if (requestParams != null && !requestParams.isEmpty()) {
@@ -53,10 +53,10 @@ public class SpacecraftServiceImpl implements SpacecraftService {
         Page<SpacecraftConfiguration> spacecrafts = spacecraftRepository.findAll(spec, pageable);
         return spacecrafts.map(spacecraft -> dtoConverter.convertToDto(spacecraft, SpacecraftConfigSummarizedDTO.class));
     }
-    @Cacheable(value = CacheNames.SPACECRAFT_CACHE,  key = "'spacecrat-' + #spacecraftId", sync = true)
+    @Cacheable(value = CacheNames.SPACECRAFT_CACHE, key = "'spacecrat-' + #spacecraftId", sync = true)
     public SpacecraftConfigurationDTO getSpacecraftById(Integer spacecraftId) {
         SpacecraftConfiguration spacecraft = spacecraftRepository.findSpacecraftWithSpacecraftId(spacecraftId)
-                .orElseThrow(() -> new ResourceNotFoundException("Spacecraft not found with id: " + spacecraftId));;
+                .orElseThrow(() -> new ResourceNotFoundException("Spacecraft configuration not found with id: " + spacecraftId));;
         return dtoConverter.convertToDto(spacecraft, SpacecraftConfigurationDTO.class);
     }
 }

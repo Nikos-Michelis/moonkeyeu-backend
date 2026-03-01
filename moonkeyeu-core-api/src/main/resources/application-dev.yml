@@ -45,6 +45,10 @@ spring:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
+  docker:
+    compose:
+      enabled: false
+
   security:
     oauth2:
       client:
@@ -55,18 +59,18 @@ spring:
             client-name: Google
 
   mail:
-    sender: ${MAIL_SENDER}
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    sender: test@test.com
+    host: localhost
+    port: 3025
+    username: test
+    password: test
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
-            required: true
+            enable: false
+            required: false
 
 application:
   frontend:

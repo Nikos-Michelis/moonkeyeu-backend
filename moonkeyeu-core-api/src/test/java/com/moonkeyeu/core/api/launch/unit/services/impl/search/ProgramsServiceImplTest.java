@@ -1,5 +1,6 @@
-package com.moonkeyeu.core.api.launch.services.impl.search;
+package com.moonkeyeu.core.api.launch.unit.services.impl.search;
 
+import com.moonkeyeu.core.api.launch.services.impl.search.ProgramsServiceImpl;
 import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
@@ -56,7 +57,7 @@ class ProgramsServiceImplTest {
         this.testPageSortingDTO = PageSortingDTO.builder()
                 .page(0)
                 .limit(12)
-                .field("name")
+                .field("startDate")
                 .sort("asc")
                 .build();
 
@@ -85,11 +86,11 @@ class ProgramsServiceImplTest {
     }
 
     @Nested
-    @DisplayName("Search Programs by filters tests")
-    class searchAstronautByParamsTest {
+    @DisplayName("Search Programs by Filters")
+    class SerachAstronautTests {
 
         @Test
-        @DisplayName("Should return paged ProgramSummarizedDTOs without filters")
+        @DisplayName("Should Return Paged Programs Summaries When No Filters Are Applied")
         void shouldReturnPagedProgramsWithoutFilters() {
             // given: service method going to test
             Page<Programs> programsPage = new PageImpl<>(List.of(testPrograms));
@@ -117,7 +118,7 @@ class ProgramsServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should return paged ProgramSummarizedDTOs with filters")
+        @DisplayName("Should Return Paged Programs Summaries When Filters Are Applied")
         void shouldReturnPagedProgramsWithFilters() {
             // given: service method going to test
             Page<Programs> programsPage = new PageImpl<>(List.of(testPrograms));
@@ -146,10 +147,10 @@ class ProgramsServiceImplTest {
     }
 
     @Nested
-    @DisplayName("find program by id tests")
+    @DisplayName("Find Program By ID")
     class findProgramById {
         @Test
-        @DisplayName("Should return program by id")
+        @DisplayName("Should Return a Program When ID Exists")
         void shouldReturnProgramById() {
             // given
             Integer programId = 40;
@@ -176,7 +177,7 @@ class ProgramsServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when programId is null")
+        @DisplayName("Should Throw ResourceNotFoundException When Program ID Is Null")
         void shouldHandleNullProgramId() {
             // given
             Integer programId = null;
@@ -197,7 +198,7 @@ class ProgramsServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when program not found")
+        @DisplayName("Should Throw ResourceNotFoundException When Program ID Not Found")
         void shouldThrowResourceNotFoundException() {
             // given
             final Integer programId = 123;

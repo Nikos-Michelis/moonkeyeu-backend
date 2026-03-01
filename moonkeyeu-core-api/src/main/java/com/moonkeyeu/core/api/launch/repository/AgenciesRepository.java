@@ -1,11 +1,6 @@
 package com.moonkeyeu.core.api.launch.repository;
 
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
-import com.moonkeyeu.core.api.launch.model.program.Programs;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -27,7 +22,7 @@ public interface AgenciesRepository extends JpaRepository<Agencies, Long>, JpaSp
             LEFT JOIN FETCH a.countries
             WHERE a.agencyId = :agencyId
     """)
-    Optional<Agencies> findAgenciesById(@Param("agencyId") Integer agencyId);
+    Optional<Agencies> findAgencyById(@Param("agencyId") Integer agencyId);
 
     @Query("""
             SELECT a FROM Agencies a

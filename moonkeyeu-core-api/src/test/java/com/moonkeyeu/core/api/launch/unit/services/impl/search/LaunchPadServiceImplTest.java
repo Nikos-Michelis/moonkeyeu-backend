@@ -1,5 +1,6 @@
-package com.moonkeyeu.core.api.launch.services.impl.search;
+package com.moonkeyeu.core.api.launch.unit.services.impl.search;
 
+import com.moonkeyeu.core.api.launch.services.impl.search.LaunchPadServiceImpl;
 import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchNormalDTO;
@@ -95,7 +96,7 @@ class LaunchPadServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return all launch pads grouped by active status")
+    @DisplayName("Should Return All LaunchPads Grouped By Active Status")
     void shouldReturnAllLaunchPads() {
 
         when(launchPadRepository.findAll())
@@ -127,10 +128,10 @@ class LaunchPadServiceImplTest {
     }
 
     @Nested
-    @DisplayName("find launchpad by id tests")
+    @DisplayName("Find LaunchPad By ID")
     class FindLaunchPadById {
         @Test
-        @DisplayName("Should return launchpad by id")
+        @DisplayName("Should Return a LaunchPad When ID Exists")
         void shouldReturnLaunchPadById() {
             // given
             Integer launchPadId = 2;
@@ -157,7 +158,7 @@ class LaunchPadServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when launchpadId is null")
+        @DisplayName("Should Throw ResourceNotFoundException When LaunchPad ID Is Null")
         void shouldHandleNullLaunchPadId() {
             // given
             Integer launchPadId = null;
@@ -178,7 +179,7 @@ class LaunchPadServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when launchpad not found")
+        @DisplayName("Should Throw ResourceNotFoundException When LaunchPad ID Not Found")
         void shouldThrowResourceNotFoundException() {
             // given
             Integer launchPadId = 132;

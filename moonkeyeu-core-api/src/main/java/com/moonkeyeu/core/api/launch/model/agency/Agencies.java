@@ -60,7 +60,7 @@ public class Agencies {
     private String agencyName;
     @Basic
     @Column(name = "featured")
-    private String featured;
+    private Boolean featured;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
     private AgencyType agencyType;

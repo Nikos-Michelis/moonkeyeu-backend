@@ -21,7 +21,7 @@ public class BaseFilter {
 
     @Basic
     @Column(name = "filter_id")
-    private Integer filterId;
+    private Long filterId;
 
     @Basic
     @Column(name = "filter_name")

@@ -14,8 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class AuthenticationManagerImpl implements AuthenticationManager {
 
     @Value("${application.otp.max-validation-attempts}")

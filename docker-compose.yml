@@ -14,7 +14,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - mysql-db-data:/var/lib/mysql
+      - backend_mysql-db-data:/var/lib/mysql
       #- ./db/prod:/docker-entrypoint-initdb.d
     restart: always
     networks:
@@ -109,16 +109,16 @@ services:
     networks:
       - spring-backend-network
 
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/www/certbot:/var/www/certbot
+  ##certbot:
+    ##image: certbot/certbot
+    #3container_name: certbot
+    ##volumes:
+      ##- /etc/letsencrypt:/etc/letsencrypt
+      ##- /var/www/certbot:/var/www/certbot
     #command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN_BACKEND} --agree-tos
     #command: renew --dry-run
     #command: renew --force-renewal
-    command: renew
+    ##command: renew
 
   prometheus:
     image: prom/prometheus:v2.44.0
@@ -161,7 +161,7 @@ networks:
   spring-backend-network:
     driver: bridge
 volumes:
-  mysql-db-data:
-    #external: true
+  backend_mysql-db-data:
+    external: true
   data:
     driver: local

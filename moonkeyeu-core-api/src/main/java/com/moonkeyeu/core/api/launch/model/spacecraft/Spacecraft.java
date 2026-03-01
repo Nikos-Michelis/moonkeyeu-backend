@@ -49,6 +49,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
+@Table(name = "spacecraft", schema = "moonkey_db")
 public class Spacecraft {
     @Id
     @Column(name = "spacecraft_id")

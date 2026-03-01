@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder({ "id", "name" })
 public class FiltersDTO implements DTOEntity {
     @JsonProperty("id")
-    private Integer filterId;
+    private Long filterId;
     @JsonProperty("name")
     private String filterName;
 }

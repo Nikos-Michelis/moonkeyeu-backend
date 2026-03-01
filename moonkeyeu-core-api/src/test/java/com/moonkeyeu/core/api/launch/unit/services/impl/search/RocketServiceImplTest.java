@@ -1,17 +1,15 @@
-package com.moonkeyeu.core.api.launch.services.impl.search;
+package com.moonkeyeu.core.api.launch.unit.services.impl.search;
 
+import com.moonkeyeu.core.api.launch.services.impl.search.RocketServiceImpl;
+import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.launch.dto.rocket.RocketConfigSummarizedDTO;
 import com.moonkeyeu.core.api.launch.dto.rocket.RocketConfigurationDTO;
 import com.moonkeyeu.core.api.launch.dto.rocket.RocketNormalDTO;
-import com.moonkeyeu.core.api.launch.dto.spacecraft.SpacecraftConfigSummarizedDTO;
-import com.moonkeyeu.core.api.launch.dto.spacecraft.SpacecraftConfigurationDTO;
 import com.moonkeyeu.core.api.launch.model.rocket.Rocket;
 import com.moonkeyeu.core.api.launch.model.rocket.RocketConfiguration;
-import com.moonkeyeu.core.api.launch.model.spacecraft.SpacecraftConfiguration;
-import com.moonkeyeu.core.api.launch.repository.SpacecraftRepository;
-import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
+import com.moonkeyeu.core.api.launch.repository.RocketsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,29 +23,28 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SpacecraftServiceImplTest Unit Tests")
-class SpacecraftServiceImplTest {
+@DisplayName("RocketServiceImplTest Unit Tests")
+class RocketServiceImplTest {
     @Mock
-    private SpacecraftRepository rocketsRepository;
+    private RocketsRepository rocketsRepository;
     @Mock
     private DtoConverter dtoConverter;
     @InjectMocks
-    private SpacecraftServiceImplTest spacecraftServiceImplTest;
+    private RocketServiceImpl rocketService;
     private PageSortingDTO testPageSortingDTO;
     private Map<String, String> testRequestParams;
-    private SpacecraftConfiguration testSpacecraftConfiguration;
-    private SpacecraftConfigurationDTO testSpacecraftConfigurationDTO;
-    private SpacecraftConfigSummarizedDTO testSpacecraftConfigSummarizedDTO;
+    private Rocket testRocket;
+    private RocketConfiguration testRocketConfiguration;
+    private RocketNormalDTO testRocketNormalDTO;
+    private RocketConfigSummarizedDTO testRocketConfigSummarizedDTO;
 
 
     @BeforeEach
@@ -60,10 +57,10 @@ class SpacecraftServiceImplTest {
                 .build();
 
         this.testRequestParams = new HashMap<>();
-        this.testRequestParams.put("upcoming", "true");
+        this.testRequestParams.put("reusable", "true");
         this.testRequestParams.put("agency", "121");
 
-        this.testSpacecraftConfiguration = new SpacecraftConfiguration();
+        this.testRocketConfiguration = new RocketConfiguration();
         this.testRocketConfiguration.setRocketConfId(2L);
         this.testRocketConfiguration.setRocketName("Falcon 9");
         this.testRocketConfiguration.setActive(true);
@@ -89,11 +86,11 @@ class SpacecraftServiceImplTest {
     }
 
     @Nested
-    @DisplayName("Search Rocket by filters tests")
-    class searchRocketByParamsTests {
+    @DisplayName("Search Rocket, Rocket Configuration by Filters")
+    class SearchRocketTests {
 
         @Test
-        @DisplayName("Should return paged RocketConfigSummarizedDTOs without filters")
+        @DisplayName("Should Return Paged Rocket Configuration Summaries When No Filters Are Applied")
         void shouldReturnPagedRocketConfigsWithoutFilters() {
             // given: service method going to test
             Page<RocketConfiguration> rocketPage = new PageImpl<>(List.of(testRocketConfiguration));
@@ -121,7 +118,7 @@ class SpacecraftServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should return paged RocketConfigSummarizedDTO with filters")
+        @DisplayName("Should Return Paged Rocket Configuration Summaries When Filters Are Applied")
         void shouldReturnPagedRocketsWithFilters() {
             // given: service method going to test
             Page<RocketConfiguration> rocketPage = new PageImpl<>(List.of(testRocketConfiguration));
@@ -147,72 +144,71 @@ class SpacecraftServiceImplTest {
             verify(dtoConverter, times(result.getSize()))
                     .convertToDto(testRocketConfiguration, RocketConfigSummarizedDTO.class);
         }
+    }
+    @Nested
+    @DisplayName("Find Rocket By ID")
+    class FindRocketById {
+        @Test
+        @DisplayName("Should return a Rocket When ID Exists")
+        void shouldReturnRocketById() {
+            // given
+            final Integer rocketId = 12;
 
-        @Nested
-        @DisplayName("find Rocket by id tests")
-        class FindRocketById {
-            @Test
-            @DisplayName("Should return rocket by id")
-            void shouldReturnRocketById() {
-                // given
-                final Integer rocketId = 12;
+            when(rocketsRepository.findRocketWithRocketId(rocketId))
+                    .thenReturn(Optional.of(testRocket));
 
-                when(rocketsRepository.findRocketWithRocketId(rocketId))
-                        .thenReturn(Optional.of(testRocket));
+            when(dtoConverter.convertToDto(testRocket, RocketNormalDTO.class))
+                    .thenReturn(testRocketNormalDTO);
 
-                when(dtoConverter.convertToDto(testRocket, RocketNormalDTO.class))
-                        .thenReturn(testRocketNormalDTO);
+            // when
+            DTOEntity result = rocketService.getRocketById(rocketId);
 
-                // when
-                DTOEntity result = rocketService.getRocketById(rocketId);
+            // then
+            assertNotNull(result);
+            assertEquals(testRocketNormalDTO, result);
 
-                // then
-                assertNotNull(result);
-                assertEquals(testRocketNormalDTO, result);
+            verify(rocketsRepository).findRocketWithRocketId(rocketId);
+            verify(dtoConverter).convertToDto(testRocket, RocketNormalDTO.class);
+        }
 
-                verify(rocketsRepository).findRocketWithRocketId(rocketId);
-                verify(dtoConverter).convertToDto(testRocket, RocketNormalDTO.class);
-            }
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException When Rocket ID Is Null")
+        void shouldHandleNullRocketId() {
+            // given
+            final Integer rocketId = null;
 
-            @Test
-            @DisplayName("Should throw ResourceNotFoundException when rocketId is null")
-            void shouldHandleNullRocketId() {
-                // given
-                final Integer rocketId = null;
+            when(rocketsRepository.findRocketWithRocketId(rocketId))
+                    .thenReturn(Optional.empty());
 
-                when(rocketsRepository.findRocketWithRocketId(rocketId))
-                        .thenReturn(Optional.empty());
+            // when & Then
+            final ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> rocketService.getRocketById(rocketId));
 
-                // when & Then
-                final ResourceNotFoundException exception = assertThrows(
-                        ResourceNotFoundException.class,
-                        () -> rocketService.getRocketById(rocketId));
+            assertNotNull(exception);
+            assertEquals("Rocket not found with id: " + rocketId, exception.getMessage());
+            verify(rocketsRepository, times(1)).findRocketWithRocketId(rocketId);
+            verifyNoInteractions(dtoConverter);
+        }
 
-                assertNotNull(exception);
-                assertEquals("Rocket not found with id: " + rocketId, exception.getMessage());
-                verify(rocketsRepository, times(1)).findRocketWithRocketId(rocketId);
-                verifyNoInteractions(dtoConverter);
-            }
+        @Test
+        @DisplayName("Should Throw ResourceNotFoundException When Rocket ID Not Found")
+        void shouldThrowResourceNotFoundException() {
+            // given
+            final Integer rocketId = 123;
 
-            @Test
-            @DisplayName("Should throw ResourceNotFoundException when rocket not found")
-            void shouldThrowResourceNotFoundException() {
-                // given
-                final Integer rocketId = 123;
+            when(rocketsRepository.findRocketWithRocketId(rocketId))
+                    .thenReturn(Optional.empty());
 
-                when(rocketsRepository.findRocketWithRocketId(rocketId))
-                        .thenReturn(Optional.empty());
+            // when & Then
+            final ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> rocketService.getRocketById(rocketId));
 
-                // when & Then
-                final ResourceNotFoundException exception = assertThrows(
-                        ResourceNotFoundException.class,
-                        () -> rocketService.getRocketById(rocketId));
-
-                assertNotNull(exception);
-                assertEquals("Rocket not found with id: " + rocketId, exception.getMessage());
-                verify(rocketsRepository, times(1)).findRocketWithRocketId(rocketId);
-                verifyNoInteractions(dtoConverter);
-            }
+            assertNotNull(exception);
+            assertEquals("Rocket not found with id: " + rocketId, exception.getMessage());
+            verify(rocketsRepository, times(1)).findRocketWithRocketId(rocketId);
+            verifyNoInteractions(dtoConverter);
         }
     }
 }

@@ -1,7 +1,8 @@
-package com.moonkeyeu.core.api.launch.services.impl.apod;
+package com.moonkeyeu.core.api.launch.integration.service.impl.apod;
 
 import com.moonkeyeu.core.api.launch.dto.NasaApodDTO;
 import com.moonkeyeu.core.api.launch.services.NasaApodClientService;
+import com.moonkeyeu.core.api.launch.services.impl.apod.NasaApodClientServiceImpl;
 import com.moonkeyeu.core.api.settings.exceptions.NasaApodFetchException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -29,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("NasaApodClientIntegrationImplTest Integration Tests")
-public class NasaApodClientIntegrationImplTest {
+public class NasaApodClientImplIntTest {
     public static MockWebServer mockBackEnd;
     public NasaApodClientService nasaApodClientService;
 
@@ -57,7 +58,7 @@ public class NasaApodClientIntegrationImplTest {
     }
 
     @Test
-    @DisplayName("Should return the latest nasa astronomy picture of the day")
+    @DisplayName("Should Return the Latest NASA Astronomy Picture of the Day")
     void shouldFetchApodSuccessfully() throws Exception {
         String mockBody = """
                 {
@@ -85,7 +86,7 @@ public class NasaApodClientIntegrationImplTest {
     }
 
     @Test
-    @DisplayName("Should handle successfully errors 5xx")
+    @DisplayName("Should Handle Successfully Errors 5xx")
     void shouldThrowExceptionOnError5XX() {
         mockBackEnd.enqueue(
                 new MockResponse()
@@ -99,7 +100,7 @@ public class NasaApodClientIntegrationImplTest {
     }
 
     @Test
-    @DisplayName("Should handle successfully errors 4xx")
+    @DisplayName("Should Handle Successfully Errors 4xx")
     void shouldThrowExceptionOnError4XX() {
         mockBackEnd.enqueue(
                 new MockResponse()

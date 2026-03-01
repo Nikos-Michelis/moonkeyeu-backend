@@ -42,12 +42,14 @@ public class PublicController {
     public ResponseEntity<?> getNasaPictureOfTheDay() {
         return ResponseEntity.ok(nasaApodService.getNasaApodFromCache());
     }
+
     @GetMapping("/launch/{launchId}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<DTOEntity> getLaunchById(@PathVariable String launchId) {
         DTOEntity dtoEntity = launchService.getLaunchById(launchId);
         return ResponseEntity.ok(dtoEntity);
     }
+
     @GetMapping("/launches")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<PagedModel<EntityModel<DTOEntity>>> getAllLaunches(

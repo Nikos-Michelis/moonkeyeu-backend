@@ -1,5 +1,6 @@
-package com.moonkeyeu.core.api.launch.services.impl.search;
+package com.moonkeyeu.core.api.launch.unit.services.impl.search;
 
+import com.moonkeyeu.core.api.launch.services.impl.search.AstronautServiceImpl;
 import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.astronaut.AstronautDetailedDTO;
@@ -73,11 +74,11 @@ class AstronautServiceImplTest {
     }
 
     @Nested
-    @DisplayName("Search Astronaut by filters tests")
-    class SearchAstronautByParamsTest {
+    @DisplayName("Search Astronaut By Filters")
+    class SearchAstronautTest {
 
         @Test
-        @DisplayName("Should return paged AstronautNormalDTOs without filters")
+        @DisplayName("Should Return Paged Astronaut Normal Summaries When No Filters Are Applied")
         void shouldReturnPagedAstronautsWithoutFilters() {
 
             // given: service method going to test
@@ -104,42 +105,43 @@ class AstronautServiceImplTest {
             verify(dtoConverter, times(result.getSize()))
                     .convertToDto(testAstronaut, AstronautNormalDTO.class);
         }
-    }
 
-    @Test
-    @DisplayName("Should return paged AstroanutNormalDTOs with filters")
-    void shouldReturnPagedLaunchesWithFilters() {
 
-        // given: service method going to test
-        Page<Astronaut> astroanutPage = new PageImpl<>(List.of(testAstronaut));
+        @Test
+        @DisplayName("Should Return Paged Astronaut Normal Summaries When Filters Are Applied")
+        void shouldReturnPagedLaunchesWithFilters() {
 
-        when(astronautsRepository.findAll(any(Specification.class), any(Pageable.class)))
-                .thenReturn(astroanutPage);
+            // given: service method going to test
+            Page<Astronaut> astroanutPage = new PageImpl<>(List.of(testAstronaut));
 
-        when(dtoConverter.convertToDto(eq(testAstronaut), eq(AstronautNormalDTO.class)))
-                .thenReturn(testAstronautNormalDTO);
+            when(astronautsRepository.findAll(any(Specification.class), any(Pageable.class)))
+                    .thenReturn(astroanutPage);
 
-        // when: when test runs
-        Page<DTOEntity> result =
-                astronautService.searchAstronaut(testRequestParams, testPageSortingDTO);
+            when(dtoConverter.convertToDto(eq(testAstronaut), eq(AstronautNormalDTO.class)))
+                    .thenReturn(testAstronautNormalDTO);
 
-        // then: result of test
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        assertSame(testAstronautNormalDTO, result.getContent().get(0));
+            // when: when test runs
+            Page<DTOEntity> result =
+                    astronautService.searchAstronaut(testRequestParams, testPageSortingDTO);
 
-        verify(astronautsRepository, times(1))
-                .findAll(any(Specification.class), any(Pageable.class));
+            // then: result of test
+            assertNotNull(result);
+            assertEquals(1, result.getTotalElements());
+            assertSame(testAstronautNormalDTO, result.getContent().get(0));
 
-        verify(dtoConverter, times(result.getSize()))
-                .convertToDto(testAstronaut, AstronautNormalDTO.class);
+            verify(astronautsRepository, times(1))
+                    .findAll(any(Specification.class), any(Pageable.class));
+
+            verify(dtoConverter, times(result.getSize()))
+                    .convertToDto(testAstronaut, AstronautNormalDTO.class);
+        }
     }
 
     @Nested
-    @DisplayName("find astronaut by id tests")
+    @DisplayName("Find Astronaut By ID")
     class FindAstronautById {
         @Test
-        @DisplayName("Should return astronaut by id")
+        @DisplayName("Should Return a Astronaut When ID Exists")
         void shouldReturnLaunchById() {
 
             // given
@@ -163,7 +165,7 @@ class AstronautServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when astronautId is null")
+        @DisplayName("Should Throw ResourceNotFoundException When Astronaut ID Is Null")
         void shouldHandleNullAstronautId() {
 
             // given
@@ -184,7 +186,7 @@ class AstronautServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when astronaut not found")
+        @DisplayName("Should Throw ResourceNotFoundException When Astronaut ID Not Found")
         void shouldThrowResourceNotFoundException() {
 
             // given

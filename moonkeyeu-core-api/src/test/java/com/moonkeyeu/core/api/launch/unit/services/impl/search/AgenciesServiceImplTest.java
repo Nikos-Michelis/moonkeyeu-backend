@@ -1,5 +1,6 @@
-package com.moonkeyeu.core.api.launch.services.impl.search;
+package com.moonkeyeu.core.api.launch.unit.services.impl.search;
 
+import com.moonkeyeu.core.api.launch.services.impl.search.AgenciesServiceImpl;
 import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.agency.AgencyDetailedDTO;
@@ -71,7 +72,7 @@ class AgenciesServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return all featured agencies")
+    @DisplayName("Should Return All Agencies Marked as Featured")
     void shouldReturnAllFeaturedAgencies() {
 
         when(agenciesRepository.findAll())
@@ -93,15 +94,15 @@ class AgenciesServiceImplTest {
     }
 
     @Nested
-    @DisplayName("find agency by id tests")
+    @DisplayName("Find Agency By ID")
     class FindAgencyByIdTests {
         @Test
-        @DisplayName("Should return agency by id")
+        @DisplayName("Should Return an Agency Configuration When ID Exists")
         void shouldReturnAgencyById() {
             // given
             Integer agencyId = 1;
 
-            when(agenciesRepository.findAgenciesById(agencyId))
+            when(agenciesRepository.findAgencyById(agencyId))
                     .thenReturn(Optional.of(testAgencies));
 
             when(launchRepository.findUpcomingLaunchesByAgencyId(agencyId))
@@ -117,18 +118,18 @@ class AgenciesServiceImplTest {
             assertNotNull(result);
             assertEquals(testAgencyDetailedDTO, result);
 
-            verify(agenciesRepository).findAgenciesById(agencyId);
+            verify(agenciesRepository).findAgencyById(agencyId);
             verify(launchRepository).findUpcomingLaunchesByAgencyId(agencyId);
             verify(dtoConverter).convertToDto(testAgencies, AgencyDetailedDTO.class);
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when agencyId is null")
+        @DisplayName("Should Throw ResourceNotFoundException When Agency ID Is Null")
         void shouldHandleNullAgencyId() {
             // given
             Integer agencyId = null;
 
-            when(agenciesRepository.findAgenciesById(agencyId))
+            when(agenciesRepository.findAgencyById(agencyId))
                     .thenReturn(Optional.empty());
 
             // when & Then
@@ -138,18 +139,18 @@ class AgenciesServiceImplTest {
 
             assertNotNull(exception);
             assertEquals("Agency not found with id: " + agencyId, exception.getMessage());
-            verify(agenciesRepository, times(1)).findAgenciesById(agencyId);
+            verify(agenciesRepository, times(1)).findAgencyById(agencyId);
             verifyNoInteractions(launchRepository);
             verifyNoInteractions(dtoConverter);
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when agency not found")
+        @DisplayName("Should Throw ResourceNotFoundException When Agency ID Not Found")
         void shouldThrowResourceNotFoundException() {
             // given
             Integer agencyId = 123;
 
-            when(agenciesRepository.findAgenciesById(agencyId))
+            when(agenciesRepository.findAgencyById(agencyId))
                     .thenReturn(Optional.empty());
 
             // when & Then
@@ -159,7 +160,7 @@ class AgenciesServiceImplTest {
 
             assertNotNull(exception);
             assertEquals("Agency not found with id: " + agencyId, exception.getMessage());
-            verify(agenciesRepository, times(1)).findAgenciesById(agencyId);
+            verify(agenciesRepository, times(1)).findAgencyById(agencyId);
             verifyNoInteractions(launchRepository);
             verifyNoInteractions(dtoConverter);
         }

@@ -1,5 +1,6 @@
-package com.moonkeyeu.core.api.launch.services.impl.search;
+package com.moonkeyeu.core.api.launch.unit.services.impl.search;
 
+import com.moonkeyeu.core.api.launch.services.impl.search.LaunchServiceImpl;
 import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchDTO;
@@ -81,11 +82,11 @@ class LaunchServiceImplTest {
     }
 
     @Nested
-    @DisplayName("Search Launch by filters tests")
+    @DisplayName("Search Launch by Filters")
     class searchLaunchByParamsTests {
 
         @Test
-        @DisplayName("Should return paged LaunchNormalDTOs without filters")
+        @DisplayName("Should Return Paged Launch Normal Summaries When No Filters Are Applied")
         void shouldReturnPagedLaunchesWithoutFilters() {
 
             // given: service method going to test
@@ -114,7 +115,7 @@ class LaunchServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should return paged LaunchNormalDTOs with filters")
+        @DisplayName("Should Return Paged Launch Normal Summaries When Filters Are Applied")
         void shouldReturnPagedLaunchesWithFilters() {
 
             // given: service method going to test
@@ -141,10 +142,10 @@ class LaunchServiceImplTest {
     }
 
     @Nested
-    @DisplayName("find Launch by id tests")
+    @DisplayName("Find Launch By ID")
     class findLaunchById {
         @Test
-        @DisplayName("Should return launch by id")
+        @DisplayName("Should Return a Launch When ID Exists")
         void shouldReturnLaunchById() {
 
             // given
@@ -168,7 +169,7 @@ class LaunchServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when launchId is null")
+        @DisplayName("Should Throw ResourceNotFoundException When Launch ID Is Null")
         void shouldHandleNullLaunchId() {
 
             // given
@@ -189,7 +190,7 @@ class LaunchServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should throw ResourceNotFoundException when launch not found")
+        @DisplayName("Should Throw ResourceNotFoundException When Launch Configuration ID Not Found")
         void shouldThrowResourceNotFoundException() {
 
             // given

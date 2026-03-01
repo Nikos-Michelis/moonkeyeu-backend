@@ -1,5 +1,6 @@
-package com.moonkeyeu.core.api.launch.services.impl.search;
+package com.moonkeyeu.core.api.launch.unit.services.impl.search;
 
+import com.moonkeyeu.core.api.launch.services.impl.search.FiltersServiceImpl;
 import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import com.moonkeyeu.core.api.launch.dto.filters.FiltersDTO;
 import com.moonkeyeu.core.api.launch.model.views.BaseFilter;
@@ -35,19 +36,19 @@ class FiltersServiceImplTest {
     @BeforeEach
     void setup() {
         BaseFilter nasa = BaseFilter.builder()
-                .filterId(1)
+                .filterId(1L)
                 .filterName("NASA")
                 .filterType("agencies")
                 .build();
 
         BaseFilter esa = BaseFilter.builder()
-                .filterId(2)
+                .filterId(2L)
                 .filterName("ESA")
                 .filterType("agencies")
                 .build();
 
         BaseFilter location = BaseFilter.builder()
-                .filterId(3)
+                .filterId(3L)
                 .filterName("Starbase")
                 .filterType("locations")
                 .build();
@@ -55,19 +56,19 @@ class FiltersServiceImplTest {
         this.launchRepositoryData = List.of(nasa, esa, location);
 
         BaseFilter statusActive = BaseFilter.builder()
-                .filterId(1)
+                .filterId(1L)
                 .filterName("Active")
                 .filterType("astronaut_status")
                 .build();
 
         BaseFilter natGreece = BaseFilter.builder()
-                .filterId(2)
+                .filterId(2L)
                 .filterName("Greece")
                 .filterType("nationality")
                 .build();
 
         BaseFilter natAmerican = BaseFilter.builder()
-                .filterId(3)
+                .filterId(3L)
                 .filterName("American")
                 .filterType("nationality")
                 .build();
@@ -76,7 +77,7 @@ class FiltersServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return launch filters grouped and sorted alphabetically")
+    @DisplayName("Should Return Launch Filters Grouped And Sorted Alphabetically")
     void shouldFilterAndSortLaunchFilters() {
         // Given
         when(filtersRepository.findAllLaunchFilters())
@@ -109,7 +110,7 @@ class FiltersServiceImplTest {
     }
 
      @Test
-     @DisplayName("Should return astronaut filters grouped and sorted alphabetically")
+     @DisplayName("Should return Astronaut Filters Grouped And Sorted Alphabetically")
      void shouldFilterAndSortAstronautFilters() {
         // Given
         when(filtersRepository.findAllAstronautFilters())
