@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.launch.integration.service.impl.search;
 
-import com.moonkeyeu.core.api.launch.config.TestContainerConfig;
-import com.moonkeyeu.core.api.launch.config.TestSecurityConfig;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
+import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
 import com.moonkeyeu.core.api.launch.dto.pad.LaunchPadDTO;
 import com.moonkeyeu.core.api.launch.dto.pad.LaunchPadDetailedDTO;
 import com.moonkeyeu.core.api.launch.model.pad.LaunchPad;
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -25,14 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
 @SpringBootTest
-@Import(TestSecurityConfig.class)
-@Transactional
+@Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("LaunchPadServiceImplIntTest Integration Tests")
-class LaunchPadServiceImplIntTest extends TestContainerConfig {
+@Transactional
+class LaunchPadServiceImplIT {
     @Autowired
     private LaunchPadServiceImpl launchPadService;
-    private List<LaunchPad> launchPadRepositoryData;
-
 
     @Test
     @DisplayName("Should Return All LaunchPads Grouped By Active Status")

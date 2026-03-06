@@ -73,8 +73,8 @@ class LaunchPadServiceImplTest {
         this.launchPadRepositoryData = List.of(launchPad1, launchPad2, launchPad3, launchPad4);
 
         this.testLaunch = new Launch();
-        this.testLaunch.setLaunchId("test_267f232e-f34a-4c79-ac56-b00cf69dd32d");
-        this.testLaunch.setLaunchName("Test Falcon 9");
+        this.testLaunch.setLaunchId("test_bf08a10b-35f0-4736-97f3-ba111e59cd55");
+        this.testLaunch.setLaunchName("Space Shuttle");
         Instant now = Instant.now();
         this.testLaunch.setNet(now);
         this.testLaunch.setWindowStart(now.minus(1, ChronoUnit.DAYS));

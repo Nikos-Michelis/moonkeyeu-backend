@@ -11,7 +11,6 @@ import com.moonkeyeu.core.api.launch.services.*;
 import com.moonkeyeu.core.api.launch.services.impl.crawler.CrawlerService;
 import com.moonkeyeu.core.api.security.limiter.RateLimited;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

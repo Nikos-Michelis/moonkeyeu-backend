@@ -1,16 +1,17 @@
 package com.moonkeyeu.core.api.launch.integration.service.impl.search;
 
-import com.moonkeyeu.core.api.launch.config.TestContainerConfig;
-import com.moonkeyeu.core.api.launch.config.TestSecurityConfig;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
+import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
-import com.moonkeyeu.core.api.launch.dto.spacecraft.SpacecraftConfigurationDTO;
-import com.moonkeyeu.core.api.launch.services.impl.search.SpacecraftServiceImpl;
+import com.moonkeyeu.core.api.launch.dto.rocket.RocketNormalDTO;
+import com.moonkeyeu.core.api.launch.services.impl.search.RocketServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -24,12 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
 @SpringBootTest
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DisplayName("RocketServiceImplIntTest Integration Tests")
 @Transactional
-@DisplayName("SpacecraftServiceImplIntTest Integration Tests")
-class SpacecraftServiceImplIntTest extends TestContainerConfig {
+class RocketServiceImplIT {
     @Autowired
-    private SpacecraftServiceImpl spacecraftService;
+    private RocketServiceImpl rocketService;
     private PageSortingDTO testPageSortingDTO;
     private Map<String, String> testRequestParams;
 
@@ -47,26 +49,24 @@ class SpacecraftServiceImplIntTest extends TestContainerConfig {
     }
 
     @Nested
-    @DisplayName("Search Spacecraft Configurations By Filters")
-    class SearchSpacecraftConfigsTests {
+    @DisplayName("Search Rocket, Rocket Configuration by Filters")
+    class SearchRocketTests {
 
         @Test
-        @DisplayName("Should Return Paged Spacecraft Configuration Summaries When No Filters Are Applied")
-        void shouldReturnPagedSpacecraftConfigsWithoutFilters() {
+        @DisplayName("Should Return Paged Rocket Configuration Summaries When No Filters Are Applied")
+        void shouldReturnPagedRocketConfigsWithoutFilters() {
             // when
-            Page<DTOEntity> result = spacecraftService.searchSpacecraft(Collections.emptyMap(), testPageSortingDTO);
+            Page<DTOEntity> result = rocketService.searchRocket(Collections.emptyMap(), testPageSortingDTO);
             // then
             assertNotNull(result);
             assertEquals(testPageSortingDTO.getLimit(), result.getPageable().getPageSize());
         }
 
         @Test
-        @DisplayName("Should Return Paged Spacecraft Configuration Summaries When Filters Are Applied")
-        void shouldReturnPagedSpacecraftConfigsWithFilters() {
+        @DisplayName("Should Return Paged Rocket Configuration Summaries When Filters Are Applied")
+        void shouldReturnPagedRocketsWithFilters() {
             // when
-            Page<DTOEntity> result =
-                    spacecraftService.searchSpacecraft(testRequestParams, testPageSortingDTO);
-
+            Page<DTOEntity> result = rocketService.searchRocket(testRequestParams, testPageSortingDTO);
             // then
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
@@ -74,49 +74,47 @@ class SpacecraftServiceImplIntTest extends TestContainerConfig {
     }
 
     @Nested
-    @DisplayName("Find SpacecraftConfig By ID")
-    class FindSpacecraftConfigById {
+    @DisplayName("Find Rocket By ID")
+    class FindRocketById {
         @Test
-        @DisplayName("Should Return a Spacecraft Configuration When ID Exists")
-        void shouldReturnSpacecraftConfigById() {
+        @DisplayName("Should return a Rocket When ID Exists")
+        void shouldReturnRocketById() {
             // given
-            final Integer spacecraftConfigId = 14;
-
+            final Integer rocketId = 453;
             // when
-            SpacecraftConfigurationDTO result = spacecraftService.getSpacecraftById(spacecraftConfigId);
-
+            RocketNormalDTO result = rocketService.getRocketById(rocketId);
             // then
             assertNotNull(result);
-            assertEquals(spacecraftConfigId, result.getSpacecraftConfId());
+            assertEquals(rocketId, result.getRocketId().intValue());
         }
 
         @Test
-        @DisplayName("Should Throw ResourceNotFoundException When Spacecraft Configuration ID Is Null")
-        void shouldHandleNullSpacecraftConfigId() {
+        @DisplayName("Should throw ResourceNotFoundException When Rocket ID Is Null")
+        void shouldHandleNullRocketId() {
             // given
-            final Integer spacecraftConfigId = null;
-
+            final Integer rocketId = null;
             // when & Then
             final ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
-                    () -> spacecraftService.getSpacecraftById(spacecraftConfigId));
+                    () -> rocketService.getRocketById(rocketId));
 
             assertNotNull(exception);
-            assertEquals("Spacecraft configuration not found with id: " + spacecraftConfigId, exception.getMessage());
+            assertEquals("Rocket not found with id: " + rocketId, exception.getMessage());
         }
 
         @Test
-        @DisplayName("Should Throw ResourceNotFoundException When Spacecraft Configuration ID Not Found")
+        @DisplayName("Should Throw ResourceNotFoundException When Rocket ID Not Found")
         void shouldThrowResourceNotFoundException() {
             // given
-            final Integer spacecraftConfigId = 123456;
+            final Integer rocketId = 123456;
+
             // when & Then
             final ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
-                    () -> spacecraftService.getSpacecraftById(spacecraftConfigId));
+                    () -> rocketService.getRocketById(rocketId));
 
             assertNotNull(exception);
-            assertEquals("Spacecraft configuration not found with id: " + spacecraftConfigId, exception.getMessage());
+            assertEquals("Rocket not found with id: " + rocketId, exception.getMessage());
         }
     }
 }

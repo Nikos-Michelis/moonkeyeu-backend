@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.launch.integration.repository;
 
-import com.moonkeyeu.core.api.launch.config.TestContainerConfig;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import com.moonkeyeu.core.api.launch.repository.LaunchRepository;
@@ -8,19 +8,24 @@ import com.moonkeyeu.core.api.launch.repository.specifications.LaunchSpecificati
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Testcontainers
-class LaunchRepositoryTest extends TestContainerConfig {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestContainerConfiguration.class)
+class LaunchRepositoryIT {
     @Autowired
     private LaunchRepository launchRepository;
     private Specification<Launch> spec;

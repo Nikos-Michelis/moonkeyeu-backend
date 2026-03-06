@@ -1,6 +1,7 @@
 package com.moonkeyeu.core.api.launch.integration.service.impl.search;
 
-import com.moonkeyeu.core.api.launch.config.TestSecurityConfig;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
+import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.launch.services.impl.search.LauncherServiceImpl;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -17,15 +19,16 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
 @DisplayName("LauncherServiceImplTest Integration Tests")
-class LauncherServiceImplIntTest {
+class LauncherServiceImplIT {
 
     @Autowired
     private LauncherServiceImpl launcherService;
@@ -37,12 +40,12 @@ class LauncherServiceImplIntTest {
         this.testPageSortingDTO = PageSortingDTO.builder()
                 .page(0)
                 .limit(12)
-                .field("name")
+                .field("serialNumber")
                 .sort("asc")
                 .build();
 
         this.testRequestParams = new HashMap<>();
-        this.testRequestParams.put("search", "B1234");
+        this.testRequestParams.put("search", "F1 B0001");
     }
 
     @Nested
@@ -54,7 +57,8 @@ class LauncherServiceImplIntTest {
         void shouldReturnPagedLauncherStageWithoutFilters() {
             Page<DTOEntity> result = launcherService.searchLauncher(Collections.emptyMap(), testPageSortingDTO);
             assertNotNull(result);
-            assertEquals(1, result.getTotalElements());
+            assertTrue(result.getTotalElements() >= 20);
+            assertEquals(testPageSortingDTO.getLimit(), result.getPageable().getPageSize());
         }
 
         @Test

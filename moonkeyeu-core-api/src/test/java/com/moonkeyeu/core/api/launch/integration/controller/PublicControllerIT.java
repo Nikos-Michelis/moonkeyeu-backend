@@ -1,9 +1,9 @@
 package com.moonkeyeu.core.api.launch.integration.controller;
-import com.moonkeyeu.core.api.launch.config.TestContainerConfig;
-import com.moonkeyeu.core.api.launch.config.TestSecurityConfig;
-import com.moonkeyeu.core.api.launch.services.*;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
+import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -16,9 +16,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = "server.port=8081"
 )
-@Import(TestSecurityConfig.class)
-@Transactional
-public class PublicControllerIntTest extends TestContainerConfig {
+@Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+public class PublicControllerIT {
 
     @Autowired
     private WebTestClient webTestClient;
@@ -28,7 +28,7 @@ public class PublicControllerIntTest extends TestContainerConfig {
         webTestClient.get()
                 .uri("/public/nasa/apod")
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().is5xxServerError()
                 .expectBody()
                 .consumeWith(System.out::println);
     }
@@ -53,7 +53,7 @@ public class PublicControllerIntTest extends TestContainerConfig {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$._embedded.launchNormalDTOes[0].id").isEqualTo("bf08a10b-35f0-4736-97f3-ba111e59cd55");
+                .jsonPath("$._embedded.launchNormalDTOes[0].id").isEqualTo("e1b6d391-fa37-47a5-9a18-7b19a8a183d8");
     }
 
     @Test

@@ -51,7 +51,7 @@ public class DashboardServiceImpl implements DashboardService, BatchService {
     @Override
     @Cacheable(value = CacheNames.CONTACT_MESSAGES_CACHE, key = "'messages-pagination-' + #requestParams + '-' + #pageSortingDTO", sync = true)
     public Page<DTOEntity> searchMessages(Map<String, String> requestParams, PageSortingDTO pageSortingDTO) {
-        Specification<Contact> spec = Specification.where(null);
+        Specification<Contact> spec = Specification.unrestricted();
         if (requestParams != null && !requestParams.isEmpty()) {
 
             if (requestParams.containsKey("search") && !requestParams.get("search").isEmpty()) {

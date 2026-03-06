@@ -50,16 +50,16 @@ class AgenciesServiceImplTest {
     @BeforeEach
     void setUp() {
         this.testLaunch = new Launch();
-        this.testLaunch.setLaunchId("test_267f232e-f34a-4c79-ac56-b00cf69dd32d");
-        this.testLaunch.setLaunchName("Test Falcon 9");
+        this.testLaunch.setLaunchId("test_bf08a10b-35f0-4736-97f3-ba111e59cd55");
+        this.testLaunch.setLaunchName("Space Shuttle");
         Instant now = Instant.now();
         this.testLaunch.setNet(now);
         this.testLaunch.setWindowStart(now.minus(1, ChronoUnit.DAYS));
         this.testLaunch.setWindowEnd(now.plus(1, ChronoUnit.DAYS));
 
         this.testAgencies = new Agencies();
-        this.testAgencies.setAgencyId(1L);
-        this.testAgencies.setAgencyName("SpaceX");
+        this.testAgencies.setAgencyId(44L);
+        this.testAgencies.setAgencyName("Nasa");
 
         this.testAgencySummarizedDTO = new AgencySummarizedDTO();
         this.testAgencySummarizedDTO.setAgencyId(testAgencies.getAgencyId());
@@ -85,7 +85,7 @@ class AgenciesServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(testAgencySummarizedDTO, result.get(0));
+        assertEquals(testAgencySummarizedDTO, result.getFirst());
 
         verify(agenciesRepository, times(1))
                 .findAll();
@@ -100,7 +100,7 @@ class AgenciesServiceImplTest {
         @DisplayName("Should Return an Agency Configuration When ID Exists")
         void shouldReturnAgencyById() {
             // given
-            Integer agencyId = 1;
+            Integer agencyId = 44;
 
             when(agenciesRepository.findAgencyById(agencyId))
                     .thenReturn(Optional.of(testAgencies));
@@ -148,7 +148,7 @@ class AgenciesServiceImplTest {
         @DisplayName("Should Throw ResourceNotFoundException When Agency ID Not Found")
         void shouldThrowResourceNotFoundException() {
             // given
-            Integer agencyId = 123;
+            Integer agencyId = 123456;
 
             when(agenciesRepository.findAgencyById(agencyId))
                     .thenReturn(Optional.empty());

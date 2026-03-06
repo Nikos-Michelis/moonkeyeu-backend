@@ -47,19 +47,21 @@ class AstronautServiceImplTest {
     @BeforeEach
     void setUp() {
         this.testPageSortingDTO = PageSortingDTO.builder()
-                .page(0)
+                .page(1)
                 .limit(12)
                 .field("name")
-                .sort("asc")
+                .sort("desc")
                 .build();
 
         this.testRequestParams = new HashMap<>();
-        this.testRequestParams.put("upcoming", "true");
-        this.testRequestParams.put("agency", "121");
+        this.testRequestParams.put("search", "Yury Usachov");
+        this.testRequestParams.put("nationality", "5");
+        this.testRequestParams.put("status", "2");
+        this.testRequestParams.put("agency", "44");
 
         this.testAstronaut = new Astronaut();
-        this.testAstronaut.setAstronautId(1L);
-        this.testAstronaut.setName("Abdul Ahad Mohmand");
+        this.testAstronaut.setAstronautId(274L);
+        this.testAstronaut.setName("Yury Usachov");
         this.testAstronaut.setInSpace(false);
 
         this.testAstronautNormalDTO = new AstronautNormalDTO();
@@ -92,12 +94,12 @@ class AstronautServiceImplTest {
 
             // when: when test runs
             Page<DTOEntity> result =
-                    astronautService.searchAstronaut(Collections.emptyMap(), testPageSortingDTO);
+                    astronautService.searchAstronaut(null, testPageSortingDTO);
 
             // then: result of test
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
-            assertEquals(testAstronautNormalDTO, result.getContent().get(0));
+            assertEquals(testAstronautNormalDTO, result.getContent().getFirst());
 
             verify(astronautsRepository, times(1))
                     .findAll(any(Specification.class), any(Pageable.class));
@@ -127,7 +129,7 @@ class AstronautServiceImplTest {
             // then: result of test
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
-            assertSame(testAstronautNormalDTO, result.getContent().get(0));
+            assertSame(testAstronautNormalDTO, result.getContent().getFirst());
 
             verify(astronautsRepository, times(1))
                     .findAll(any(Specification.class), any(Pageable.class));
@@ -145,7 +147,7 @@ class AstronautServiceImplTest {
         void shouldReturnLaunchById() {
 
             // given
-            Integer astronautId = 123;
+            Integer astronautId = 44;
 
             when(astronautsRepository.findAstronautByAstronautId(astronautId))
                     .thenReturn(Optional.of(testAstronaut));
@@ -190,7 +192,7 @@ class AstronautServiceImplTest {
         void shouldThrowResourceNotFoundException() {
 
             // given
-            final Integer astronautId = 123;
+            final Integer astronautId = 123456;
 
             when(astronautsRepository.findAstronautByAstronautId(astronautId))
                     .thenReturn(Optional.empty());

@@ -28,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LaunchServiceImpl Unit Tests")
 class LaunchServiceImplTest {
@@ -48,19 +47,27 @@ class LaunchServiceImplTest {
     @BeforeEach
     void setUp() {
         this.testPageSortingDTO = PageSortingDTO.builder()
-                .page(0)
+                .page(1)
                 .limit(12)
                 .field("net")
                 .sort("asc")
                 .build();
 
         this.testRequestParams = new HashMap<>();
-        this.testRequestParams.put("upcoming", "true");
+        this.testRequestParams.put("upcoming", "false");
         this.testRequestParams.put("agency", "121");
+        this.testRequestParams.put("astronaut", "712");
+        this.testRequestParams.put("location", "12");
+        this.testRequestParams.put("pad", "80");
+        this.testRequestParams.put("launcher", "240");
+        this.testRequestParams.put("rocketConfig", "87");
+        this.testRequestParams.put("spacecraftConfig", "6");
+        this.testRequestParams.put("program", "17");
+        this.testRequestParams.put("search", "Falcon 9 Block 5 | Crew-12");
 
         this.testLaunch = new Launch();
-        this.testLaunch.setLaunchId("test_267f232e-f34a-4c79-ac56-b00cf69dd32d");
-        this.testLaunch.setLaunchName("Test Falcon 9");
+        this.testLaunch.setLaunchId("862b54e3-7bf8-48e5-8cd1-d77257d5fde9");
+        this.testLaunch.setLaunchName("Falcon 9 Block 5 | Crew-12");
         Instant now = Instant.now();
         this.testLaunch.setNet(now);
         this.testLaunch.setWindowStart(now.minus(1, ChronoUnit.DAYS));
@@ -100,12 +107,12 @@ class LaunchServiceImplTest {
 
             // when: when test runs
             Page<DTOEntity> result =
-                    launchService.searchLaunch(Collections.emptyMap(), testPageSortingDTO);
+                    launchService.searchLaunch(null, testPageSortingDTO);
 
             // then: result of test
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
-            assertSame(testLaunchNormalDTO, result.getContent().get(0));
+            assertSame(testLaunchNormalDTO, result.getContent().getFirst());
 
             verify(LaunchServiceImplTest.this.launchRepository, times(1))
                     .findAll(any(Specification.class), any(Pageable.class));
@@ -149,7 +156,7 @@ class LaunchServiceImplTest {
         void shouldReturnLaunchById() {
 
             // given
-            final String launchId = "test_267f232e-f34a-4c79-ac56-b00cf69dd32d";
+            final String launchId = "test_bf08a10b-35f0-4736-97f3-ba111e59cd55";
 
             when(LaunchServiceImplTest.this.launchRepository.findLaunchWithLaunchId(launchId))
                     .thenReturn(Optional.of(testLaunch));
@@ -194,7 +201,7 @@ class LaunchServiceImplTest {
         void shouldThrowResourceNotFoundException() {
 
             // given
-            final String launchId = "test_267f232e-f34a-4c79-ac56-b00cf69dd32d";
+            final String launchId = "test_not_exists_f08a10b-35f0-4736-97f3-ba111e59cd55";
 
             when(LaunchServiceImplTest.this.launchRepository.findLaunchWithLaunchId(launchId))
                     .thenReturn(Optional.empty());

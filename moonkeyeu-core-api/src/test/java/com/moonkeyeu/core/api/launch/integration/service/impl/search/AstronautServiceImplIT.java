@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.launch.integration.service.impl.search;
 
-import com.moonkeyeu.core.api.launch.config.TestContainerConfig;
-import com.moonkeyeu.core.api.launch.config.TestSecurityConfig;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
+import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.astronaut.AstronautDetailedDTO;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -24,10 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
 @SpringBootTest
-@Import(TestSecurityConfig.class)
-@Transactional
+@Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("AstronautServiceImpl Integration Tests")
-class AstronautServiceImplIntTest extends TestContainerConfig {
+@Transactional
+class AstronautServiceImplIT {
     @Autowired
     private AstronautServiceImpl astronautService;
     private PageSortingDTO testPageSortingDTO;

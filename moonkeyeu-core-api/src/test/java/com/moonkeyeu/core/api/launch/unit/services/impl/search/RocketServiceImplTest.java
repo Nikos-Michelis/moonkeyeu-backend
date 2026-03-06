@@ -50,19 +50,21 @@ class RocketServiceImplTest {
     @BeforeEach
     void setUp() {
         this.testPageSortingDTO = PageSortingDTO.builder()
-                .page(0)
+                .page(1)
                 .limit(12)
                 .field("net")
-                .sort("asc")
+                .sort("desc")
                 .build();
 
         this.testRequestParams = new HashMap<>();
         this.testRequestParams.put("reusable", "true");
         this.testRequestParams.put("agency", "121");
+        this.testRequestParams.put("active", "true");
+        this.testRequestParams.put("search", "true");
 
         this.testRocketConfiguration = new RocketConfiguration();
         this.testRocketConfiguration.setRocketConfId(2L);
-        this.testRocketConfiguration.setRocketName("Falcon 9");
+        this.testRocketConfiguration.setRocketName("Falcon 9 Block 5 | Crew-12");
         this.testRocketConfiguration.setActive(true);
 
         this.testRocket = new Rocket();
@@ -103,7 +105,7 @@ class RocketServiceImplTest {
 
             // when: when test runs
             Page<DTOEntity> result =
-                    rocketService.searchRocket(Collections.emptyMap(), testPageSortingDTO);
+                    rocketService.searchRocket(null, testPageSortingDTO);
 
             // then: result of test
             assertNotNull(result);

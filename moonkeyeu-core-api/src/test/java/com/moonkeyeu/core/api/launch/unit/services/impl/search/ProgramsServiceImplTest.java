@@ -55,10 +55,10 @@ class ProgramsServiceImplTest {
     @BeforeEach
     void setUp() {
         this.testPageSortingDTO = PageSortingDTO.builder()
-                .page(0)
+                .page(1)
                 .limit(12)
                 .field("startDate")
-                .sort("asc")
+                .sort("desc")
                 .build();
 
         this.testRequestParams = new HashMap<>();
@@ -92,7 +92,7 @@ class ProgramsServiceImplTest {
         @Test
         @DisplayName("Should Return Paged Programs Summaries When No Filters Are Applied")
         void shouldReturnPagedProgramsWithoutFilters() {
-            // given: service method going to test
+            // given
             Page<Programs> programsPage = new PageImpl<>(List.of(testPrograms));
 
             when(programsRepository.findAll(any(Specification.class), any(Pageable.class)))
@@ -101,11 +101,11 @@ class ProgramsServiceImplTest {
             when(dtoConverter.convertToDto(eq(testPrograms), eq(ProgramSummarizedDTO.class)))
                     .thenReturn(testProgramSummarizedDTO);
 
-            // when: when test runs
+            // when
             Page<DTOEntity> result =
-                    programsService.searchProgram(Collections.emptyMap(), testPageSortingDTO);
+                    programsService.searchProgram(null, testPageSortingDTO);
 
-            // then: result of test
+            // then
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
             assertEquals(testProgramSummarizedDTO, result.getContent().get(0));
@@ -120,7 +120,7 @@ class ProgramsServiceImplTest {
         @Test
         @DisplayName("Should Return Paged Programs Summaries When Filters Are Applied")
         void shouldReturnPagedProgramsWithFilters() {
-            // given: service method going to test
+            // given
             Page<Programs> programsPage = new PageImpl<>(List.of(testPrograms));
 
             when(programsRepository.findAll(any(Specification.class), any(Pageable.class)))

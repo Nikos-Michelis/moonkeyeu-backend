@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("NasaApodClientIntegrationImplTest Integration Tests")
-public class NasaApodClientImplIntTest {
+public class NasaApodClientImplIT {
     public static MockWebServer mockBackEnd;
     public NasaApodClientService nasaApodClientService;
 

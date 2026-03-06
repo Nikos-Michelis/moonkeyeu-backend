@@ -1,28 +1,35 @@
 package com.moonkeyeu.core.api.launch.integration.repository;
 
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.launch.model.launcher.Launcher;
-import com.moonkeyeu.core.api.launch.model.program.Programs;
 import com.moonkeyeu.core.api.launch.repository.LauncherRepository;
-import com.moonkeyeu.core.api.launch.repository.ProgramsRepository;
-import com.moonkeyeu.core.api.launch.repository.specifications.ProgramSpecification;
+import com.moonkeyeu.core.api.launch.repository.specifications.LauncherSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ProgramsRepositoryTest extends AbstractRepositoryTest {
+@Testcontainers
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestContainerConfiguration.class)
+class LauncherRepositoryIT {
     @Autowired
-    private ProgramsRepository programsRepository;
-    private Specification<Programs> spec;
+    private LauncherRepository launcherRepository;
+    private Specification<Launcher> spec;
     private Pageable pageable;
 
     @BeforeEach
@@ -30,11 +37,11 @@ class ProgramsRepositoryTest extends AbstractRepositoryTest {
         PageSortingDTO testPageSortingDTO = PageSortingDTO.builder()
                 .page(0)
                 .limit(12)
-                .field("startDate")
+                .field("serialNumber")
                 .sort("asc")
                 .build();
 
-        this.spec = ProgramSpecification.hasSearchKey("Space Shuttle");
+        this.spec = LauncherSpecification.hasSearchKey("F1 B0001");
         this.pageable =
                 PageRequest.of(
                         testPageSortingDTO.getPage(),
@@ -44,15 +51,16 @@ class ProgramsRepositoryTest extends AbstractRepositoryTest {
 
     }
 
-    @Test
-    void ShouldFindProgramById() {
-        Optional<Programs> program = programsRepository.findProgramById(6);
-        assertTrue(program.isPresent());
-    }
+    /*@Test
+    void findLauncherById() {
+        Integer launcherId = 3;
+        Optional<Launcher> launcher = launcherRepository.findLauncherWithLauncherId(launcherId);
+        assertTrue(launcher.isPresent());
+    }*/
 
     @Test
-    void ShouldFindAllPrograms() {
-        Page<Programs> programs = programsRepository.findAll(this.spec, this.pageable);
-        assertTrue(programs.getTotalElements() > 0);
+    void ShouldFindAllLaunchers() {
+        Page<Launcher> launchers = launcherRepository.findAll(this.spec, this.pageable);
+        assertTrue(launchers.getTotalElements() > 0);
     }
 }

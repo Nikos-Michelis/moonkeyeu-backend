@@ -1,12 +1,13 @@
 package com.moonkeyeu.core.api.launch.integration.service.impl.search;
 
-import com.moonkeyeu.core.api.launch.config.TestContainerConfig;
-import com.moonkeyeu.core.api.launch.config.TestSecurityConfig;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
+import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
 import com.moonkeyeu.core.api.launch.dto.filters.FiltersDTO;
 import com.moonkeyeu.core.api.launch.services.impl.search.FiltersServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
 @SpringBootTest
-@Import(TestSecurityConfig.class)
-@Transactional
+@Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("FiltersServiceImplTest Integration Tests")
-class FiltersServiceImplIntTest extends TestContainerConfig {
+@Transactional
+class FiltersServiceImplIT {
     @Autowired
     private FiltersServiceImpl filtersService;
 

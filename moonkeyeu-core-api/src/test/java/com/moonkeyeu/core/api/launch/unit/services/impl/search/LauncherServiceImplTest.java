@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -47,18 +46,18 @@ class LauncherServiceImplTest {
     @BeforeEach
     void setUp() {
         this.testPageSortingDTO = PageSortingDTO.builder()
-                .page(0)
+                .page(1)
                 .limit(12)
                 .field("name")
-                .sort("asc")
+                .sort("desc")
                 .build();
 
         this.testRequestParams = new HashMap<>();
-        this.testRequestParams.put("search", "B1234");
+        this.testRequestParams.put("search", "B1101");
 
         this.testLauncher = new Launcher();
         this.testLauncher.setLauncherId(32L);
-        this.testLauncher.setSerialNumber("B1234");
+        this.testLauncher.setSerialNumber("B1101");
         this.testLauncher.setFlightProven(true);
 
         this.testLauncherDTO = new LauncherDTO();
@@ -86,7 +85,7 @@ class LauncherServiceImplTest {
 
             // when: when test runs
             Page<DTOEntity> result =
-                    launcherService.searchLauncher(Collections.emptyMap(), testPageSortingDTO);
+                    launcherService.searchLauncher(null, testPageSortingDTO);
 
             // then: result of test
             assertNotNull(result);

@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.launch.integration.service.impl.search;
 
-import com.moonkeyeu.core.api.launch.config.TestContainerConfig;
-import com.moonkeyeu.core.api.launch.config.TestSecurityConfig;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
+import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.agency.AgencyDetailedDTO;
 import com.moonkeyeu.core.api.launch.services.impl.search.AgenciesServiceImpl;
@@ -9,9 +9,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -21,10 +23,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
-@Import(TestSecurityConfig.class)
-@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
 @DisplayName("AgenciesServiceImplTest Integration Tests")
-class AgenciesServiceImplIntTest extends TestContainerConfig {
+@ActiveProfiles("test")
+@Transactional
+class AgenciesServiceImplIT {
     
     @Autowired
     private AgenciesServiceImpl agenciesService;

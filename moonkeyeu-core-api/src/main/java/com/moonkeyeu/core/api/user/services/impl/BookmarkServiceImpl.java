@@ -59,7 +59,7 @@ public class BookmarkServiceImpl implements BookmarkService {
     @Override
     @Cacheable(value = CacheNames.BOOKMARKED_ITEMS_CACHE,  key = "#name + '-' + #user.getUserId()", sync = true)
     public Page<DTOEntity> searchLaunchesByUserAndBookmarkName(User user, String name, Map<String, String> requestParams, PageSortingDTO pageSortingDTO) {
-        Specification<Launch> spec = Specification.where(null);
+        Specification<Launch> spec = Specification.unrestricted();
        // spec = spec.and(MyLaunchesSpecification.rootSpecification());
         spec = spec.and(MyLaunchesSpecification.hasUserIdAndBookmarkName(user.getUserId(), name));
         if (requestParams != null && !requestParams.isEmpty()) {

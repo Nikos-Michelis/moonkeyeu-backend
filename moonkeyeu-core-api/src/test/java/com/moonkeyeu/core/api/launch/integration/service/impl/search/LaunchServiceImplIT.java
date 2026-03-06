@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.launch.integration.service.impl.search;
 
-import com.moonkeyeu.core.api.launch.config.TestContainerConfig;
-import com.moonkeyeu.core.api.launch.config.TestSecurityConfig;
+import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
+import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchDTO;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -23,10 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
 @SpringBootTest
-@Import(TestSecurityConfig.class)
-@Transactional
+@Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("LaunchServiceImplIntTest Integration Tests")
-class LaunchServiceImplIntTest extends TestContainerConfig {
+@Transactional
+class LaunchServiceImplIT {
     @Autowired
     private LaunchServiceImpl launchService;
     private PageSortingDTO testPageSortingDTO;
@@ -35,7 +37,7 @@ class LaunchServiceImplIntTest extends TestContainerConfig {
     @BeforeEach
     void setUp() {
         this.testPageSortingDTO = PageSortingDTO.builder()
-                .page(0)
+                .page(1)
                 .limit(12)
                 .field("net")
                 .sort("asc")
@@ -43,10 +45,10 @@ class LaunchServiceImplIntTest extends TestContainerConfig {
 
         this.testRequestParams = new HashMap<>();
         this.testRequestParams.put("upcoming", "false");
-        this.testRequestParams.put("agency", "191");
+        this.testRequestParams.put("agency", "44");
         this.testRequestParams.put("program", "6");
         this.testRequestParams.put("pad", "87");
-        this.testRequestParams.put("rocketConfig", "453");
+        this.testRequestParams.put("rocketConfig", "493");
     }
 
     @Nested
@@ -66,7 +68,7 @@ class LaunchServiceImplIntTest extends TestContainerConfig {
         void shouldReturnPagedLaunchesWithFilters() {
             Page<DTOEntity> result = launchService.searchLaunch(testRequestParams, testPageSortingDTO);
             assertNotNull(result);
-            assertTrue(result.getTotalElements() >= 10);
+            assertEquals(2, result.getTotalElements());
         }
     }
 

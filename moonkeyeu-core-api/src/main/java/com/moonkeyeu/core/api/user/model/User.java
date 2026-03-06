@@ -90,7 +90,7 @@ public class User implements UserDetails, Principal {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "method_id")
     )
-    private Set<SignUpMethods> signUpMethods = new HashSet<>();
+    private Set<SignUpMethods> signUpMethods;
     @OneToMany(orphanRemoval = true, mappedBy = "user")
     @BatchSize(size = 20)
     private List<Bookmark> bookmarks;

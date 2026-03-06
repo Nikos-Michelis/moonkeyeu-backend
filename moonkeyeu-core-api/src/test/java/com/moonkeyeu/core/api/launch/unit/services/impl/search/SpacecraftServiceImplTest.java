@@ -49,10 +49,10 @@ class SpacecraftServiceImplTest {
     @BeforeEach
     void setUp() {
         this.testPageSortingDTO = PageSortingDTO.builder()
-                .page(0)
+                .page(1)
                 .limit(12)
                 .field("net")
-                .sort("asc")
+                .sort("desc")
                 .build();
 
         this.testRequestParams = new HashMap<>();
@@ -91,7 +91,7 @@ class SpacecraftServiceImplTest {
 
             // when: when test runs
             Page<DTOEntity> result =
-                    spacecraftService.searchSpacecraft(Collections.emptyMap(), testPageSortingDTO);
+                    spacecraftService.searchSpacecraft(null, testPageSortingDTO);
 
             // then: result of test
             assertNotNull(result);
