@@ -233,7 +233,6 @@
                 <configuration>
                     <excludes>
                         <exclude>**/security/**</exclude>
-                        <exclude>**/user/**</exclude>
                         <exclude>**/settings/**</exclude>
                         <exclude>**/configuration/**</exclude>
                         <exclude>**/launch/model/**</exclude>

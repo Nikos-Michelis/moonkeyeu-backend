@@ -48,10 +48,10 @@ public class AgenciesServiceImpl implements AgenciesService {
 
         AgencyDetailedDTO agencyDetailedDTO = dtoConverter.convertToDto(agency, AgencyDetailedDTO.class);
 
-        if (launch.isPresent()) {
-            LaunchNormalDTO launchDTO = dtoConverter.convertToDto(launch, LaunchNormalDTO.class);
+        launch.ifPresent(l -> {
+            LaunchNormalDTO launchDTO = dtoConverter.convertToDto(l, LaunchNormalDTO.class);
             agencyDetailedDTO.setUpcomingLaunches(launchDTO);
-        }
+        });
 
         return agencyDetailedDTO;
     }

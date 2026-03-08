@@ -61,10 +61,10 @@ public class LaunchPadServiceImpl implements LaunchPadService {
         Optional<Launch> launch = launchRepository.findUpcomingLaunchesByLaunchPadId(launchPadId);
         LaunchPadDetailedDTO launchPadDetailedDTO = dtoConverter.convertToDto(launchPad, LaunchPadDetailedDTO.class);
 
-        if (launch.isPresent()) {
-            LaunchNormalDTO launchDTO = dtoConverter.convertToDto(launch, LaunchNormalDTO.class);
+        launch.ifPresent(l -> {
+            LaunchNormalDTO launchDTO = dtoConverter.convertToDto(l, LaunchNormalDTO.class);
             launchPadDetailedDTO.setUpcomingLaunches(launchDTO);
-        }
+        });
 
         return launchPadDetailedDTO;
     }

@@ -8,7 +8,6 @@ import com.moonkeyeu.core.api.launch.dto.pad.LaunchPadDetailedDTO;
 import com.moonkeyeu.core.api.launch.dto.program.ProgramDetailedDTO;
 import com.moonkeyeu.core.api.launch.dto.spacecraft.SpacecraftConfigurationDTO;
 import com.moonkeyeu.core.api.launch.services.*;
-import com.moonkeyeu.core.api.launch.services.impl.crawler.CrawlerService;
 import com.moonkeyeu.core.api.security.limiter.RateLimited;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class CrawlerController {
     public ResponseEntity<Object> getDefaultPreview(
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        return crawlerService.getDefaultPreview(userAgent, "",
+        return crawlerService.getMetaByType(userAgent, "",
                 CrawlerDTO.builder()
                         .description(DEFAULT_DESCRIPTION)
                         .image(DEFAULT_IMG_URL)
@@ -50,7 +49,7 @@ public class CrawlerController {
             @PathVariable String segment,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        return crawlerService.getDefaultPreview(userAgent, segment,
+        return crawlerService.getMetaByType(userAgent, segment,
                 CrawlerDTO.builder()
                         .title(segment.toLowerCase())
                         .description(DEFAULT_DESCRIPTION)
@@ -68,7 +67,7 @@ public class CrawlerController {
     ) {
         LaunchDTO launchDTO = (LaunchDTO) launchService.getLaunchById(id);
         String launchDescription = launchDTO.getRocket().getRocketConfiguration().getDescription();
-        return crawlerService.handlePreview(userAgent, id, "launches",
+        return crawlerService.getMetaByTypeAndId(userAgent, id, "launches",
                 CrawlerDTO.builder()
                         .title(launchDTO.getLaunchName())
                         .description(
@@ -92,7 +91,7 @@ public class CrawlerController {
         AstronautDetailedDTO astronautDetailedDTO = (AstronautDetailedDTO) astronautService.getAstronautById(id);
         Optional<ImageDTO> imageUrls = astronautDetailedDTO.getAstronautImages().stream().findFirst();
         String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
-        return crawlerService.handlePreview(userAgent, id, "astronauts",
+        return crawlerService.getMetaByTypeAndId(userAgent, id, "astronauts",
                 CrawlerDTO.builder()
                         .title(astronautDetailedDTO.getName())
                         .description(
@@ -114,7 +113,7 @@ public class CrawlerController {
         ProgramDetailedDTO programDetailedDTO = (ProgramDetailedDTO) programsService.getProgramById(id);
         Optional<ImageDTO> imageUrls = programDetailedDTO.getProgramImages().stream().findFirst();
         String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
-        return crawlerService.handlePreview(userAgent, id, "programs",
+        return crawlerService.getMetaByTypeAndId(userAgent, id, "programs",
                 CrawlerDTO.builder()
                         .title(programDetailedDTO.getTypeName())
                         .description(
@@ -136,7 +135,7 @@ public class CrawlerController {
         SpacecraftConfigurationDTO spacecraftDTO = spacecraftService.getSpacecraftById(id);
         Optional<ImageDTO> imageUrls = spacecraftDTO.getSpacecraftConfImages().stream().findFirst();
         String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
-        return crawlerService.handlePreview(userAgent, id, "vehicles/spacecraft",
+        return crawlerService.getMetaByTypeAndId(userAgent, id, "vehicles/spacecraft",
                 CrawlerDTO.builder()
                         .title(spacecraftDTO.getSpacecraftConfName())
                         .description(
@@ -157,7 +156,7 @@ public class CrawlerController {
     ) {
         LaunchPadDetailedDTO launchPadDTO = (LaunchPadDetailedDTO) launchPadService.getLaunchPadById(id);
         String imageUrl = launchPadDTO.getMapImage() != null ? launchPadDTO.getMapImage() : DEFAULT_IMG_URL;
-        return crawlerService.handlePreview(userAgent, id, "locations",
+        return crawlerService.getMetaByTypeAndId(userAgent, id, "locations",
                 CrawlerDTO.builder()
                         .title(launchPadDTO.getLaunchPadName())
                         .description(
@@ -179,7 +178,7 @@ public class CrawlerController {
         AgencyDetailedDTO agencyDetailedDTO = (AgencyDetailedDTO) agenciesService.getAgencyById(id);
         Optional<ImageDTO> imageUrls = agencyDetailedDTO.getAgenciesImages().stream().findFirst();
         String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
-        return crawlerService.handlePreview(userAgent, id, "agencies",
+        return crawlerService.getMetaByTypeAndId(userAgent, id, "agencies",
                 CrawlerDTO.builder()
                         .title(agencyDetailedDTO.getAgencyName())
                         .description(

@@ -67,10 +67,10 @@ public class ProgramsServiceImpl implements ProgramsService {
 
         ProgramDetailedDTO programDetailedDTO = dtoConverter.convertToDto(program, ProgramDetailedDTO.class);
 
-        if (launch.isPresent()) {
-            LaunchNormalDTO launchDTO = dtoConverter.convertToDto(launch, LaunchNormalDTO.class);
+        launch.ifPresent(l -> {
+            LaunchNormalDTO launchDTO = dtoConverter.convertToDto(l, LaunchNormalDTO.class);
             programDetailedDTO.setUpcomingLaunches(launchDTO);
-        }
+        });
 
         return programDetailedDTO;
     }

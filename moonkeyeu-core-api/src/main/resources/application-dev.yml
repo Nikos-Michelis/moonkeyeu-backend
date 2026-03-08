@@ -73,6 +73,7 @@ spring:
             required: false
 
 application:
+  name: MoonkeyEU
   frontend:
     url: http://localhost:3001
   backend:

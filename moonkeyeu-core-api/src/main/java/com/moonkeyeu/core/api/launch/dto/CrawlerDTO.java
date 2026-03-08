@@ -36,6 +36,4 @@ public class CrawlerDTO {
                 ? description
                 : "Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.";
     }
-
-
 }
