@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -122,7 +123,9 @@ public class GlobalExceptionHandler {
                         .build()
                 );
     }
-
+    /**
+     * Thrown if the request body validation fails
+     * **/
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exp) {
         Set<Map<String, Object>> errors = new HashSet<>();
@@ -140,6 +143,18 @@ public class GlobalExceptionHandler {
                         .validationErrors(errors)
                         .build()
                 );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exp) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                .businessErrorCode(INVALID_PATH_VARIABLE.getCode())
+                .businessErrorDescription(INVALID_PATH_VARIABLE.getDescription())
+                .error(exp.getMessage())
+                .build()
+        );
     }
 
     @ExceptionHandler(MessagingException.class)
