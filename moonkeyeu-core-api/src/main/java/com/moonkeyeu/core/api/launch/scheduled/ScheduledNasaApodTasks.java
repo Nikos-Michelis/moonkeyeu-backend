@@ -1,4 +1,4 @@
-package com.moonkeyeu.core.api.launch.sheduled;
+package com.moonkeyeu.core.api.launch.scheduled;
 
 import com.moonkeyeu.core.api.launch.services.NasaApodService;
 import jakarta.annotation.PostConstruct;

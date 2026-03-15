@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
-//@EnableJpaAuditing
 @EnableScheduling
 public class MoonkeyEuCoreApplication {
 
@@ -23,7 +22,7 @@ public class MoonkeyEuCoreApplication {
     }
 
     @Bean
-    @Profile("!test")
+    @Profile({"dev", "prod"})
     public CommandLineRunner seedDatabase(RoleRepository roleRepository, PermissionRepository permissionRepository) {
         return args -> {
             for (Permissions permissionEnum : Permissions.values()) {

@@ -757,9 +757,6 @@ class PublicControllerTest {
     @Nested
     @DisplayName("Public: /launchers")
     class LaunchersPadEndpointsTests {
-        /**TODO
-         * extend the database with data about launchers
-         * **/
         @Test
         @DisplayName("Should return a paged JSON response of launchers with the requested query parameters")
         public void shouldReturnPagedLaunchers() throws Exception {

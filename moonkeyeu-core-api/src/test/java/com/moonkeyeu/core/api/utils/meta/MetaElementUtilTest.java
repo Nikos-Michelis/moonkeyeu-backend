@@ -4,6 +4,7 @@ import com.moonkeyeu.core.api.launch.dto.CrawlerDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,13 +14,14 @@ import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = {MetaElementUtil.class})
-@TestPropertySource(properties = "application.name=MoonkeyEU")
+@TestPropertySource(properties = "application.seo.name=TestName")
 class MetaElementUtilTest {
     @Autowired
     private MetaElementUtil metaElementUtil;
     private CrawlerDTO articleCrawlerDTO;
     private CrawlerDTO pageCrawlerDTO;
-
+    @Value("${application.seo.name}")
+    private String applicationName;
     @BeforeEach
     void setUp() {
         this.pageCrawlerDTO = CrawlerDTO.builder()
@@ -46,14 +48,14 @@ class MetaElementUtilTest {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "url": "https://www.example.com/launches",
-            "name": "TestName",
+            "name": "%s",
             "description": "Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.",
             "image": "https://cdn.example.com/media/assets/logo/example-logo.png",
             "datePublished": "%s",
             "dateModified": "%s",
             "inLanguage": "en-US"
         }
-    """.formatted(this.pageCrawlerDTO.getDateModified(), this.pageCrawlerDTO.getDatePublished());
+    """.formatted(applicationName, this.pageCrawlerDTO.getDatePublished(), this.pageCrawlerDTO.getDateModified());
 
         String resultJson = this.metaElementUtil.buildJsonLdScript(this.pageCrawlerDTO, "https://www.example.com/launches");
         String expectedJsonOnly = expectedJson.strip();
@@ -72,14 +74,14 @@ class MetaElementUtilTest {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "url": "https://www.example.com/launches",
-            "name": "TestName",
+            "name": "%s",
             "description": "Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.",
             "image": "https://cdn.example.com/media/assets/logo/example-logo.png",
             "datePublished": "%s",
             "dateModified": "%s",
             "inLanguage": "en-US"
         }
-    """.formatted(this.articleCrawlerDTO.getDatePublished(), this.articleCrawlerDTO.getDateModified());
+    """.formatted(applicationName, this.articleCrawlerDTO.getDatePublished(), this.articleCrawlerDTO.getDateModified());
 
         String expected = """
                     <!DOCTYPE html>
@@ -114,12 +116,12 @@ class MetaElementUtilTest {
                 articleCrawlerDTO.getImage(),
                 articleCrawlerDTO.getTitle(),
                 url,
-                "TestName",
+                applicationName,
                 articleCrawlerDTO.getTitle(),
                 articleCrawlerDTO.getDescription(),
                 articleCrawlerDTO.getImage(),
                 articleCrawlerDTO.getTitle(),
-                "TestName",
+                applicationName,
                 url,
                 JsonLdScript
         );
@@ -136,14 +138,14 @@ class MetaElementUtilTest {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "url": "https://www.example.com/launches",
-            "name": "TestName",
+            "name": "%s",
             "description": "Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.",
             "image": "https://cdn.example.com/media/assets/logo/example-logo.png",
             "datePublished": "%s",
             "dateModified": "%s",
             "inLanguage": "en-US"
         }
-    """.formatted(this.articleCrawlerDTO.getDatePublished(), this.articleCrawlerDTO.getDateModified());
+    """.formatted(applicationName, this.articleCrawlerDTO.getDatePublished(), this.articleCrawlerDTO.getDateModified());
 
         String expected = """
                     <!DOCTYPE html>
@@ -178,12 +180,12 @@ class MetaElementUtilTest {
                 articleCrawlerDTO.getImage(),
                 articleCrawlerDTO.getTitle(),
                 url,
-                "TestName",
+                applicationName,
                 articleCrawlerDTO.getTitle(),
                 articleCrawlerDTO.getDescription(),
                 articleCrawlerDTO.getImage(),
                 articleCrawlerDTO.getTitle(),
-                "TestName",
+                applicationName,
                 url,
                 JsonLdScript
         );

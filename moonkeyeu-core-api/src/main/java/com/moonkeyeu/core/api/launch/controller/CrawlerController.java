@@ -1,62 +1,66 @@
 package com.moonkeyeu.core.api.launch.controller;
-import com.moonkeyeu.core.api.launch.dto.CrawlerDTO;
-import com.moonkeyeu.core.api.launch.dto.ImageDTO;
-import com.moonkeyeu.core.api.launch.dto.agency.AgencyDetailedDTO;
-import com.moonkeyeu.core.api.launch.dto.astronaut.AstronautDetailedDTO;
-import com.moonkeyeu.core.api.launch.dto.launch.LaunchDTO;
-import com.moonkeyeu.core.api.launch.dto.pad.LaunchPadDetailedDTO;
-import com.moonkeyeu.core.api.launch.dto.program.ProgramDetailedDTO;
-import com.moonkeyeu.core.api.launch.dto.spacecraft.SpacecraftConfigurationDTO;
 import com.moonkeyeu.core.api.launch.services.*;
 import com.moonkeyeu.core.api.security.limiter.RateLimited;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+import java.net.URI;
 
-import java.time.Instant;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("crawler")
 @RequiredArgsConstructor
 public class CrawlerController {
-    private final LaunchService launchService;
-    private final AstronautService astronautService;
-    private final ProgramsService programsService;
-    private final SpacecraftService spacecraftService;
-    private final LaunchPadService launchPadService;
-    private final AgenciesService agenciesService;
     private final CrawlerService crawlerService;
-    private final String DEFAULT_DESCRIPTION =
-            "Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.";
-    private final String DEFAULT_IMG_URL = "https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg";
+    @Value("${application.frontend.url}")
+    private String frontendUrl;
+
     @GetMapping("/default")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<Object> getDefaultPreview(
-            @RequestHeader(value = "User-Agent", required = false) String userAgent
+            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
     ) {
-        return crawlerService.getMetaByType(userAgent, "",
-                CrawlerDTO.builder()
-                        .description(DEFAULT_DESCRIPTION)
-                        .image(DEFAULT_IMG_URL)
-                        .datePublished(Instant.now())
-                        .dateModified(Instant.now())
-                        .build());
+
+        if (crawlerService.isCrawler(userAgent)) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(frontendUrl))
+                    .build();
+        }
+
+        String seo = crawlerService.getDefaultMetaHtml(frontendUrl);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(seo);
     }
+
     @GetMapping("/{segment}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<Object> getDefaultPreviewBySegment(
             @PathVariable String segment,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        return crawlerService.getMetaByType(userAgent, segment,
-                CrawlerDTO.builder()
-                        .title(segment.toLowerCase())
-                        .description(DEFAULT_DESCRIPTION)
-                        .image(DEFAULT_IMG_URL)
-                        .datePublished(Instant.now())
-                        .dateModified(Instant.now())
-                        .build());
+        String url = UriComponentsBuilder
+                .fromUri(URI.create(frontendUrl))
+                .pathSegment(segment.toLowerCase())
+                .toUriString();
+
+        if (crawlerService.isCrawler(userAgent)) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(url))
+                    .build();
+        }
+
+        String seo = crawlerService.getMetaHtmlBySegment(url, segment);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(seo);
     }
 
     @GetMapping("/launch/{id}")
@@ -65,44 +69,45 @@ public class CrawlerController {
             @PathVariable String id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        LaunchDTO launchDTO = (LaunchDTO) launchService.getLaunchById(id);
-        String launchDescription = launchDTO.getRocket().getRocketConfiguration().getDescription();
-        return crawlerService.getMetaByTypeAndId(userAgent, id, "launches",
-                CrawlerDTO.builder()
-                        .title(launchDTO.getLaunchName())
-                        .description(
-                                launchDescription != null && !launchDescription.isEmpty()
-                                        ? launchDescription
-                                        : DEFAULT_DESCRIPTION
-                        )
-                        .image(launchDTO.getRocketConfImages() != null
-                                ? launchDTO.getRocketConfImages().getImageUrl()
-                                : DEFAULT_IMG_URL)
-                        .datePublished(Instant.now())
-                        .dateModified(Instant.now())
-                        .build());
+        String url = UriComponentsBuilder
+                .fromUri(URI.create(frontendUrl))
+                .pathSegment("launches")
+                .pathSegment(id).toUriString();
+
+        if (crawlerService.isCrawler(userAgent)) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(url))
+                    .build();
+        }
+
+        String seo = crawlerService.getLaunchMetaHtml(id, url);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(seo);
     }
-    @GetMapping("/astronaut/{id}")
+   @GetMapping("/astronaut/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<Object> getAstronautPreview(
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        AstronautDetailedDTO astronautDetailedDTO = (AstronautDetailedDTO) astronautService.getAstronautById(id);
-        Optional<ImageDTO> imageUrls = astronautDetailedDTO.getAstronautImages().stream().findFirst();
-        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
-        return crawlerService.getMetaByTypeAndId(userAgent, id, "astronauts",
-                CrawlerDTO.builder()
-                        .title(astronautDetailedDTO.getName())
-                        .description(
-                                astronautDetailedDTO.getBio() != null && !astronautDetailedDTO.getBio().isEmpty()
-                                        ? astronautDetailedDTO.getBio()
-                                        : DEFAULT_DESCRIPTION
-                        )
-                        .image(imageUrl)
-                        .datePublished(Instant.now())
-                        .dateModified(Instant.now())
-                        .build());
+       String url = UriComponentsBuilder
+               .fromUri(URI.create(frontendUrl))
+               .pathSegment("astronauts")
+               .pathSegment(id.toString()).toUriString();
+
+       if (crawlerService.isCrawler(userAgent)) {
+           return ResponseEntity.status(HttpStatus.FOUND)
+                   .location(URI.create(url))
+                   .build();
+       }
+
+       String seo = crawlerService.getAstronautMetaHtml(id, url);
+
+       return ResponseEntity.ok()
+               .contentType(MediaType.TEXT_HTML)
+               .body(seo);
     }
     @GetMapping("/program/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
@@ -110,21 +115,22 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        ProgramDetailedDTO programDetailedDTO = (ProgramDetailedDTO) programsService.getProgramById(id);
-        Optional<ImageDTO> imageUrls = programDetailedDTO.getProgramImages().stream().findFirst();
-        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
-        return crawlerService.getMetaByTypeAndId(userAgent, id, "programs",
-                CrawlerDTO.builder()
-                        .title(programDetailedDTO.getTypeName())
-                        .description(
-                                programDetailedDTO.getDescription() != null && !programDetailedDTO.getDescription().isEmpty()
-                                        ? programDetailedDTO.getDescription()
-                                        : DEFAULT_DESCRIPTION
-                        )
-                        .image(imageUrl)
-                        .datePublished(Instant.now())
-                        .dateModified(Instant.now())
-                        .build());
+        String url = UriComponentsBuilder
+                .fromUri(URI.create(frontendUrl))
+                .pathSegment("programs")
+                .pathSegment(id.toString()).toUriString();
+
+        if (crawlerService.isCrawler(userAgent)) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(url))
+                    .build();
+        }
+
+        String seo = crawlerService.getProgramMetaHtml(id, url);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(seo);
     }
     @GetMapping("/spacecraft/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
@@ -132,21 +138,25 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        SpacecraftConfigurationDTO spacecraftDTO = spacecraftService.getSpacecraftById(id);
-        Optional<ImageDTO> imageUrls = spacecraftDTO.getSpacecraftConfImages().stream().findFirst();
-        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
-        return crawlerService.getMetaByTypeAndId(userAgent, id, "vehicles/spacecraft",
-                CrawlerDTO.builder()
-                        .title(spacecraftDTO.getSpacecraftConfName())
-                        .description(
-                                spacecraftDTO.getDetails() != null && !spacecraftDTO.getDetails().isEmpty()
-                                        ? spacecraftDTO.getDetails()
-                                        : DEFAULT_DESCRIPTION
-                        )
-                        .image(imageUrl)
-                        .datePublished(Instant.now())
-                        .dateModified(Instant.now())
-                        .build());
+
+        String url = UriComponentsBuilder
+                .fromUri(URI.create(frontendUrl))
+                .pathSegment("vehicles")
+                .pathSegment("spacecraft")
+                .path(id.toString()).toUriString();
+
+        if (crawlerService.isCrawler(userAgent)) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(url))
+                    .build();
+        }
+
+        String seo = crawlerService.getSpacecraftMetaHtml(id, url);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(seo);
+
     }
     @GetMapping("/launch-pad/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
@@ -154,20 +164,22 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        LaunchPadDetailedDTO launchPadDTO = (LaunchPadDetailedDTO) launchPadService.getLaunchPadById(id);
-        String imageUrl = launchPadDTO.getMapImage() != null ? launchPadDTO.getMapImage() : DEFAULT_IMG_URL;
-        return crawlerService.getMetaByTypeAndId(userAgent, id, "locations",
-                CrawlerDTO.builder()
-                        .title(launchPadDTO.getLaunchPadName())
-                        .description(
-                                launchPadDTO.getDescription() != null && !launchPadDTO.getDescription().isEmpty()
-                                    ? launchPadDTO.getDescription()
-                                    : launchPadDTO.getLocation().getDescription()
-                        )
-                        .image(imageUrl)
-                        .datePublished(Instant.now())
-                        .dateModified(Instant.now())
-                        .build());
+        String url = UriComponentsBuilder
+                .fromUri(URI.create(frontendUrl))
+                .pathSegment("locations")
+                .path(id.toString()).toUriString();
+
+        if (crawlerService.isCrawler(userAgent)) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(url))
+                    .build();
+        }
+
+        String seo = crawlerService.getLaunchPadMetaHtml(id, url);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(seo);
     }
     @GetMapping("/agency/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
@@ -175,20 +187,22 @@ public class CrawlerController {
             @PathVariable Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
-        AgencyDetailedDTO agencyDetailedDTO = (AgencyDetailedDTO) agenciesService.getAgencyById(id);
-        Optional<ImageDTO> imageUrls = agencyDetailedDTO.getAgenciesImages().stream().findFirst();
-        String imageUrl = imageUrls.map(ImageDTO::getImageUrl).orElse(DEFAULT_IMG_URL);
-        return crawlerService.getMetaByTypeAndId(userAgent, id, "agencies",
-                CrawlerDTO.builder()
-                        .title(agencyDetailedDTO.getAgencyName())
-                        .description(
-                                agencyDetailedDTO.getDescription() != null && !agencyDetailedDTO.getDescription().isEmpty()
-                                    ? agencyDetailedDTO.getDescription()
-                                    : DEFAULT_DESCRIPTION
-                        )
-                        .image(imageUrl)
-                        .datePublished(Instant.now())
-                        .dateModified(Instant.now())
-                        .build());
+
+        String url = UriComponentsBuilder
+                .fromUri(URI.create(frontendUrl))
+                .pathSegment("agencies")
+                .path(id.toString()).toUriString();
+
+        if (crawlerService.isCrawler(userAgent)) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(url))
+                    .build();
+        }
+
+        String seo = crawlerService.getAgencyMetaHtml(id, url);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(seo);
     }
 }

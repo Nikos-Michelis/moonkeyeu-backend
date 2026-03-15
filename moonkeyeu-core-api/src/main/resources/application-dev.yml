@@ -59,21 +59,24 @@ spring:
             client-name: Google
 
   mail:
-    sender: test@test.com
-    host: localhost
-    port: 3025
-    username: test
-    password: test
+    sender: ${MAIL_SENDER}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
-          auth: false
+          auth: true
           starttls:
-            enable: false
-            required: false
+            enable: true
+            required: true
 
 application:
-  name: MoonkeyEU
+  seo:
+    name: MoonkeyEU
+    logo: ${CLOUDFRONT_URL}/media/assets/moonkeyeu-logo.jpg
+    description: Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.
   frontend:
     url: http://localhost:3001
   backend:

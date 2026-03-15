@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MetaElementUtil {
-    @Value("${application.name}")
+    @Value("${application.seo.name}")
     private String appName;
 
     public String buildJsonLdScript(CrawlerDTO crawlerDTO, String url) {

@@ -233,11 +233,14 @@
                 <configuration>
                     <excludes>
                         <exclude>**/security/**</exclude>
+                        <exclude>**/user/**</exclude>
+                        <exclude>**/scheduled/**</exclude>
                         <exclude>**/settings/**</exclude>
                         <exclude>**/configuration/**</exclude>
                         <exclude>**/launch/model/**</exclude>
                         <exclude>**/launch/dto/**</exclude>
                         <exclude>**/repository/**</exclude>
+                        <exclude>**/MoonkeyEuCoreApplication</exclude>
                     </excludes>
                 </configuration>
                 <executions>

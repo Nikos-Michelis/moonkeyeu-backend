@@ -171,7 +171,7 @@ class AstronautServiceImplTest {
         void shouldHandleNullAstronautId() {
 
             // given
-            final Integer astronautId = null;
+            Integer astronautId = null;
 
             when(astronautsRepository.findAstronautByAstronautId(astronautId))
                     .thenReturn(Optional.empty());
