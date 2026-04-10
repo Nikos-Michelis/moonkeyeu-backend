@@ -1,0 +1,73 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    paths:
+      - 'moonkeyeu-core-api/**'
+      - 'moonkeyeu-etl-api/**'
+    branches: [21-implement-cicd-pipeline-for-automated-vps-deployment]
+env:
+  API_PROFILE: ${{ vars.API_PROFILE }}
+  CLOUDFRONT_URL: ${{ vars.CLOUDFRONT_URL }}
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    name: Download Test Database From S3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 #v6.0.2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 #v6.0.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: Download test database from S3
+        run: |
+          aws s3 cp s3://fs-moonkeyeu-bucket-test/database/mysql/test/ ./test_db/ --recursive
+
+      - name: Upload SQL as artifact
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f #v7.0.0
+        with:
+          name: test-db
+          path: ./test_db/
+
+  tests:
+    name: Test ${{ matrix.module }}
+    needs: [ setup ]
+    strategy:
+      matrix:
+        module: [ moonkeyeu-core-api, moonkeyeu-etl-api ]
+    uses: ./.github/workflows/test.yml
+    with:
+      module_name: ${{ matrix.module }}
+    secrets:
+      NASA_APOD_KEY: ${{ secrets.NASA_APOD_KEY }}
+
+  build:
+    name: Build Image ${{ matrix.module }}
+    needs: tests
+    strategy:
+      matrix:
+        module: [ moonkeyeu-core-api, moonkeyeu-etl-api ]
+    uses: ./.github/workflows/build.yml
+    with:
+      module_name: ${{ matrix.module }}
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    uses: ./.github/workflows/deploy.yml
+    secrets:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+      VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+      VPS_PORT: ${{ secrets.VPS_PORT }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      S3_REGION: ${{ secrets.S3_REGION }}
