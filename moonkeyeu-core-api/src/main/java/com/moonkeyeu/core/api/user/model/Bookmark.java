@@ -37,7 +37,7 @@ public class Bookmark {
     private User user;
     @ManyToMany(mappedBy = "bookmarks", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @BatchSize(size = 20)
-    private Set<Launch> launches = new HashSet<>();
+    private Set<Launch> launches;
     @CreatedDate
     @Column(name = "created_at", nullable = false, unique = false)
     private Instant createdAt;

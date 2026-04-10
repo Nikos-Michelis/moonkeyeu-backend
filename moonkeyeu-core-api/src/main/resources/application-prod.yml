@@ -17,24 +17,38 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     encoding: UTF-8
+
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:${LOCAL_MYSQL_PORT}}/${MYSQL_DATABASE:${LOCAL_MYSQL_DATABASE}}
     username: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
     password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  batch:
+    jdbc:
+      table-prefix: BATCH_
+      initialize-schema: always
+
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: false
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
         default_batch_fetch_size: 50
       jdbc:
         batch_size: 50
         time_zone: UTC
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  docker:
+    compose:
+      enabled: false
+
   security:
     oauth2:
       client:
@@ -57,9 +71,14 @@ spring:
           starttls:
             enable: true
             required: true
+
 application:
+  seo:
+    name: MoonkeyEU
+    logo: ${CLOUDFRONT_URL}/media/assets/moonkeyeu-logo.jpg
+    description: Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.
   frontend:
-    url: https://www.moonkeyeu.com
+    url: http://localhost:3001
   backend:
     url: http://localhost:8080/api/v1/
   limiter:

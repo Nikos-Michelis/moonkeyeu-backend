@@ -38,6 +38,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
+@Table(name = "rocket", schema = "moonkey_db")
 public class Rocket {
     @Id
     @Column(name = "rocket_id")

@@ -12,8 +12,6 @@ import com.moonkeyeu.core.api.launch.dto.mission.MissionDTO;
 import com.moonkeyeu.core.api.launch.dto.mission.MissionPatchesDTO;
 import com.moonkeyeu.core.api.launch.dto.program.ProgramSummarizedDTO;
 import com.moonkeyeu.core.api.launch.dto.rocket.RocketDetailedDTO;
-import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

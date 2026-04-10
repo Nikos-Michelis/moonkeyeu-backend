@@ -65,7 +65,7 @@ public class Launcher {
     private String details;
     @Basic
     @Column(name = "flight_proven")
-    private Byte flightProven;
+    private Boolean flightProven;
     @Basic
     @Column(name = "serial_number")
     private String serialNumber;

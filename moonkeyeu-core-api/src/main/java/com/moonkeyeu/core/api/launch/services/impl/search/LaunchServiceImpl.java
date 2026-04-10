@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.launch.services.impl.search;
 
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchDTO;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchNormalDTO;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
@@ -9,7 +9,7 @@ import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.repository.LaunchRepository;
 import com.moonkeyeu.core.api.launch.repository.specifications.LaunchSpecification;
 import com.moonkeyeu.core.api.launch.services.LaunchService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,10 +18,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -38,8 +38,7 @@ public class LaunchServiceImpl implements LaunchService {
     @Override
     @Cacheable(value = CacheNames.LAUNCH_CACHE,  key = "'launch-pagination-' + #requestParams + '-' + #pageSortingDTO", sync = true)
     public Page<DTOEntity> searchLaunch(Map<String, String> requestParams, PageSortingDTO pageSortingDTO) throws NumberFormatException {
-        Specification<Launch> spec = Specification.where(null);
-        spec = spec.and(LaunchSpecification.rootSpecification());
+        Specification<Launch> spec = LaunchSpecification.rootSpecification();
 
         if (requestParams != null && !requestParams.isEmpty()) {
             if (requestParams.containsKey("launcher")) {
@@ -105,8 +104,9 @@ public class LaunchServiceImpl implements LaunchService {
     }
     @Override
     @Cacheable(value = CacheNames.LAUNCH_CACHE,  key = "'launch-' + #launchId", sync = true)
-    public Optional<DTOEntity> getLaunchById(String launchId) {
-        Optional<Launch> launch = launchRepository.findLaunchWithLaunchId(launchId);
-        return launch.map(l -> dtoConverter.convertToDto(l, LaunchDTO.class));
+    public DTOEntity getLaunchById(String launchId) {
+       Launch launch = launchRepository.findLaunchWithLaunchId(launchId)
+                .orElseThrow(() -> new ResourceNotFoundException("Launch not found with id: " + launchId));;
+        return dtoConverter.convertToDto(launch, LaunchDTO.class);
     }
 }

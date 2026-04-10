@@ -16,7 +16,7 @@ import java.time.Instant;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "bookmark_list")
+@Table(name = "bookmark_list", schema = "moonkey_db")
 @EqualsAndHashCode(of = "bookmarkListId")
 public class BookmarkList {
     @Id

@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "permissions")
+@Table(name = "permissions", schema = "moonkey_db")
 @EqualsAndHashCode(of = "permissionId")
 public class Permission {
     @Id

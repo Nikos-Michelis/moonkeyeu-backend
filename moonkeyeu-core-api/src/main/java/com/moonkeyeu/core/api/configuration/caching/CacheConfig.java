@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.configuration.caching;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;

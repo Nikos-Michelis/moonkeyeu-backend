@@ -39,7 +39,7 @@ public class Roles {
     private Set<Permission> permissions;
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    private List<User> users = new ArrayList<>();
+    private List<User> users;
     @CreatedDate
     @Column(name = "created_at", nullable = false, unique = false)
     private Instant createdAt;

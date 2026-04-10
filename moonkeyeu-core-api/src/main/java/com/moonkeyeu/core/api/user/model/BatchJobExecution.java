@@ -16,7 +16,7 @@ public class BatchJobExecution {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "JOB_EXECUTION_ID")
-    private long jobExecutionId;
+    private Long jobExecutionId;
     @Basic
     @Column(name = "VERSION")
     private Long version;

@@ -28,7 +28,7 @@ public class SignUpMethods {
     private String provider;
     @ManyToMany(mappedBy = "signUpMethods")
     @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    private Set<User> users;
     @CreatedDate
     @Column(name = "created_at", nullable = false, unique = false)
     private Instant createdAt;

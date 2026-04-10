@@ -16,9 +16,10 @@ public enum BusinessErrorCodes {
     INVALID_REQUEST_PARAM(101, BAD_REQUEST, "Invalid request parameter value."),
     ENTITY_CONFLICT(102, CONFLICT, "Entity has already been added to your list."),
     ENTITY_NOT_FOUND(103, NOT_FOUND, "Entity Not Found."),
-    INVALID_HEADERS(104, BAD_REQUEST, "Entity Not Found."),
+    INVALID_HEADERS(104, BAD_REQUEST, "Invalid header value."),
     UNAVAILABLE_REMOTE_API(105, SERVICE_UNAVAILABLE, "Failed to call remote service."),
     ERROR_REMOTE_API(106, INTERNAL_SERVER_ERROR, "Remote API returned an error."),
+    INVALID_PATH_VARIABLE(107, INTERNAL_SERVER_ERROR, "Invalid path variable."),
 
     INCORRECT_CURRENT_PASSWORD(300, BAD_REQUEST, "Current password is incorrect."),
     NEW_PASSWORD_DOES_NOT_MATCH(301, BAD_REQUEST, "The new password does not match."),

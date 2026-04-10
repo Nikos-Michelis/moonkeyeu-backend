@@ -51,7 +51,6 @@ public class UserStatusServiceImpl implements UserStatusService {
         user.setAccountLocked(false);
         user.setAttempts(0);
         user.setBlocks(0);
-        //log.info(String.format("user after lock change: " + user));
         updateLock(user);
     }
     @Override

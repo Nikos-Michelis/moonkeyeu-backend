@@ -6,10 +6,9 @@ import com.moonkeyeu.core.api.launch.dto.rocket.RocketNormalDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.Map;
-import java.util.Optional;
 
 public interface RocketService {
-    Optional<RocketNormalDTO> getRocketById(Integer rocketId);
+    RocketNormalDTO getRocketById(Integer rocketId);
     Page<DTOEntity> searchRocket(Map<String, String> requestParams, PageSortingDTO pageSortingDTO);
 
 }

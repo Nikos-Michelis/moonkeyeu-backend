@@ -47,7 +47,7 @@ aws:
 
 application:
   backend:
-    url: ${CORE_API_URL}
+    url: ${API_CORE_URL}
   path:
     root:
       data:
@@ -81,7 +81,7 @@ management:
         enabled: true
 
 server:
-  port: ${ETL_API_PORT}
+  port: ${API_ETL_PORT}
   servlet:
     context-path: ${API_CONTEXT_PATH}
 

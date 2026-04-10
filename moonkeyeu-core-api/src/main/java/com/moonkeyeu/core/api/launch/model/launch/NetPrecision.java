@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "net_precision")
+@Table(name = "net_precision", schema = "moonkey_db")
 public class NetPrecision {
     @Id
     @Column(name = "net_precision_id", nullable = false)

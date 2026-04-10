@@ -1,7 +1,8 @@
 package com.moonkeyeu.core.api.launch.services.impl.apod;
 
+import com.moonkeyeu.core.api.utils.caching.CacheManagerUtil;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import com.moonkeyeu.core.api.launch.dto.NasaApodDTO;
-import com.moonkeyeu.core.api.launch.services.CacheManagerService;
 import com.moonkeyeu.core.api.launch.services.NasaApodClientService;
 import com.moonkeyeu.core.api.launch.services.NasaApodService;
 import com.moonkeyeu.core.api.settings.exceptions.NasaApodFetchException;
@@ -16,22 +17,22 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class NasaApodServiceImpl implements NasaApodService {
     private final NasaApodClientService nasaApodClientService;
-    private final CacheManagerService cacheManagerService;
+    private final CacheManagerUtil cacheManagerUtil;
     @Value("${application.api.nasa-apod.media.type}")
     private String mediaType;
 
     @Autowired
     public NasaApodServiceImpl(
-            CacheManagerService cacheManagerService,
+            CacheManagerUtil cacheManagerUtil,
             NasaApodClientService nasaApodClientService
     ) {
-        this.cacheManagerService = cacheManagerService;
+        this.cacheManagerUtil = cacheManagerUtil;
         this.nasaApodClientService = nasaApodClientService;
     }
 
     @Override
     public void refreshNasaApod() {
-        Cache nasaApodCache = cacheManagerService.getCacheByName("nasa-apod-cache");
+        Cache nasaApodCache = cacheManagerUtil.getCacheByName(CacheNames.NASA_APOD_CACHE);
         NasaApodDTO cached = nasaApodCache.get("today", NasaApodDTO.class);
         try {
             NasaApodDTO latest = nasaApodClientService.fetchNasaAstronomyPictureOfTheDay();
@@ -53,7 +54,7 @@ public class NasaApodServiceImpl implements NasaApodService {
     }
     @Override
     public NasaApodDTO getNasaApodFromCache() throws RemoteServiceUnavailableException {
-        return cacheManagerService.getByCacheNameAndKey("nasa-apod-cache", "today", NasaApodDTO.class)
+        return cacheManagerUtil.getByCacheNameAndKey(CacheNames.NASA_APOD_CACHE, "today", NasaApodDTO.class)
                 .orElseThrow(() -> new RemoteServiceUnavailableException("Nasa Apod temporary unavailable, try again later."));
     }
 }

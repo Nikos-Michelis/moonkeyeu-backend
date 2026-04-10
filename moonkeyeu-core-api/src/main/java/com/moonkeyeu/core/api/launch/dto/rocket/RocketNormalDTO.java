@@ -15,7 +15,7 @@ import java.util.Set;
 @JsonPropertyOrder({"id", "configuration", "launches"})
 public class RocketNormalDTO implements DTOEntity {
     @JsonProperty("id")
-    private Integer rocketId;
+    private Long rocketId;
     @JsonProperty("configuration")
     private RocketConfigurationDTO rocketConfiguration;
     @JsonProperty("launches")

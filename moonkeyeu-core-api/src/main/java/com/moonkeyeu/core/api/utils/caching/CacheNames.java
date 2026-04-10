@@ -1,4 +1,4 @@
-package com.moonkeyeu.core.api.configuration.utils;
+package com.moonkeyeu.core.api.utils.caching;
 
 public class CacheNames {
     public static final String FILTERS_CACHE = "filters-cache";
