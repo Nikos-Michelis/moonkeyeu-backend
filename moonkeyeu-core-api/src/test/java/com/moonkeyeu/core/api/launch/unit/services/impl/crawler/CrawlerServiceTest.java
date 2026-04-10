@@ -27,6 +27,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -64,10 +66,11 @@ class CrawlerServiceTest {
     private SpacecraftConfigurationDTO spacecraftConfiguration;
     private LaunchPadDetailedDTO launchPadDetailedDTO;
     private AgencyDetailedDTO agencyDetailedDTO;
-    private final String DEFAULT_IMG_URL = "https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg";
+    private final String DEFAULT_IMG_URL = "https://cdn.example.com/media/logo/logo.jpg";
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(crawlerService, "applicationLogo", DEFAULT_IMG_URL);
         ImageDTO imageDTO = new ImageDTO();
         imageDTO.setImageId(1L);
         imageDTO.setImageUrl("https://cdn.example.com/assets/test.png");
@@ -256,7 +259,7 @@ class CrawlerServiceTest {
         }
 
         @Test
-        void shouldReturnLaunchMetaTagsAndJsonLd_DefaultImageUrl() {
+        void shouldReturnLaunchMetaHtml_DefaultImageUrl() {
             String id = "e1b6d391-fa37-47a5-9a18-7b19a8a183d8";
             String url = UriComponentsBuilder
                     .fromUri(URI.create("https://www.example.com"))
@@ -329,7 +332,6 @@ class CrawlerServiceTest {
             when(metaElementUtil.buildMetaOg(any(), any(), any(), any())).thenReturn(expected);
 
             String result = crawlerService.getAstronautMetaHtml(id, url);
-
             assertNotNull(result);
             assertEquals(expected, result);
 

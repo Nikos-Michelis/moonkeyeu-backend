@@ -33,7 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = CrawlerController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@TestPropertySource(properties = "application.frontend.url=https://www.example.com")
+@TestPropertySource(properties = {
+        "application.frontend.url=https://www.example.com",
+        "application.seo.logo=https://cdn.example.com/media/logo/logo.jpg",
+        "application.seo.description=Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world."
+})
 class CrawlerControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -55,10 +59,11 @@ class CrawlerControllerTest {
     private CrawlerService crawlerService;
     @Value("${application.frontend.url}")
     private String frontendUrl;
+    @Value("${application.seo.logo}")
+    private String applicationLogo;
+    @Value("${application.seo.description}")
+    private String applicationDescription;
     private CrawlerDTO defaultCrawler;
-    private final String DEFAULT_DESCRIPTION =
-            "Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.";
-    private final String DEFAULT_IMG_URL = "https://cdn.moonkeyeu.com/media/assets/logo/moonkeyeu-logo.jpg";
 
     @BeforeEach
     void setUp() {
@@ -67,8 +72,8 @@ class CrawlerControllerTest {
         testLaunch.setLaunchName("Space Shuttle Atlantis / OV-104 | STS-135");
 
         this.defaultCrawler = CrawlerDTO.builder()
-                .description(DEFAULT_DESCRIPTION)
-                .image(DEFAULT_IMG_URL)
+                .description(applicationDescription)
+                .image(applicationLogo)
                 .datePublished(Instant.now())
                 .dateModified(Instant.now())
                 .build();
