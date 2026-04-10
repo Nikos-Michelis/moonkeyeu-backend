@@ -210,7 +210,7 @@ services:
     volumes:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./monitoring/grafana/dash-files:/var/lib/grafana/dashboards:ro
+      - ./monitoring/grafana/json:/var/lib/grafana/dashboards:ro
     deploy:
       resources:
         limits:

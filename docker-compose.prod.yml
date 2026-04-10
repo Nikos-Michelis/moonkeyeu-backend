@@ -201,7 +201,9 @@ services:
         condition: service_healthy
     restart: unless-stopped
     volumes:
-      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/json:/var/lib/grafana/dashboards:ro
     deploy:
       resources:
         limits:

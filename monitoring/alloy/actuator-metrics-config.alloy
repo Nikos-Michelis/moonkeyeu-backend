@@ -1,0 +1,9 @@
+prometheus.scrape "actuator_metrics" {
+  targets = [
+    {"__address__" = "moonkeyeu-core-api:8081"},
+    {"__address__" = "moonkeyeu-etl-api:8082"},
+  ]
+  metrics_path = "/api/v1/actuator/prometheus"
+  scrape_interval = "15s"
+  forward_to = [prometheus.remote_write.default.receiver]
+}
