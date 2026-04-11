@@ -32,7 +32,7 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: "500m"
+          memory: "600m"
     container_name: moonkeyeu-etl-api-container
     restart: on-failure
     environment:
@@ -41,6 +41,7 @@ services:
       MYSQL_PORT: ${MYSQL_PORT}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
       S3_REGION: ${S3_REGION}
       S3_BUCKET: ${S3_BUCKET}
       S3_BUCKET_ROOT: ${S3_BUCKET_ROOT}
@@ -75,7 +76,7 @@ services:
       resources:
         limits:
           cpus: "1.3"
-          memory: "950m"
+          memory: "900m"
     container_name: moonkeyeu-core-api-container
     restart: on-failure
     environment:

@@ -31,7 +31,7 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: "800m"
+          memory: "600m"
     container_name: moonkeyeu-etl-api-container
     restart: on-failure
     environment:
@@ -45,11 +45,13 @@ services:
       S3_BUCKET: ${S3_BUCKET}
       S3_BUCKET_ROOT: ${S3_BUCKET_ROOT}
       CLOUDFRONT_URL: ${CLOUDFRONT_URL}
+      THE_SPACE_DEVS_VERSION: ${THE_SPACE_DEVS_VERSION}
+      API_ETL_PORT: ${API_ETL_PORT}
       API_PROFILE: ${API_PROFILE:prod}
       APP_NAME: ${APP_NAME}
-      DATA_PATH: ${DATA_PATH}
       CSV_DATASET: /app/data/csv-dataset
       JSON_DATASET: /app/data/json-dataset
+      DB_IMAGES_DIR: /app/data/images
     volumes:
       - ./data/csv-dataset:/app/data/csv-dataset
       - ./data/json-dataset:/app/data/json-dataset
@@ -58,7 +60,7 @@ services:
       mysqldb:
         condition: service_healthy
     networks:
-      - spring-backend-network
+      - private-internal-network
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://moonkeyeu-etl-api-container:8081/api/v1/actuator/health | jq -e '.status == \"UP\"' > /dev/null || exit 1" ]
       interval: 30s
@@ -72,7 +74,7 @@ services:
       resources:
         limits:
           cpus: "1.3"
-          memory: "950m"
+          memory: "900m"
     container_name: moonkeyeu-core-api-container
     restart: on-failure
     environment:
@@ -89,10 +91,12 @@ services:
         GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
         NASA_APOD_KEY: ${NASA_APOD_KEY}
-        API_PROFILE: ${API_PROFILE:prod}
+        API_CORE_PORT: ${API_CORE_PORT}
+        API_PROFILE: ${API_PROFILE}
         APP_NAME: ${APP_NAME}
-        BACKEND_URL: ${BACKEND_URL}
         DOMAIN_URL: ${DOMAIN_URL}
+        BACKEND_URL: ${BACKEND_URL}
+        CLOUDFRONT_URL: ${CLOUDFRONT_URL}
     volumes:
       - ./jwt-keys:/app/jwt-keys
     ports:
@@ -103,7 +107,7 @@ services:
       mysqldb:
         condition: service_healthy
     networks:
-      - spring-backend-network
+      - private-internal-network
     healthcheck:
       test: [ "CMD-SHELL", "curl -s http://moonkeyeu-core-api-container:8080/api/v1/actuator/health | jq -e '.status == \"UP\"' || exit 1" ]
       interval: 30s
@@ -114,6 +118,11 @@ services:
   prometheus:
     image: prom/prometheus:v2.44.0
     container_name: prometheus-container
+    command:
+      - --web.enable-remote-write-receiver
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       mysql-exporter:
         condition: service_healthy
@@ -121,15 +130,14 @@ services:
         condition: service_healthy
       moonkeyeu-core-api:
         condition: service_healthy
-    volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     deploy:
       resources:
         limits:
           cpus: "0.6"
           memory: "100m"
     networks:
-      - spring-backend-network
+      - private-internal-network
+    restart: unless-stopped
     healthcheck:
       test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://prometheus-container:9090/-/healthy" ]
       interval: 30s
@@ -199,7 +207,10 @@ services:
     depends_on:
       prometheus:
         condition: service_healthy
-    restart: unless-stopped
+      loki:
+        condition: service_healthy
+      alloy:
+        condition: service_started
     volumes:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
@@ -208,9 +219,10 @@ services:
       resources:
         limits:
           cpus: "0.6"
-          memory: "140m"
+          memory: "160m"
+    restart: unless-stopped
     networks:
-      - spring-backend-network
+      - private-internal-network
     healthcheck:
       test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://grafana-container:3000/api/health" ]
       interval: 30s
@@ -244,7 +256,7 @@ services:
     networks:
       - private-internal-network
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:83/health | jq -e '.status == \"UP\"' || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost:80/health | jq -e '.status == \"UP\"' || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -265,7 +277,7 @@ services:
     command: renew
 
 networks:
-  spring-backend-network:
+  private-internal-network:
     driver: bridge
 volumes:
   mysql-db-data:

@@ -13,3 +13,4 @@ jwt-keys/refresh-token/*
 !jwt-keys/.gitkeep
 */src/main/resources/test_db/**.sql
 nginx/logs/*
+.github/test/*

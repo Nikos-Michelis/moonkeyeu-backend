@@ -3,6 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     paths:
+      - 'backend/**'
       - 'moonkeyeu-core-api/**'
       - 'moonkeyeu-etl-api/**'
     branches: [21-implement-cicd-pipeline-for-automated-vps-deployment]

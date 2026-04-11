@@ -1,6 +1,6 @@
 jwt:
-  issuer: 'https://backend.moonkeyeu.com'
-  audience: 'https://www.moonkeyeu.com'
+  issuer: 'https://backend.example.com'
+  audience: 'https://www.example.com'
   public:
     access:
       key: classpath:jwt-keys/access-token/access-token-public.pem
