@@ -9,6 +9,7 @@ on:
     branches: [21-implement-cicd-pipeline-for-automated-vps-deployment]
 env:
   API_PROFILE: ${{ vars.API_PROFILE }}
+  APP_NAME: ${{ vars.APP_NAME }}
   CLOUDFRONT_URL: ${{ vars.CLOUDFRONT_URL }}
   AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
 permissions:

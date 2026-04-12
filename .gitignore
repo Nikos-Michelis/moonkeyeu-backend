@@ -14,3 +14,4 @@ jwt-keys/refresh-token/*
 */src/main/resources/test_db/**.sql
 nginx/logs/*
 .github/test/*
+.github/workflows/test/*

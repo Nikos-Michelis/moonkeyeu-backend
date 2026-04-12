@@ -46,6 +46,10 @@ spring:
             client-name: Google
 
 application:
+  seo:
+    name: MoonkeyEU
+    logo: ${CLOUDFRONT_URL}/media/assets/moonkeyeu-logo.jpg
+    description: Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.
   frontend:
     url: http://localhost:3001
   backend:

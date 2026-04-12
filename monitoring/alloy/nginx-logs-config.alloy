@@ -1,14 +1,14 @@
 local.file_match "log_targets" {
     path_targets = [{
         __address__ = "localhost",
-        __path__    = "/var/log/myapp/*.log",
-        job         = "nginx_access",
+        __path__ = "/var/log/myapp/*.log",
+        job = "nginx_access",
     }]
     sync_period = "15s"
 }
 
 loki.source.file "nginx_logs" {
-    targets    = local.file_match.log_targets.targets
+    targets = local.file_match.log_targets.targets
     forward_to = [loki.process.nginx_processor.receiver]
 }
 
@@ -17,7 +17,7 @@ loki.process "nginx_processor" {
 
     stage.json {
         expressions = {
-            status       = "status",
+            status = "status",
             timestamp = "time_iso8601",
         }
     }
@@ -28,7 +28,7 @@ loki.process "nginx_processor" {
 
     stage.labels {
         values = {
-            status= "status",
+            status = "status",
         }
     }
 }
