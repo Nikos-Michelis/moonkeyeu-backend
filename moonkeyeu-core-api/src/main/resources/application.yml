@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${API_PROFILE:test}
+    active: ${API_PROFILE}
   servlet:
     multipart:
       max-file-size: 10MB

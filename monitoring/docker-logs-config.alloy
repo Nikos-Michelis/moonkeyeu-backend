@@ -1,0 +1,32 @@
+// Docker Logs
+discovery.docker "docker_logs" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// Define a relabeling rule to create a service name from the container name.
+discovery.relabel "docker_logs" {
+      targets = []
+
+      rule {
+          source_labels = ["__meta_docker_container_name"]
+          regex = "/(.*)"
+          target_label = "container_name"
+      }
+}
+
+// Configure a loki.source.docker component to collect logs from Docker containers.
+loki.source.docker "default" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.docker_logs.targets
+  relabel_rules = discovery.relabel.docker_logs.rules
+  forward_to = [loki.write.default.receiver]
+}
+
+// Exclude infrastructure containers from collecting logs
+loki.process "docker_logs" {
+  forward_to = [loki.write.default.receiver]
+  stage.drop {
+    source     = "container_name"
+    expression = "(alloy|grafana|loki)"
+  }
+}

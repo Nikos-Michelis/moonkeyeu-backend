@@ -1,6 +1,6 @@
 jwt:
-  issuer: 'https://backend.moonkeyeu.com'
-  audience: 'https://www.moonkeyeu.com'
+  issuer: ${BACKEND_URL}
+  audience: ${DOMAIN_URL}
   public:
     access:
       key: ./jwt-keys/access-token/access-token-public.pem
@@ -44,10 +44,6 @@ spring:
         time_zone: UTC
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
-
-  docker:
-    compose:
-      enabled: false
 
   security:
     oauth2:
@@ -106,10 +102,10 @@ management:
       show-details: always
       group:
         core-api:
-          include: db, mail
+          include: db
   health:
     mail:
-      enabled: true
+      enabled: false
     db:
       enabled: true
     diskspace:
@@ -120,7 +116,7 @@ management:
         enabled: true
 
 server:
-  port: 8081
+  port: ${API_CORE_PORT:8080}
   servlet:
     context-path: /api/v1/
   cors:

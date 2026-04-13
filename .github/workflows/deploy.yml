@@ -1,0 +1,49 @@
+name: Deploy backend to LightSail VPS
+on:
+  workflow_call:
+    secrets:
+      VPS_HOST:
+        required: true
+      VPS_USERNAME:
+        required: true
+      VPS_SSH_KEY:
+        required: true
+      VPS_PORT:
+        required: true
+      VPS_USER:
+        required: true
+      S3_REGION:
+        required: true
+env:
+  APP_NAME: ${{ vars.APP_NAME }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: SSH and Update
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 #v1.2.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Navigate to app directory
+            su ${{ secrets.VPS_USER }}
+            cd /opt/${{ env.APP_NAME }} || mkdir -p /opt/${{ env.APP_NAME }} && cd /opt/${{ env.APP_NAME }}
+            
+            aws s3 cp s3://fs-moonkebucket-test/database/mysql/prod/ ./ --recursive --region ${{ secrets.S3_REGION }}
+            
+            # Pull latest image
+            docker compose -f docker-compose.yml --env-file .env pull
+            
+            #Stop and remove old containers
+            docker compose -f docker-compose.yml --env-file .env down
+            
+            # start new containers
+            docker compose -f docker-compose.yml --env-file .env up    -d
+            
+            # Clean up old images
+            docker image prune -f

@@ -1,6 +1,6 @@
 jwt:
-  issuer: 'https://backend.moonkeyeu.com'
-  audience: 'https://www.moonkeyeu.com'
+  issuer: 'https://backend.example.com'
+  audience: 'https://www.example.com'
   public:
     access:
       key: classpath:jwt-keys/access-token/access-token-public.pem
@@ -46,6 +46,10 @@ spring:
             client-name: Google
 
 application:
+  seo:
+    name: MoonkeyEU
+    logo: ${CLOUDFRONT_URL}/media/assets/moonkeyeu-logo.jpg
+    description: Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.
   frontend:
     url: http://localhost:3001
   backend:
