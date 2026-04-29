@@ -1,6 +1,8 @@
 package com.moonkeyeu.core.api.security.services;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.moonkeyeu.core.api.email.EmailDetails;
+import com.moonkeyeu.core.api.email.EmailTemplateName;
 import com.moonkeyeu.core.api.security.dto.OAuth2GoogleDTO;
 import com.moonkeyeu.core.api.security.dto.TokenDTO;
 import com.moonkeyeu.core.api.security.dto.request.AuthenticationRequest;
@@ -8,8 +10,6 @@ import com.moonkeyeu.core.api.security.dto.request.OAuth2Request;
 import com.moonkeyeu.core.api.security.dto.request.OtpValidationRequest;
 import com.moonkeyeu.core.api.security.dto.request.RegisterRequest;
 import com.moonkeyeu.core.api.security.dto.response.TokenDetailsDTO;
-import com.moonkeyeu.core.api.security.email.EmailDetails;
-import com.moonkeyeu.core.api.security.email.EmailTemplateName;
 import com.moonkeyeu.core.api.security.model.SignUpProvider;
 import com.moonkeyeu.core.api.security.model.otp.OtpToken;
 import com.moonkeyeu.core.api.security.model.otp.OtpType;
@@ -22,7 +22,7 @@ import com.moonkeyeu.core.api.security.services.jwt.JwtServiceParserImpl;
 import com.moonkeyeu.core.api.security.services.jwt.JwtServiceProvider;
 import com.moonkeyeu.core.api.security.services.otp.OtpServiceProvider;
 import com.moonkeyeu.core.api.security.services.otp.impl.OtpServiceValidatorImpl;
-import com.moonkeyeu.core.api.settings.exceptions.*;
+import com.moonkeyeu.core.api.settings.exceptions.auth.*;
 import com.moonkeyeu.core.api.user.model.User;
 import com.moonkeyeu.core.api.user.reporitory.UserRepository;
 import com.moonkeyeu.core.api.security.repository.TokenRepository;
@@ -67,7 +67,7 @@ public class AuthenticationService {
     private final GoogleTokenVerifierService googleTokenVerifierService;
 
     @Transactional
-    public OtpToken register(RegisterRequest request) throws MessagingException {
+    public TokenDetailsDTO register(RegisterRequest request) throws MessagingException {
         if (!request.getPassword().equals(request.getRepeatPassword())) {
             throw new BadCredentialsException("Password do not match.");
         }
@@ -90,15 +90,26 @@ public class AuthenticationService {
                 .build();
 
         userRepository.save(newUser);
-        OtpToken otpToken = otpServiceProvider.issueOtpCode(newUser, OtpType.REGISTER);
-        otpServiceProvider.buildEmail(
+        //OtpToken otpToken = otpServiceProvider.issueOtpCode(newUser, OtpType.REGISTER);
+        /*otpServiceProvider.buildEmail(
                 newUser,
                 otpToken,
                 EmailDetails.builder()
                         .subject("Account Verification")
                         .emailTemplateName(EmailTemplateName.VERIFY_ACCOUNT)
-                        .build());
-        return otpToken;
+                        .build());*/
+        Token accessToken = jwtServiceProvider.generateAccessToken(newUser);
+        Token refreshToken = jwtServiceProvider.generateRefreshToken(newUser, true);
+        tokenRepository.save(refreshToken);
+        return TokenDetailsDTO.builder()
+                .accessToken(accessToken.getToken())
+                .refreshToken(refreshToken.getToken())
+                .accessTokenIssuedAt(accessToken.getIssuedAt())
+                .accessTokenExpiresAt(accessToken.getExpiresAt())
+                .refreshTokenIssuedAt(refreshToken.getIssuedAt())
+                .refreshTokenExpiresAt(refreshToken.getExpiresAt())
+                .message("Login Successful.")
+                .build();
     }
    @Transactional(noRollbackFor = {BadCredentialsException.class, LockedException.class})
    public OtpToken authenticate(AuthenticationRequest request) throws MessagingException {

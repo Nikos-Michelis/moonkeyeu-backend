@@ -5,7 +5,7 @@ import com.moonkeyeu.core.api.launch.dto.filters.FiltersDTO;
 import com.moonkeyeu.core.api.launch.model.views.BaseFilter;
 import com.moonkeyeu.core.api.launch.repository.filters.FiltersRepository;
 import com.moonkeyeu.core.api.launch.services.FiltersService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

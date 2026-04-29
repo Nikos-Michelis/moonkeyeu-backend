@@ -8,7 +8,7 @@ import com.moonkeyeu.core.api.user.services.impl.UserDetailsServiceImpl;
 import com.moonkeyeu.core.api.security.dto.TokenDTO;
 import com.moonkeyeu.core.api.user.model.User;
 import com.moonkeyeu.core.api.security.repository.TokenRepository;
-import com.moonkeyeu.core.api.settings.exceptions.InvalidJwtTokenException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.InvalidJwtTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        if (request.getRequestURI().matches("^/api/v1/(auth|oauth2|public|images|csrf|community|payment|webhook)/.*")) {
+        if (request.getRequestURI().matches("^/api/v1/(auth|oauth2|public|images|csrf|community|stripe|webhook)/.*")) {
             filterChain.doFilter(request, response);
             return;
         }

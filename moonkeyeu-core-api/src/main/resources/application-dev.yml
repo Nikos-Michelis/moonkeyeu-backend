@@ -76,8 +76,12 @@ spring:
             enable: true
             required: true
 application:
+  seo:
+    name: MoonkeyEU
+    logo: ${CLOUDFRONT_URL}/media/assets/moonkeyeu-logo.jpg
+    description: Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.
   frontend:
-    url: http://localhost:3001
+    url: ${DOMAIN_URL:http://localhost:3001}
   backend:
     url: http://localhost:8080/api/v1/
   limiter:
@@ -106,7 +110,12 @@ application:
       key: ${STRIPE_API_KEY}
       tier:
         trial:
-          period: 30
+          period: 14
+      hosted:
+        configs:
+          update-id: "bpc_1TaaiaGrKq02A5TNMOuZh30f"
+          cancel-id: "bpc_1Taam4GrKq02A5TNdmT0TtCm"
+          account-management-id: "bpc_1Taam4GrKq02A5TNdmT0TtCm"
 
 management:
   endpoints:
@@ -136,7 +145,7 @@ server:
   servlet:
     context-path: /api/v1/
   cors:
-    origins: http://localhost:3002
+    origins: http://localhost:3001
 
 logging:
   level:

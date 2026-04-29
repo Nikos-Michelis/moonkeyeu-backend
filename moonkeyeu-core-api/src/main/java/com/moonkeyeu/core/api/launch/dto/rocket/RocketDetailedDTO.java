@@ -2,7 +2,7 @@ package com.moonkeyeu.core.api.launch.dto.rocket;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.launcher.LauncherStageNormalDTO;
 import com.moonkeyeu.core.api.launch.dto.spacecraft.SpacecraftStageDTO;
 import lombok.AllArgsConstructor;

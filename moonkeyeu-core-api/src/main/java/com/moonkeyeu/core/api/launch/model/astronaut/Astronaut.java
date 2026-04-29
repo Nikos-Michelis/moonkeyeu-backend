@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.launch.model.astronaut;
 
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
-import com.moonkeyeu.core.api.ai.model.AiPrompt;
+import com.moonkeyeu.core.api.assistant.model.AiPrompt;
 import com.moonkeyeu.core.api.launch.model.country.Country;
 import jakarta.persistence.*;
 import lombok.*;

@@ -2,7 +2,7 @@ package com.moonkeyeu.core.api.launch.services.impl.caching;
 
 
 import com.moonkeyeu.core.api.launch.services.CacheManagerService;
-import com.moonkeyeu.core.api.settings.exceptions.CacheInitializationException;
+import com.moonkeyeu.core.api.settings.exceptions.common.CacheInitializationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;

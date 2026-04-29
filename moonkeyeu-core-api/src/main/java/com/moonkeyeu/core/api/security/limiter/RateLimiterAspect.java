@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.security.limiter;
 
 import com.moonkeyeu.core.api.security.util.ClientInfoExtractor;
-import com.moonkeyeu.core.api.settings.exceptions.RateLimitException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.RateLimitException;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

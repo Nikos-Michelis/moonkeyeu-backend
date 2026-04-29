@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.launch.services.impl.search;
 
 import com.moonkeyeu.core.api.configuration.utils.CacheNames;
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.agency.AgencyDetailedDTO;
 import com.moonkeyeu.core.api.launch.dto.agency.AgencySummarizedDTO;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchNormalDTO;
@@ -10,7 +10,7 @@ import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import com.moonkeyeu.core.api.launch.repository.AgenciesRepository;
 import com.moonkeyeu.core.api.launch.repository.LaunchRepository;
 import com.moonkeyeu.core.api.launch.services.AgenciesService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

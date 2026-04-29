@@ -10,7 +10,7 @@ import com.moonkeyeu.core.api.launch.model.astronaut.CrewMember;
 import com.moonkeyeu.core.api.launch.model.mission.Mission;
 import com.moonkeyeu.core.api.launch.model.mission.MissionPatches;
 import com.moonkeyeu.core.api.launch.model.program.Programs;
-import com.moonkeyeu.core.api.ai.model.AiPrompt;
+import com.moonkeyeu.core.api.assistant.model.AiPrompt;
 import com.moonkeyeu.core.api.user.model.bookmark.Bookmark;
 import jakarta.persistence.*;
 import lombok.*;

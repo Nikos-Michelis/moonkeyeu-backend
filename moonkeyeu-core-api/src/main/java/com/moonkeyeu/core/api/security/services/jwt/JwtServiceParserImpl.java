@@ -2,7 +2,7 @@ package com.moonkeyeu.core.api.security.services.jwt;
 
 import com.moonkeyeu.core.api.security.dto.TokenDTO;
 import com.moonkeyeu.core.api.security.model.token.jwt.TokenScope;
-import com.moonkeyeu.core.api.settings.exceptions.InvalidJwtTokenException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.InvalidJwtTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.constraints.NotNull;

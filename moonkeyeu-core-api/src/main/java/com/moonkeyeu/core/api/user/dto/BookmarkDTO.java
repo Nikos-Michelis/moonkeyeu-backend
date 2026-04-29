@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.ImageDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

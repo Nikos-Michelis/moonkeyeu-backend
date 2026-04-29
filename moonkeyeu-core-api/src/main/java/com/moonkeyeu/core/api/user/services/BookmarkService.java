@@ -1,16 +1,13 @@
 package com.moonkeyeu.core.api.user.services;
 
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
-import com.moonkeyeu.core.api.launch.dto.launch.LaunchSummarizedDTO;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
-import com.moonkeyeu.core.api.launch.repository.specifications.MyLaunchesSpecification;
 import com.moonkeyeu.core.api.user.dto.BookmarkDTO;
 import com.moonkeyeu.core.api.user.model.User;
 import com.moonkeyeu.core.api.user.dto.request.RequestBookmark;
 import com.moonkeyeu.core.api.user.dto.request.RequestCreateBookmark;
 import com.moonkeyeu.core.api.user.dto.request.RequestEditBookmark;
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Map;

@@ -3,7 +3,7 @@ package com.moonkeyeu.core.api.security.services.otp.impl;
 import com.moonkeyeu.core.api.security.model.otp.OtpResend;
 import com.moonkeyeu.core.api.security.services.lock.UserStatusService;
 import com.moonkeyeu.core.api.security.services.otp.OtpResendServiceValidator;
-import com.moonkeyeu.core.api.settings.exceptions.OtpLimitException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.OtpLimitException;
 import com.moonkeyeu.core.api.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

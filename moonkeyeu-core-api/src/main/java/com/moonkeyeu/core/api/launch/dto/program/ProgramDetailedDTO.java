@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.moonkeyeu.core.api.launch.dto.agency.AgencyNormalDTO;
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.ImageDTO;
 import com.moonkeyeu.core.api.launch.dto.launch.LaunchNormalDTO;
 import lombok.AllArgsConstructor;

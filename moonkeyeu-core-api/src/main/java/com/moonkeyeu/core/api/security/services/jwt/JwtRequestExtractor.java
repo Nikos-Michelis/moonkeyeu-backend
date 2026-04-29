@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.security.services.jwt;
 
-import com.moonkeyeu.core.api.settings.exceptions.InvalidHeadersException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.InvalidHeadersException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

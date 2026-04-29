@@ -6,7 +6,7 @@ import com.moonkeyeu.core.api.security.model.token.jwt.TokenScope;
 import com.moonkeyeu.core.api.security.model.token.jwt.TokenType;
 import com.moonkeyeu.core.api.security.util.RequestTokenBuilder;
 import com.moonkeyeu.core.api.user.model.User;
-import com.moonkeyeu.core.api.settings.exceptions.InvalidJwtTokenException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.InvalidJwtTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;

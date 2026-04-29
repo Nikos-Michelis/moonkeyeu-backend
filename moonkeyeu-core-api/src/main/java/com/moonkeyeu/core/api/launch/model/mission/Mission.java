@@ -25,7 +25,7 @@ public class Mission {
     private String name;
     @Basic
     @Column(name = "description")
-    private String description;
+    private String missionDescription;
     @Basic
     @Column(name = "type")
     private String type;

@@ -3,7 +3,7 @@ package com.moonkeyeu.core.api.security.services.otp;
 import com.moonkeyeu.core.api.security.dto.request.OtpResendRequest;
 import com.moonkeyeu.core.api.security.model.otp.OtpResend;
 import com.moonkeyeu.core.api.security.model.otp.OtpToken;
-import com.moonkeyeu.core.api.settings.exceptions.OtpLimitException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.OtpLimitException;
 import com.moonkeyeu.core.api.user.model.User;
 import jakarta.mail.MessagingException;
 

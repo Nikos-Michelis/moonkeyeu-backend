@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.settings;
 
-import com.moonkeyeu.core.api.settings.exceptions.InvalidJwtTokenException;
-import com.moonkeyeu.core.api.settings.exceptions.SessionExpiredException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.InvalidJwtTokenException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.SessionExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

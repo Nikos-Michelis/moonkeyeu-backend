@@ -1,10 +1,10 @@
 package com.moonkeyeu.core.api.user.services.impl;
 
+import com.moonkeyeu.core.api.email.service.AuthenticationEmailService;
 import com.moonkeyeu.core.api.security.dto.request.ChangePasswordRequest;
 import com.moonkeyeu.core.api.security.dto.request.ResetCredentialsRequest;
 import com.moonkeyeu.core.api.security.dto.request.ResetPasswordRequest;
-import com.moonkeyeu.core.api.security.email.EmailService;
-import com.moonkeyeu.core.api.security.email.EmailTemplateName;
+import com.moonkeyeu.core.api.email.EmailTemplateName;
 import com.moonkeyeu.core.api.security.model.token.reset.ResetToken;
 import com.moonkeyeu.core.api.user.dto.UserDTO;
 import com.moonkeyeu.core.api.user.model.Roles;
@@ -13,7 +13,7 @@ import com.moonkeyeu.core.api.security.repository.ResetTokenRepository;
 import com.moonkeyeu.core.api.user.reporitory.UserRepository;
 import com.moonkeyeu.core.api.security.util.RequestTokenBuilder;
 import com.moonkeyeu.core.api.user.services.UserService;
-import com.moonkeyeu.core.api.settings.exceptions.InvalidResetTokenException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.InvalidResetTokenException;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RequestTokenBuilder requestTokenBuilder;
     private final ResetTokenRepository resetTokenRepository;
-    private final EmailService emailService;
+    private final AuthenticationEmailService authenticationEmailService;
     private final PasswordEncoder passwordEncoder;
     @Override
     @Transactional
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
         ResetToken resetToken = new ResetToken(token, expiresAt, issuedAt ,user);
         resetTokenRepository.save(resetToken);
         String resetUrl = frontendUrl + "/account/reset-password/" + token;
-        emailService.sendOtpEmail(
+        authenticationEmailService.sendOtpEmail(
                 user.getEmail(),
                 null,
                 EmailTemplateName.RESET_PASSWORD,

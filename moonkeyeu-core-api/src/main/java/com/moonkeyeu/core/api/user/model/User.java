@@ -1,12 +1,12 @@
 package com.moonkeyeu.core.api.user.model;
 
-import com.moonkeyeu.core.api.ai.model.AiUsage;
+import com.moonkeyeu.core.api.assistant.model.AiUsage;
 import com.moonkeyeu.core.api.security.model.SignUpMethods;
 import com.moonkeyeu.core.api.security.model.otp.OtpResend;
 import com.moonkeyeu.core.api.security.model.otp.OtpToken;
 import com.moonkeyeu.core.api.security.model.token.jwt.Token;
 import com.moonkeyeu.core.api.security.model.token.reset.ResetToken;
-import com.moonkeyeu.core.api.subscription.model.Subscription;
+import com.moonkeyeu.core.api.membership.domain.model.StripeCustomer;
 import com.moonkeyeu.core.api.user.model.bookmark.Bookmark;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,8 +40,6 @@ public class User implements UserDetails, Principal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
-    @Column(name = "customer_id")
-    private String customerId;
     @Column(name = "username", unique = true)
     private String username;
     @Column(name="email", unique = true)
@@ -99,13 +97,11 @@ public class User implements UserDetails, Principal {
     @OneToMany(orphanRemoval = true, mappedBy = "user")
     @BatchSize(size = 20)
     private List<Bookmark> bookmarks;
-
     @OneToMany(orphanRemoval = true, mappedBy = "user")
     @BatchSize(size = 20)
     private List<AiUsage> aiUsages;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Subscription subscription;
+    @OneToOne(mappedBy = "user")
+    private StripeCustomer stripeCustomer;
 
     public void addSignUpProvider(SignUpMethods signUpMethod) {
         this.signUpMethods.add(signUpMethod);

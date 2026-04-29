@@ -4,7 +4,7 @@ import com.moonkeyeu.core.api.security.model.token.jwt.Token;
 import com.moonkeyeu.core.api.security.services.cookie.CookieServiceProvider;
 import com.moonkeyeu.core.api.security.services.jwt.JwtRequestExtractor;
 import com.moonkeyeu.core.api.security.repository.TokenRepository;
-import com.moonkeyeu.core.api.settings.exceptions.SessionExpiredException;
+import com.moonkeyeu.core.api.settings.exceptions.auth.SessionExpiredException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

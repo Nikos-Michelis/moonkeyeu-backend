@@ -12,25 +12,29 @@ import java.util.Map;
 @Component
 @Slf4j
 public class ClientInfoExtractor {
-    public Map<String, String> getClientInfo(HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        String remoteHost = request.getRemoteHost();
-        String remoteUser = request.getRemoteUser();
-        String contentType = request.getHeader("content-type");
-        String userAgent = request.getHeader("user-agent");
 
-        Parser uaParser = new Parser();
+    private final Parser uaParser;
+
+    public ClientInfoExtractor() {
+        this.uaParser = new Parser();
+    }
+
+    public Map<String, String> getClientInfo(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty()) {
+            ipAddress = request.getRemoteAddr();
+        }
+
+        String userAgent = request.getHeader("user-agent");
         Client client = uaParser.parse(userAgent);
 
         Map<String, String> clientInfo = new HashMap<>();
         clientInfo.put("os_family", client.os.family);
         clientInfo.put("device_family", client.device.family);
         clientInfo.put("userAgent_family", client.userAgent.family);
-        clientInfo.put("remote_address", remoteAddr);
-        clientInfo.put("remote_host", remoteHost);
-        clientInfo.put("remote_user", remoteUser);
-        clientInfo.put("content_type", contentType);
-        //log.info("client: {} ", clientInfo);
+        clientInfo.put("remote_address", ipAddress);
+
         return clientInfo;
     }
 }
+

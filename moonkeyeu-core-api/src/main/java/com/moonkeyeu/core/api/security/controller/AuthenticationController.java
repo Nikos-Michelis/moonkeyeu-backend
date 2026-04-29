@@ -37,15 +37,16 @@ public class AuthenticationController {
     @PostMapping("/register")
     @RateLimited(requests = 5, durationSeconds = 60)
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) throws MessagingException {
-        OtpToken otpToken = authenticationService.register(request);
-        return ResponseEntity.ok().body(
-                ResponseDTO.builder()
+        TokenDetailsDTO tokenDetailsDTO = authenticationService.register(request);
+        ResponseCookie refreshTokenCookie = cookieServiceProvider.buildRefreshTokenCookie(tokenDetailsDTO);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(ResponseDTO.builder()
                         .timestamp(Instant.now())
-                        .token(otpToken.getToken())
-                        .expiredAt(otpToken.getExpiresAt())
-                        .message("We have just sent the one-time password (OTP) to your email.")
-                        .build()
-        );
+                        .token(tokenDetailsDTO.getAccessToken())
+                        .expiredAt(tokenDetailsDTO.getAccessTokenExpiresAt())
+                        .message("You have successfully authenticate your account.")
+                        .build());
     }
 
     @PostMapping("/authenticate")

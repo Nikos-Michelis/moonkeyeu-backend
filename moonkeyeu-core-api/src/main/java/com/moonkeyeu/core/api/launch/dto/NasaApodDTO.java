@@ -1,5 +1,6 @@
 package com.moonkeyeu.core.api.launch.dto;
 
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,6 +1,8 @@
 package com.moonkeyeu.core.api.settings;
 
-import com.moonkeyeu.core.api.settings.exceptions.*;
+import com.moonkeyeu.core.api.settings.exceptions.auth.*;
+import com.moonkeyeu.core.api.settings.exceptions.common.ConflictException;
+import com.moonkeyeu.core.api.settings.exceptions.common.RemoteServiceUnavailableException;
 import jakarta.mail.MessagingException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;

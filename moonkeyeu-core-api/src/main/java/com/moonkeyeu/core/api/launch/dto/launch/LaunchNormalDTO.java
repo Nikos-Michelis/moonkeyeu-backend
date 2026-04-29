@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.moonkeyeu.core.api.launch.dto.info.InfoUrlDTO;
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.ImageDTO;
 import com.moonkeyeu.core.api.launch.dto.info.VideoDTO;
 import com.moonkeyeu.core.api.launch.dto.pad.LaunchPadSummarized;
@@ -24,6 +24,8 @@ public class LaunchNormalDTO implements DTOEntity {
     private String launchName;
     @JsonProperty("agency")
     private String agenciesName;
+    @JsonProperty("description")
+    private String description;
     @JsonProperty("location")
     private LaunchPadSummarized launchPad;
     @JsonProperty("net")

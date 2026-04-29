@@ -25,4 +25,5 @@ public class CacheNames {
     public static final String MEMBERS_CACHE = "members-cache";
     public static final String NASA_APOD_CACHE = "nasa-apod-cache";
     public static final String AI_CACHE = "ai-cache";
+    public static final String IDEMPOTENCY_CACHE = "idempotency-cache";
 }

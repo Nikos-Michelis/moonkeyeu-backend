@@ -56,7 +56,8 @@ public class CacheConfig {
                         CacheNames.CONTACT_MESSAGES_CACHE,
                         CacheNames.MEMBERS_CACHE,
                         CacheNames.AI_CACHE,
-                        CacheNames.NASA_APOD_CACHE
+                        CacheNames.NASA_APOD_CACHE,
+                        CacheNames.IDEMPOTENCY_CACHE
                 )
         );
         return cacheManager;

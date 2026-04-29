@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.user.services;
 
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.user.dto.ContactDTO;
 import com.moonkeyeu.core.api.user.dto.UserDTO;

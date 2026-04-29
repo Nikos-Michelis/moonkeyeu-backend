@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.user.services.impl;
 
 import com.moonkeyeu.core.api.configuration.utils.CacheNames;
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.user.dto.BatchJobExecDTO;
 import com.moonkeyeu.core.api.user.dto.ContactDTO;
@@ -14,7 +14,7 @@ import com.moonkeyeu.core.api.user.reporitory.UserRepository;
 import com.moonkeyeu.core.api.user.reporitory.specification.MessagesSpecification;
 import com.moonkeyeu.core.api.user.services.BatchService;
 import com.moonkeyeu.core.api.user.services.DashboardService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

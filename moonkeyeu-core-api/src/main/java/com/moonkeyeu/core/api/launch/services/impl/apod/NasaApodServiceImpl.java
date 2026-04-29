@@ -6,7 +6,7 @@ import com.moonkeyeu.core.api.launch.services.CacheManagerService;
 import com.moonkeyeu.core.api.launch.services.NasaApodClientService;
 import com.moonkeyeu.core.api.launch.services.NasaApodService;
 import com.moonkeyeu.core.api.settings.exceptions.NasaApodFetchException;
-import com.moonkeyeu.core.api.settings.exceptions.RemoteServiceUnavailableException;
+import com.moonkeyeu.core.api.settings.exceptions.common.RemoteServiceUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

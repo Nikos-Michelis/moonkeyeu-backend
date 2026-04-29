@@ -1,11 +1,12 @@
 package com.moonkeyeu.core.api.security.services.otp.impl;
 
+import com.moonkeyeu.core.api.email.service.AuthenticationEmailService;
 import com.moonkeyeu.core.api.security.model.otp.OtpToken;
 import com.moonkeyeu.core.api.security.model.otp.OtpType;
 import com.moonkeyeu.core.api.security.services.otp.OtpServiceBuilder;
 import com.moonkeyeu.core.api.security.services.otp.OtpServiceProvider;
-import com.moonkeyeu.core.api.security.email.EmailDetails;
-import com.moonkeyeu.core.api.security.email.EmailService;
+import com.moonkeyeu.core.api.email.EmailDetails;
+import com.moonkeyeu.core.api.email.service.impl.EmailSenderServiceImpl;
 import com.moonkeyeu.core.api.user.model.User;
 import com.moonkeyeu.core.api.security.repository.OtpRepository;
 import jakarta.mail.MessagingException;
@@ -17,17 +18,18 @@ import org.springframework.stereotype.Service;
 public class OtpServiceProviderImpl implements OtpServiceProvider {
 
     private final OtpRepository otpRepository;
-    private final EmailService emailService;
+    private final AuthenticationEmailService authenticationEmailService;
     private final OtpServiceBuilder otpServiceBuilder;
     @Override
     public void buildEmail(User user, OtpToken otpToken, EmailDetails emailDetails) throws MessagingException {
-        emailService.sendOtpEmail(
+        authenticationEmailService.sendOtpEmail(
                 user.getEmail(),
                 user.getUsername(),
                 emailDetails.getEmailTemplateName(),
                 emailDetails.getUrl(),
                 otpToken.getOtp(),
-                emailDetails.getSubject());
+                emailDetails.getSubject()
+        );
     }
 
     public OtpToken issueOtpCode(User user, OtpType otpType){

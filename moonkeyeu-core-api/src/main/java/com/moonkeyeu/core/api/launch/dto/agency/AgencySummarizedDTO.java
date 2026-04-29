@@ -2,7 +2,7 @@ package com.moonkeyeu.core.api.launch.dto.agency;
 
 import com.fasterxml.jackson.annotation.*;
 import com.moonkeyeu.core.api.launch.dto.CountryDTO;
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.ImageDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;

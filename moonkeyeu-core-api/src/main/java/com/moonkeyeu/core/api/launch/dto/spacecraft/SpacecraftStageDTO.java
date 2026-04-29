@@ -3,7 +3,7 @@ package com.moonkeyeu.core.api.launch.dto.spacecraft;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.moonkeyeu.core.api.launch.dto.landing.LandingDTO;
-import com.moonkeyeu.core.api.launch.dto.DTOEntity;
+import com.moonkeyeu.core.api.utils.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.astronaut.CrewMemberDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;

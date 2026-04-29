@@ -48,7 +48,7 @@ public class SecurityConfig {
                                         "/public/**",
                                         "/agent/**",
                                         "/auth/**",
-                                        "/payment/**",
+                                        "/stripe/**",
                                         "/webhook/**",
                                         "/oauth2/**",
                                         "/images/**",
