@@ -33,6 +33,7 @@ public class S3MediaServiceImpl implements S3MediaService {
 
     private final Map<Class<?>, String> entityToS3KeyMap = Map.of(
             RocketImageEntity.class, "rockets",
+            LaunchImagesEntity.class, "launch",
             LaunchPadEntity.class, "pads-locations",
             LauncherImagesEntity.class, "launchers",
             SpacecraftImagesEntity.class, "spacecraft",
@@ -68,13 +69,9 @@ public class S3MediaServiceImpl implements S3MediaService {
     }
 
     private String getS3Key(ImageEntity imageEntity) throws MalformedURLException {
+        String basePath = getRootPath(imageEntity);
         String fileName = getFileName(imageEntity);
-        return UriComponentsBuilder
-                .fromUriString(this.cloudFrontUrl)
-                .pathSegment(s3KeyValue)
-                .pathSegment()
-                .pathSegment(fileName)
-                .toUriString();
+        return String.format("%s/%s/%s", s3KeyValue, basePath, fileName);
     }
 
     private String getFileName(ImageEntity item) throws MalformedURLException {

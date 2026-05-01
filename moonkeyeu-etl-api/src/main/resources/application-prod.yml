@@ -41,8 +41,8 @@ aws:
   region: ${S3_REGION}
   s3:
     buckets:
-      db-images: ${S3_BUCKET}
       root: ${S3_BUCKET_ROOT}
+      bucket-name: ${S3_BUCKET}
   cloudfront:
     url: ${CLOUDFRONT_URL}
 

@@ -15,7 +15,7 @@ import lombok.*;
 @Entity
 @Table(name = "launch_pad_images", schema = "moonkey_db")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PadImagesEntity implements CsvEntity<Object>, ImageEntity {
+public class PadImagesEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "image_id", nullable = false)
     @JsonProperty("pad_image_id")
@@ -44,15 +44,5 @@ public class PadImagesEntity implements CsvEntity<Object>, ImageEntity {
     @Override
     public Object getPrimaryKey() {
         return image_id;
-    }
-
-    @Override
-    public String getImageUrl() {
-        return image_url;
-    }
-
-    @Override
-    public void setImageUrl(String imageUrl) {
-        this.image_url = imageUrl;
     }
 }

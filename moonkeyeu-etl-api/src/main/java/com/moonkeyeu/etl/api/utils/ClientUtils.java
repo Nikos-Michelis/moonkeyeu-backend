@@ -2,8 +2,8 @@ package com.moonkeyeu.etl.api.utils;
 
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class ClientUtils {
 
@@ -12,14 +12,26 @@ public class ClientUtils {
             throw new MalformedURLException("Image url should not be null or empty");
         }
 
-        URL url = new URL(imageUrl);
-        String protocol = url.getProtocol();
+        try {
+            var path = getPath(imageUrl);
+            return path.substring(path.lastIndexOf('/') + 1);
+        } catch (URISyntaxException e) {
+            throw new MalformedURLException("Invalid URL syntax: " + imageUrl);
+        }
+    }
 
-        if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
+    private static String getPath(String imageUrl) throws URISyntaxException, MalformedURLException {
+        URI uri = new URI(imageUrl);
+        String scheme = uri.getScheme();
+
+        if (scheme == null || (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https"))) {
             throw new MalformedURLException("Invalid image Url protocol: " + imageUrl);
         }
 
-        return Paths.get(url.getPath()).getFileName().toString();
+        String path = uri.getPath();
+        if (path == null || path.isEmpty() || path.equals("/")) {
+            throw new MalformedURLException("URL path is empty: " + imageUrl);
+        }
+        return path;
     }
-
 }
