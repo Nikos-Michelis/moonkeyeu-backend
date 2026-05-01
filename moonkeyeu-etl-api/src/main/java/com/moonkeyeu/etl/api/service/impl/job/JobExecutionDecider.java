@@ -34,17 +34,19 @@ public class JobExecutionDecider {
 
         JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", jobParameters, runDailyUpdateJob);
         if (launchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
-            return BatchStatus.FAILED;
+            log.warn("dailyJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
         }
 
         JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);
         if (updateAgenciesJob.getStatus() != BatchStatus.COMPLETED) {
+            log.error("dailyJobExecution: Agencies fetching failed {} Abort the job execution", BatchStatus.FAILED);
             return BatchStatus.FAILED;
         }
 
         JobParameters retryParams = JobParamsBuilder.addRetryTimestamp(jobParameters);
         JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", retryParams, runDailyUpdateJob);
         if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
+            log.error("dailyJobExecution: Launches fetching failed {} Abort the job execution", BatchStatus.FAILED);
             return BatchStatus.FAILED;
         }
         return BatchStatus.COMPLETED;
@@ -60,18 +62,19 @@ public class JobExecutionDecider {
 
         JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", jobParameters, runLaunchesUpdateJob);
         if (launchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
-            return BatchStatus.FAILED;
+            log.warn("midnightJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
         }
 
         JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);
         if (updateAgenciesJob.getStatus() != BatchStatus.COMPLETED) {
-            log.error("UpdateAgenciesJob failed. Aborting sequence.");
+            log.error("midnightJobExecution: Agencies fetching failed {} Abort the job execution", BatchStatus.FAILED);
             return BatchStatus.FAILED;
         }
 
         JobParameters retryParams = JobParamsBuilder.addRetryTimestamp(jobParameters);
         JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", retryParams, runLaunchesUpdateJob);
         if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
+            log.error("midnightJobExecution: Launches fetching failed {} Abort the job execution", BatchStatus.FAILED);
             return BatchStatus.FAILED;
         }
         return BatchStatus.COMPLETED;

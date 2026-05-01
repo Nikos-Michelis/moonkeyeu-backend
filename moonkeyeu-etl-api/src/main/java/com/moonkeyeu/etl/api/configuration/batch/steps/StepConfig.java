@@ -3,7 +3,6 @@ package com.moonkeyeu.etl.api.configuration.batch.steps;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepCompletionListener;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepContextSetter;
-import com.moonkeyeu.etl.api.configuration.batch.processors.ChunkProcessor;
 import com.moonkeyeu.etl.api.configuration.batch.readers.JsonItemReader;
 import com.moonkeyeu.etl.api.configuration.batch.writers.ItemWriterRegistry;
 import com.moonkeyeu.etl.api.dto.storage.CleanupType;
@@ -24,6 +23,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +31,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_AGENCIES;
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_LAUNCHES;
@@ -45,7 +44,7 @@ public class StepConfig {
     private final CsvManager csvManager;
     private final RootConfig rootConfig;
     private final FilePathProvider filePathProvider;
-    private final ChunkProcessor chunkProcessor;
+    private final CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> compositeProcessor;
     private final ItemProcessor<JsonNode, ChunkStore> launchesProcessor;
     private final ItemProcessor<JsonNode, ChunkStore> agenciesProcessor;
     private final ItemWriter<Object> jpaEntityWriter;
@@ -190,7 +189,7 @@ public class StepConfig {
         String stepName = "process_" + config.getEntityClass().getSimpleName() + "_" + config.getOrder();
         return new StepBuilder(stepName, jobRepository).<CsvEntity<?>, CsvEntity<?>>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(itemReader)
-                .processor(chunkProcessor)
+                .processor(compositeProcessor)
                 .writer(jpaEntityWriter)
                 .listener(new StepContextSetter<>("entityConfig", config))
                 .listener(new StepCompletionListener())

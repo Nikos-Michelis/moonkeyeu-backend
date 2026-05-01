@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "aws.s3.buckets")
 @Data
 public class S3Buckets {
-    @Value("db-images")
+    @Value("bucket-name")
     private String bucketName;
 }

@@ -9,23 +9,20 @@ import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.model.ImageEntity;
 import com.moonkeyeu.etl.api.service.LocalMediaService;
 import com.moonkeyeu.etl.api.service.S3MediaService;
-import com.moonkeyeu.etl.api.settings.exceptions.DataCleaningException;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreOperationException;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreProviderException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>> {
-    private static final String UNKNOWN_VALUE = "Unknown";
+@StepScope
+public class MediaProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>> {
     private final LocalMediaService localMediaService;
     private final S3MediaService s3MediaService;
     private final RootConfig rootConfig;
@@ -42,12 +39,11 @@ public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
 
         if (item.getPrimaryKey() == null) return null;
 
-        cleanValuesByField(item);
-
         if (item instanceof ImageEntity entity) {
-                String imageUrl = mediaStorageProvider(entity);
-                entity.setImageUrl(imageUrl);
+            String imageUrl = mediaStorageProvider(entity);
+            entity.setImageUrl(imageUrl);
         }
+
         return item;
     }
 
@@ -94,40 +90,5 @@ public class ChunkProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
                     s3MediaService.getCloudFrontUrl(entity);
             default -> throw new InvalidStoreOperationException("Unexpected operation: " + storeOperation);
         };
-    }
-
-    private void cleanValuesByField(CsvEntity<?> item) {
-        for (Field field : item.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                Object originalValue = field.get(item);
-                Object cleanedByNullOrEmpty = handleNullEmptyValues(originalValue);
-                Object cleaned = handleSpecialCharacters(cleanedByNullOrEmpty);
-                field.set(item, cleaned);
-            } catch (IllegalAccessException e) {
-                throw new DataCleaningException("Error cleaning field " + field.getName() + " for entity " + item.getClass().getSimpleName());
-            }
-        }
-    }
-
-    public static boolean useRegex(String input) {
-        Pattern pattern = Pattern.compile("\\?{2,}");
-        final Matcher matcher = pattern.matcher(input);
-        return matcher.matches();
-    }
-
-    private Object handleSpecialCharacters(Object value) {
-        if (value == null) {
-            return null;
-        }
-        return useRegex(value.toString()) ? UNKNOWN_VALUE : value;
-    }
-
-    private Object handleNullEmptyValues(Object value) {
-        if (value instanceof String str) {
-            str = str.trim();
-            return str.isEmpty() ? null : str;
-        }
-        return value;
     }
 }

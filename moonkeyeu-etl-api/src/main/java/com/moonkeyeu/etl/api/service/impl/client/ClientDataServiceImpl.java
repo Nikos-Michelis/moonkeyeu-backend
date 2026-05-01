@@ -115,7 +115,7 @@ public class ClientDataServiceImpl implements ClientDataService {
             finalResult.set("all_results", objectMapper.valueToTree(allResults));
             Files.write(Paths.get(fileName), objectMapper.writeValueAsBytes(finalResult),
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            log.info("Data written to JSON file: " + fileName);
+            log.info("Data written to JSON file: {}", fileName);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Somthing went wrong during Json tree parsing." + e.getMessage());
         } catch (IOException e) {
