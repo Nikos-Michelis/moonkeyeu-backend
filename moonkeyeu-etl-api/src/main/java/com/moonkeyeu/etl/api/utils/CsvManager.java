@@ -31,12 +31,12 @@ public class CsvManager {
         try {
             boolean deleted = Files.deleteIfExists(file);
             if (deleted) {
-                log.debug("Deleted file: " + file.getFileName());
+                log.debug("Deleted file: {}", file.getFileName());
             } else {
-                log.error("Failed to delete file: " + file.getFileName());
+                log.error("Failed to delete file: {}", file.getFileName());
             }
         } catch (IOException e) {
-            log.error("Error deleting file: " + file.getFileName(), e);
+            log.error("Error deleting file: {}", file.getFileName(), e);
         }
     }
 }
