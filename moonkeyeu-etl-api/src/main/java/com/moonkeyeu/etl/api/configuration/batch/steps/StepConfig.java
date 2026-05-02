@@ -11,10 +11,10 @@ import com.moonkeyeu.etl.api.settings.exceptions.InvalidCleanupOperationExceptio
 import com.moonkeyeu.etl.api.utils.CsvManager;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
-import com.moonkeyeu.etl.api.configuration.url.UrlBuilderConfig;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
 import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import com.moonkeyeu.etl.api.model.CsvEntity;
+import com.moonkeyeu.etl.api.utils.UrlBuilderConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;

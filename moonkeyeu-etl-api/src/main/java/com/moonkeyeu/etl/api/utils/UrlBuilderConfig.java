@@ -1,4 +1,4 @@
-package com.moonkeyeu.etl.api.configuration.url;
+package com.moonkeyeu.etl.api.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -22,22 +22,20 @@ public class GenericPersistenceServiceImpl implements GenericPersistenceService 
     }
 
     @Override
-    public <T> T save(T object) throws SQLException {
+    public <T> T save(T object) {
         Object repo = repositories.getRepositoryFor(object.getClass())
-                .orElseThrow(() -> new IllegalStateException(
-                        "Can't find repository for entity of type " + object.getClass()));
+                .orElseThrow(() -> new IllegalStateException("Can't find repository for entity of type " + object.getClass()));
         CrudRepository<T, Long> crudRepository = (CrudRepository<T, Long>) repo;
         return crudRepository.save(object);
     }
 
     @Override
-    public <T> void saveAll(Chunk<?> entities) throws SQLException {
+    public <T> void saveAll(Chunk<?> entities) {
         if (entities.isEmpty()) return;
 
-        Object first = entities.getItems().get(0);
+        Object first = entities.getItems().getFirst();
         Object repo = repositories.getRepositoryFor(first.getClass())
-                .orElseThrow(() -> new IllegalStateException(
-                        "Can't find repository for entity of type " + first.getClass()));
+                .orElseThrow(() -> new IllegalStateException("Can't find repository for entity of type " + first.getClass()));
         CrudRepository<Object, Long> crudRepository = (CrudRepository<Object, Long>) repo;
         crudRepository.saveAll((List<Object>) entities.getItems());
     }

@@ -2,7 +2,6 @@ package com.moonkeyeu.etl.api.model.programs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.model.PkBuilder;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +15,7 @@ import lombok.*;
         @UniqueConstraint(columnNames = {"program_id", "launch_id"})
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LaunchHasProgramsEntity implements CsvEntity<Object>, PkBuilder {
+public class LaunchHasProgramsEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "launch_programs_id")
     @EqualsAndHashCode.Include
@@ -34,7 +33,6 @@ public class LaunchHasProgramsEntity implements CsvEntity<Object>, PkBuilder {
         return id;
     }
 
-    @Override
     public void setPrimaryKey() {
         this.id = launch_id + program_id;
     }

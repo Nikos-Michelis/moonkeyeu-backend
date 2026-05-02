@@ -1,7 +1,6 @@
 package com.moonkeyeu.etl.api.model.media;
 
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.model.PkBuilder;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +11,7 @@ import lombok.*;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "video_url", schema = "moonkey_db")
-public class VideoEntity implements CsvEntity<Object>, PkBuilder {
+public class VideoEntity implements CsvEntity<Object> {
     @Id
     @Column(name = "video_id")
     @EqualsAndHashCode.Include
@@ -47,7 +46,7 @@ public class VideoEntity implements CsvEntity<Object>, PkBuilder {
         setPrimaryKey();
         return video_id;
     }
-    @Override
+
     public void setPrimaryKey() {
         this.video_id = priority + launch_id ;
     }
