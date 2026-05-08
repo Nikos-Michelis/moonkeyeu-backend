@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.configuration.mappers.MappersConfig;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidFileTypeException;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.*;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 @Setter
+@Getter
 @Slf4j
 public class JsonItemReader implements ItemReader<JsonNode>, ItemStream {
     private ObjectMapper mapper;

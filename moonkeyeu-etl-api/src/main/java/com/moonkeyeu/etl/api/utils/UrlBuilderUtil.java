@@ -2,16 +2,16 @@ package com.moonkeyeu.etl.api.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-@Configuration
+@Component
 @RequiredArgsConstructor
-public class UrlBuilderConfig {
+public class UrlBuilderUtil {
     @Value("${application.api.the-space-devs.url}")
     private String baseUrl;
     @Value("${application.api.the-space-devs.version}")
@@ -67,6 +67,18 @@ public class UrlBuilderConfig {
                 .queryParam("ordering", "-last_updated")
                 .queryParam("net__gte", windowStart)
                 .queryParam("net__lte", windowEnd)
+                .build()
+                .toUri();
+    }
+
+    public URI getThrottleUrl() {
+        return UriComponentsBuilder
+                .fromUri(URI.create(baseUrl))
+                .pathSegment(version, "launches")
+                .path("/")
+                .queryParam("format=json")
+                .queryParam("mode", "detailed")
+                .queryParam("limit", 100)
                 .build()
                 .toUri();
     }

@@ -30,9 +30,8 @@ public class MediaDownloadServiceImpl implements MediaDownloadService {
 
             try (InputStream inputStream = dataBuffer.asInputStream(true)) {
                 return inputStream.readAllBytes();
-            } finally {
-                DataBufferUtils.release(dataBuffer);
             }
+
         } catch (Exception e) {
             throw new IOException("Failed to download resource: " + resourceUrl, e);
         }

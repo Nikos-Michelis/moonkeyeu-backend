@@ -4,6 +4,7 @@ import com.moonkeyeu.etl.api.configuration.batch.jobs.JobParamsBuilder;
 import com.moonkeyeu.etl.api.dto.storage.CleanupType;
 import com.moonkeyeu.etl.api.dto.storage.StorageType;
 import com.moonkeyeu.etl.api.dto.storage.StoreOperation;
+import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
@@ -63,6 +64,10 @@ public class JobExecutionDecider {
         JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", jobParameters, runLaunchesUpdateJob);
         if (launchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
             log.warn("midnightJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
+        }
+
+        if (launchesUpdateJob.getFailureExceptions() instanceof RateLimitExceededException) {
+            return BatchStatus.FAILED;
         }
 
         JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);

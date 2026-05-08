@@ -3,6 +3,7 @@ package com.moonkeyeu.etl.api.repository.persistence.impl;
 import com.moonkeyeu.etl.api.repository.persistence.GenericPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,8 @@ public class GenericPersistenceServiceImpl implements GenericPersistenceService 
 
     private final Repositories repositories;
 
-    public GenericPersistenceServiceImpl(WebApplicationContext applicationContext) {
-        this.repositories = new Repositories(applicationContext);
+    public GenericPersistenceServiceImpl(Repositories repositories) {
+        this.repositories = repositories;
     }
 
     @Override

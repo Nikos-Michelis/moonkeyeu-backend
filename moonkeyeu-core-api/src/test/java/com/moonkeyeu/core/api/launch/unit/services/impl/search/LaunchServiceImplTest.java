@@ -99,10 +99,10 @@ class LaunchServiceImplTest {
             // given: service method going to test
             Page<Launch> launchPage = new PageImpl<>(List.of(testLaunch));
 
-            when(LaunchServiceImplTest.this.launchRepository.findAll(any(Specification.class), any(Pageable.class)))
+            when(launchRepository.findAll(any(Specification.class), any(Pageable.class)))
                     .thenReturn(launchPage);
 
-            when(LaunchServiceImplTest.this.dtoConverter.convertToDto(eq(testLaunch), eq(LaunchNormalDTO.class)))
+            when(dtoConverter.convertToDto(eq(testLaunch), eq(LaunchNormalDTO.class)))
                     .thenReturn(testLaunchNormalDTO);
 
             // when: when test runs
@@ -114,10 +114,10 @@ class LaunchServiceImplTest {
             assertEquals(1, result.getTotalElements());
             assertSame(testLaunchNormalDTO, result.getContent().getFirst());
 
-            verify(LaunchServiceImplTest.this.launchRepository, times(1))
+            verify(launchRepository, times(1))
                     .findAll(any(Specification.class), any(Pageable.class));
 
-            verify(LaunchServiceImplTest.this.dtoConverter, times(result.getSize()))
+            verify(dtoConverter, times(result.getSize()))
                     .convertToDto(testLaunch, LaunchNormalDTO.class);
         }
 
@@ -128,22 +128,22 @@ class LaunchServiceImplTest {
             // given: service method going to test
             Page<Launch> launchPage = new PageImpl<>(List.of(testLaunch));
 
-            when(LaunchServiceImplTest.this.launchRepository.findAll(any(Specification.class), any(Pageable.class)))
+            when(launchRepository.findAll(any(Specification.class), any(Pageable.class)))
                     .thenReturn(launchPage);
 
-            when(LaunchServiceImplTest.this.dtoConverter.convertToDto(eq(testLaunch), eq(LaunchNormalDTO.class)))
+            when(dtoConverter.convertToDto(eq(testLaunch), eq(LaunchNormalDTO.class)))
                     .thenReturn(testLaunchNormalDTO);
 
             // when: when test runs
             Page<DTOEntity> result =
-                    launchService.searchLaunch(LaunchServiceImplTest.this.testRequestParams, testPageSortingDTO);
+                    launchService.searchLaunch(testRequestParams, testPageSortingDTO);
 
             // then: result of test
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
             assertSame(testLaunchNormalDTO, result.getContent().get(0));
 
-            verify(LaunchServiceImplTest.this.launchRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+            verify(launchRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
             verify(dtoConverter, times(result.getSize())).convertToDto(testLaunch, LaunchNormalDTO.class);
         }
     }
@@ -158,10 +158,10 @@ class LaunchServiceImplTest {
             // given
             final String launchId = "test_bf08a10b-35f0-4736-97f3-ba111e59cd55";
 
-            when(LaunchServiceImplTest.this.launchRepository.findLaunchWithLaunchId(launchId))
+            when(launchRepository.findLaunchWithLaunchId(launchId))
                     .thenReturn(Optional.of(testLaunch));
 
-            when(LaunchServiceImplTest.this.dtoConverter.convertToDto(testLaunch, LaunchDTO.class))
+            when(dtoConverter.convertToDto(testLaunch, LaunchDTO.class))
                     .thenReturn(testLaunchDTO);
 
             // when
@@ -171,8 +171,8 @@ class LaunchServiceImplTest {
             assertNotNull(result);
             assertEquals(testLaunchDTO, result);
 
-            verify(LaunchServiceImplTest.this.launchRepository).findLaunchWithLaunchId(launchId);
-            verify(LaunchServiceImplTest.this.dtoConverter).convertToDto(testLaunch, LaunchDTO.class);
+            verify(launchRepository).findLaunchWithLaunchId(launchId);
+            verify(dtoConverter).convertToDto(testLaunch, LaunchDTO.class);
         }
 
         @Test
@@ -182,18 +182,18 @@ class LaunchServiceImplTest {
             // given
             final String launchId = null;
 
-            when(LaunchServiceImplTest.this.launchRepository.findLaunchWithLaunchId(launchId))
+            when(launchRepository.findLaunchWithLaunchId(launchId))
                     .thenReturn(Optional.empty());
 
             // when & Then
             final ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
-                    ()-> LaunchServiceImplTest.this.launchService.getLaunchById(launchId));
+                    ()-> launchService.getLaunchById(launchId));
 
             assertNotNull(exception);
             assertEquals("Launch not found with id: " + launchId, exception.getMessage());
-            verify(LaunchServiceImplTest.this.launchRepository, times(1)).findLaunchWithLaunchId(launchId);
-            verifyNoInteractions(LaunchServiceImplTest.this.dtoConverter);
+            verify(launchRepository, times(1)).findLaunchWithLaunchId(launchId);
+            verifyNoInteractions(dtoConverter);
         }
 
         @Test
@@ -203,18 +203,18 @@ class LaunchServiceImplTest {
             // given
             final String launchId = "test_not_exists_f08a10b-35f0-4736-97f3-ba111e59cd55";
 
-            when(LaunchServiceImplTest.this.launchRepository.findLaunchWithLaunchId(launchId))
+            when(launchRepository.findLaunchWithLaunchId(launchId))
                     .thenReturn(Optional.empty());
 
             // when & Then
             final ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
-                    ()-> LaunchServiceImplTest.this.launchService.getLaunchById(launchId));
+                    ()-> launchService.getLaunchById(launchId));
 
             assertNotNull(exception);
             assertEquals("Launch not found with id: " + launchId, exception.getMessage());
-            verify(LaunchServiceImplTest.this.launchRepository).findLaunchWithLaunchId(launchId);
-            verifyNoInteractions(LaunchServiceImplTest.this.dtoConverter);
+            verify(launchRepository).findLaunchWithLaunchId(launchId);
+            verifyNoInteractions(dtoConverter);
         }
     }
 }

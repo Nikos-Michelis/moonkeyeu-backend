@@ -70,7 +70,7 @@ public class FlowConfig {
         LinkedList<EntityConfig> configs = filePathProvider.getCsvGroups();
         FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("importToDatabaseFlow");
         if (!configs.isEmpty()) {
-            flowBuilder.start(createStepForEntity.createImportStep(configs.get(0)));
+            flowBuilder.start(createStepForEntity.createImportStep(configs.getFirst()));
             for (int i = 1; i < configs.size(); i++) {
                 flowBuilder.next(createStepForEntity.createImportStep(configs.get(i)));
             }

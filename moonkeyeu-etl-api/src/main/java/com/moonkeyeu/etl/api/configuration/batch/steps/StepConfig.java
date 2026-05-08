@@ -14,7 +14,7 @@ import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
 import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.utils.UrlBuilderConfig;
+import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
@@ -53,7 +53,7 @@ public class StepConfig {
     private final JsonItemReader jsonItemReader;
     private final ItemReader<CsvEntity<?>> itemReader;
     private final ClientDataService clientDataService;
-    private final UrlBuilderConfig urlBuilderConfig;
+    private final UrlBuilderUtil urlBuilderUtil;
     private final int CHUNK_SIZE = 150;
 
     @Bean
@@ -61,7 +61,7 @@ public class StepConfig {
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
         return new StepBuilder("fetchLatestDataStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    clientDataService.fetchData(urlBuilderConfig.getLaunchesUrlForWindow(), launchesJsonFile).block();
+                    clientDataService.fetchAll(urlBuilderUtil.getLaunchesUrlForWindow(), launchesJsonFile).block();
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .transactionManager(platformTransactionManager)
@@ -73,7 +73,7 @@ public class StepConfig {
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
         return new StepBuilder("fetchAllLatestDataStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    clientDataService.fetchData(urlBuilderConfig.getAllLatestLaunchesUrl(), launchesJsonFile).block();
+                    clientDataService.fetchAll(urlBuilderUtil.getAllLatestLaunchesUrl(), launchesJsonFile).block();
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .transactionManager(platformTransactionManager)
@@ -85,7 +85,7 @@ public class StepConfig {
         String agenciesJsonFile = filePathProvider.getJsonSource(JSON_AGENCIES.getJsonFile());
         return new StepBuilder("fetchAgenciesStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    clientDataService.fetchData(urlBuilderConfig.baseAgenciesUrl(), agenciesJsonFile).block();
+                    clientDataService.fetchAll(urlBuilderUtil.baseAgenciesUrl(), agenciesJsonFile).block();
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .listener(new StepCompletionListener())
@@ -98,7 +98,7 @@ public class StepConfig {
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
         return new StepBuilder("fetchLaunchesStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    clientDataService.fetchData(urlBuilderConfig.baseLaunchesUrl(), launchesJsonFile).block();
+                    clientDataService.fetchAll(urlBuilderUtil.baseLaunchesUrl(), launchesJsonFile).block();
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .listener(new StepCompletionListener())
