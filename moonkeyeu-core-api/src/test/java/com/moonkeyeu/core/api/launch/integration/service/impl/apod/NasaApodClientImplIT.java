@@ -43,12 +43,7 @@ public class NasaApodClientImplIT {
     @BeforeEach
     void setup() {
         String baseUrl = mockBackEnd.url("/").toString();
-
-        nasaApodClientService = new NasaApodClientServiceImpl(
-                WebClient.builder(),
-                baseUrl
-        );
-
+        nasaApodClientService = new NasaApodClientServiceImpl(WebClient.builder(), baseUrl);
         ReflectionTestUtils.setField(nasaApodClientService, "apiKey", "test-key");
     }
 

@@ -45,7 +45,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
             }
 
             if (!isHeaderWritten()) {
-                String[] headers = getHeaders(chunk.getItems().get(0));
+                String[] headers = getHeaders(chunk.getItems().getFirst());
                 CsvSchema csvSchema =  buildSchema(headers);
                 writer = buildSequenceWriter(csvSchema);
                 setHeaderWritten(true);
@@ -54,10 +54,8 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
             for (Object obj : chunk.getItems()) {
                 writer.write(flattenObject(obj));
             }
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to write chunk", e);
         }
     }
 
@@ -81,7 +79,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
             if (bufferedWriter != null) bufferedWriter.close();
             if (writer != null) writer.close();
         } catch (IOException e) {
-            log.error("Failed to close file {}: {}", resource.getFilename(), e.getMessage(), e);
+            throw new RuntimeException("Failed to close file " + resource.getFilename(), e);
         }
     }
 

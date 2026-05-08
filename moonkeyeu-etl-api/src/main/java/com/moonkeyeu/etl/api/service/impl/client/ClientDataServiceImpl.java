@@ -1,14 +1,17 @@
 package com.moonkeyeu.etl.api.service.impl.client;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.moonkeyeu.etl.api.service.ClientDataService;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
+import com.moonkeyeu.etl.api.utils.JsonStreamFileWriter;
+import io.netty.handler.timeout.ReadTimeoutException;
+import io.netty.handler.timeout.WriteTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -16,12 +19,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
@@ -30,97 +28,100 @@ public class ClientDataServiceImpl implements ClientDataService {
 
     private final WebClient webClient;
     private final ClientThrottleService throttleService;
-    private final ObjectMapper objectMapper;
-
+    private final JsonStreamFileWriter jsonStreamFileWriter;
+    private final Integer MAX_RETRIES = 30;
+    private final Integer RETRY_DELAY = 1;
     @Autowired
-    public ClientDataServiceImpl(WebClient webClient, ClientThrottleService clientThrottleService, @Qualifier("objectMapper") ObjectMapper objectMapper) {
+    public ClientDataServiceImpl(WebClient webClient, ClientThrottleService clientThrottleService, JsonStreamFileWriter jsonStreamFileWriter) {
         this.webClient = webClient;
         this.throttleService = clientThrottleService;
-        this.objectMapper = objectMapper;
+        this.jsonStreamFileWriter = jsonStreamFileWriter;
     }
 
     @Override
-    public Mono<Void> fetchData(URI url, String fileName) {
-        List<JsonNode> allResults = new ArrayList<>();
-        return throttleService.getThrottleDelay()
-                .flatMap(delay -> {
+    public Mono<Void> fetchAll(URI url, String fileName) {
+        return jsonStreamFileWriter.open(fileName)
+                .flatMap(generator ->
+                        fetchNext(url, fileName, generator).doOnTerminate(() -> jsonStreamFileWriter.close(generator))
+                )
+                .doOnSuccess(done -> log.info("Fetching process successfully completed."))
+                .doOnError(error -> log.error("An error occurred during fetching: {}", error.getMessage()));
+    }
+
+    @Override
+    public Mono<Void> fetchNext(URI url, String fileName, JsonGenerator generator) {
+        if (url == null) {
+            log.info("No next page. Stopping pagination.");
+            return Mono.empty();
+        }
+
+        return fetchThrottle()
+                .then(fetch(url, fileName))
+                .flatMap(response -> jsonStreamFileWriter.write(generator, response).thenReturn(response))
+                .flatMap(response -> {
+                    if (!hasNextPage(response)) return Mono.empty();
+                    URI nextUrl = getNextPageUrl(response);
+                    return Mono.defer(() -> fetchNext(nextUrl, fileName, generator));
+                });
+    }
+
+    private Mono<Long> fetchThrottle() {
+        return throttleService.fetchThrottle()
+                .flatMap(throttle -> {
+                    long delay = throttle.nextUseSeconds();
                     if (delay > 0) {
-                        log.warn("Throttle delay detected: Waiting for {} seconds.", delay);
-                        return Mono.delay(Duration.ofSeconds(delay));
+                        log.info("Request limit reached. Waiting for {} seconds...", delay);
+                        return Mono.delay(Duration.ofSeconds(delay)).thenReturn(delay);
                     }
-                    return Mono.empty();
-                })
-                .then(fetchNextPage(url, allResults))
-                .expand(response -> hasNextPage(response) ? fetchThrottle(getNextPageUrl(response), allResults) : Mono.empty())
-                .then()
-                .doOnSubscribe(subscription -> {
-                    log.info("Fetching process started.");
-                })
-                .doOnSuccess(done -> {
-                    saveJsonData(allResults, fileName);
-                    log.info("Fetching process successfully completed.");
-                })
-                .doOnError(error -> {
-                    log.error("An error occurred during fetching: {}", error.getMessage());
+
+                    return Mono.just(0L);
                 });
     }
 
     @Override
-    public Mono<JsonNode> fetchThrottle(URI url, List<JsonNode> allResults) {
-        return throttleService.getThrottleDelay()
-                .flatMap(delay -> {
-                    if (delay > 0) {
-                        log.warn("Throttling applied. Waiting for {} seconds.", delay);
-                        return Mono.delay(Duration.ofSeconds(delay)).then(fetchNextPage(url, allResults));
-                    } else {
-                        return fetchNextPage(url, allResults);
-                    }
-                });
-    }
-
-    @Override
-    public Mono<JsonNode> fetchNextPage(URI url, List<JsonNode> allResults) {
+    public Mono<JsonNode> fetch(URI url, String fileName) {
         return webClient.get()
                 .uri(url)
                 .retrieve()
-                .onStatus(status -> status.value() == 429, clientResponse -> {
-                    log.warn("Rate limit hit (429). Fetching delay...");
-                    return throttleService.getThrottleDelay()
-                            .flatMap(delay -> {
-                                if (delay > 0) {
-                                    return Mono.delay(Duration.ofSeconds(delay))
-                                            .then(Mono.error(new RateLimitExceededException("Rate limit hit. Waiting for " + delay + " seconds...", delay)));
-                                }
-                                return Mono.empty();
-                            });
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    if (clientResponse.statusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+                        return Mono.error(new RateLimitExceededException("Rate limit hit."));
+                    }
+                    return Mono.empty();
                 })
                 .bodyToMono(JsonNode.class)
-                .retryWhen(Retry.backoff(5, Duration.ofSeconds(2))
-                        .maxBackoff(Duration.ofMinutes(3))
-                        .filter(this::hasThrownAnyOfException))
-                .doOnSubscribe(subscription -> {
-                    log.info("Request started, awaiting long response...");
-                })
-                .doOnError(error -> log.error("Error fetching data: {}", error.getMessage()))
-                .doOnNext(response -> {
-                    if (response != null) {
-                        allResults.add(response);
-                    }
-                });
+                .retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(RETRY_DELAY))
+                        .filter(this::isNetworkError))
+                .retryWhen(Retry.from(companion ->
+                        companion.flatMap(this::handleRateLimitRetry)))
+                .doOnSubscribe(s -> log.info("Request started for: {}", url))
+                .doOnError(error -> log.error("Error fetching data: {}", error.getMessage()));
     }
 
-    public void saveJsonData(List<JsonNode> allResults, String fileName) {
-        try {
-            ObjectNode finalResult = objectMapper.createObjectNode();
-            finalResult.set("all_results", objectMapper.valueToTree(allResults));
-            Files.write(Paths.get(fileName), objectMapper.writeValueAsBytes(finalResult),
-                    StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            log.info("Data written to JSON file: {}", fileName);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Somthing went wrong during Json tree parsing." + e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException("An unexpected error occurred." + e.getMessage());
+    private Mono<Long> handleRateLimitRetry(Retry.RetrySignal retrySignal) {
+        if (retrySignal.totalRetries() >= MAX_RETRIES) {
+            return Mono.error(retrySignal.failure());
         }
+
+        if (retrySignal.failure() instanceof RateLimitExceededException) {
+            return throttleService.fetchThrottle()
+                    .flatMap(throttle -> {
+                        long delay =  throttle.nextUseSeconds() > 0 ? throttle.nextUseSeconds() : RETRY_DELAY;
+                        log.warn("Rate limit exceeded. Waiting {} seconds (retry {}/{})", throttle, retrySignal.totalRetries() + 1, MAX_RETRIES);
+                        return Mono.delay(Duration.ofSeconds(delay));
+                    })
+                    .thenReturn(retrySignal.totalRetries());
+        }
+
+        return Mono.error(retrySignal.failure());
+    }
+
+    private boolean isNetworkError(Throwable throwable) {
+        return throwable instanceof WebClientResponseException ||
+                throwable instanceof WriteTimeoutException ||
+                throwable instanceof ReadTimeoutException ||
+                throwable instanceof TimeoutException ||
+                throwable instanceof IOException;
     }
 
     private boolean hasNextPage(JsonNode response) {
@@ -129,15 +130,7 @@ public class ClientDataServiceImpl implements ClientDataService {
         return nextPage != null && !nextPage.isNull();
     }
 
-    private boolean hasThrownAnyOfException(Throwable throwable) {
-        return throwable instanceof RateLimitExceededException ||
-                        throwable instanceof WebClientResponseException ||
-                        throwable instanceof TimeoutException ||
-                        throwable instanceof IOException;
-    }
-
     private URI getNextPageUrl(JsonNode response) {
         return URI.create(response.get("next").asText());
     }
-
 }
