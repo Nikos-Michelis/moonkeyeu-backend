@@ -27,12 +27,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * <p>Reference: <a href="https://github.com/spring-projects/spring-framework/issues/19852#issuecomment-453452354">
  * Spring Framework GitHub Issue #19852</a>
+ * <p>Reference: <a href="https://www.baeldung.com/spring-mocking-webclient">
+ * Mocking a WebClient in Spring</a>
+ *
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("NasaApodClientIntegrationImplTest Integration Tests")
 public class NasaApodClientImplIT {
-    public static MockWebServer mockBackEnd;
-    public NasaApodClientService nasaApodClientService;
+    private static MockWebServer mockBackEnd;
+    private NasaApodClientService nasaApodClientService;
 
     @BeforeAll
     static void setUp() throws IOException {
@@ -76,6 +79,7 @@ public class NasaApodClientImplIT {
 
         RecordedRequest request = mockBackEnd.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
+        Assertions.assertNotNull(request.getRequestUrl());
         assertThat(request.getRequestUrl().queryParameter("api_key"))
                 .isEqualTo("test-key");
     }

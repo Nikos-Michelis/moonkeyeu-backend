@@ -1,7 +1,7 @@
 package com.moonkeyeu.etl.api.service.impl.s3;
 
 import com.moonkeyeu.etl.api.service.S3StorageService;
-import com.moonkeyeu.etl.api.service.S3Manager;
+import com.moonkeyeu.etl.api.service.S3CrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
@@ -12,13 +12,13 @@ import software.amazon.awssdk.core.sync.RequestBody;
 @Slf4j
 @Service
 public class S3StorageServiceImpl implements S3StorageService {
-     private final S3Manager s3Manager;
+     private final S3CrudService s3CrudService;
     private final CacheManager cacheManager;
 
 
     @Autowired
-    public S3StorageServiceImpl(S3Manager s3Manager, CacheManager cacheManager) {
-        this.s3Manager = s3Manager;
+    public S3StorageServiceImpl(S3CrudService s3CrudService, CacheManager cacheManager) {
+        this.s3CrudService = s3CrudService;
         this.cacheManager = cacheManager;
     }
 
@@ -38,7 +38,7 @@ public class S3StorageServiceImpl implements S3StorageService {
             return true;
         }
 
-        boolean existsInS3 = s3Manager.isObjectExists(bucketName, s3Key);
+        boolean existsInS3 = s3CrudService.isObjectExists(bucketName, s3Key);
         if (existsInS3 && cache != null) {
             cache.put(s3Key, true);
         }
@@ -50,7 +50,7 @@ public class S3StorageServiceImpl implements S3StorageService {
     public void upload(String s3Key, String bucketName, byte[] data) {
         try {
             RequestBody requestBody = RequestBody.fromBytes(data);
-            s3Manager.putObject(bucketName, s3Key, requestBody);
+            s3CrudService.putObject(bucketName, s3Key, requestBody);
             log.info("Uploaded {} to S3 bucket {}", s3Key, bucketName);
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload " + s3Key + " to S3", e);

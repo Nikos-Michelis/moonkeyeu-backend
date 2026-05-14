@@ -74,11 +74,9 @@ public class UrlBuilderUtil {
     public URI getThrottleUrl() {
         return UriComponentsBuilder
                 .fromUri(URI.create(baseUrl))
-                .pathSegment(version, "launches")
+                .pathSegment(version, "api-throttle")
                 .path("/")
                 .queryParam("format=json")
-                .queryParam("mode", "detailed")
-                .queryParam("limit", 100)
                 .build()
                 .toUri();
     }

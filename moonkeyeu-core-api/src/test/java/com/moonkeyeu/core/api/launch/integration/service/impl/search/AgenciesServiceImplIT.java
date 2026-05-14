@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
 @DisplayName("AgenciesServiceImplTest Integration Tests")
-@ActiveProfiles("test")
 @Transactional
 class AgenciesServiceImplIT {
     

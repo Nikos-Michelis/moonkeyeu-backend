@@ -66,10 +66,6 @@ public class JobExecutionDecider {
             log.warn("midnightJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
         }
 
-        if (launchesUpdateJob.getFailureExceptions() instanceof RateLimitExceededException) {
-            return BatchStatus.FAILED;
-        }
-
         JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);
         if (updateAgenciesJob.getStatus() != BatchStatus.COMPLETED) {
             log.error("midnightJobExecution: Agencies fetching failed {} Abort the job execution", BatchStatus.FAILED);

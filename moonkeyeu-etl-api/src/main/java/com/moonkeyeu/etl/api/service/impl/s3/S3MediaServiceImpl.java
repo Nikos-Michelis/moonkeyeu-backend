@@ -57,14 +57,14 @@ public class S3MediaServiceImpl implements S3MediaService {
         return cloudFrontUrl;
     }
 
+    @Override
     public String getCloudFrontUrl(ImageEntity imageEntity) throws MalformedURLException {
         String basePath = getRootPath(imageEntity);
         String fileName = getFileName(imageEntity);
         return UriComponentsBuilder
                 .fromUriString(this.cloudFrontUrl)
-                .pathSegment(s3KeyValue)
-                .pathSegment(basePath)
-                .pathSegment(fileName)
+                .path(s3KeyValue)
+                .pathSegment(basePath, fileName)
                 .toUriString();
     }
 

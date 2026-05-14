@@ -65,8 +65,8 @@ public class MediaProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
 
     private String saveToLocal(ImageEntity entity) throws InvalidStoreOperationException, IOException {
 
-        if (storage == null) {
-            throw new InvalidStoreOperationException("operation is null");
+        if (operation == null || operation.isEmpty()) {
+            throw new InvalidStoreOperationException("The store operation could not be completed because the current state is invalid.");
         }
 
         StoreOperation storeOperation = StoreOperation.from(operation);
@@ -81,8 +81,8 @@ public class MediaProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>>
 
     private String saveToS3(ImageEntity entity) throws InvalidStoreOperationException, IOException {
 
-        if (storage == null) {
-            throw new InvalidStoreOperationException("operation is null");
+        if (operation == null || operation.isEmpty()) {
+            throw new InvalidStoreOperationException("The store operation could not be completed because the current state is invalid.");
         }
 
         StoreOperation storeOperation = StoreOperation.from(operation);

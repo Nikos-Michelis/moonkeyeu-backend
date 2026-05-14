@@ -56,7 +56,7 @@ public class ClientDataServiceImpl implements ClientDataService {
         }
 
         return fetchThrottle()
-                .then(fetch(url, fileName))
+                .then(fetch(url))
                 .flatMap(response -> jsonStreamFileWriter.write(generator, response).thenReturn(response))
                 .flatMap(response -> {
                     if (!hasNextPage(response)) return Mono.empty();
@@ -79,7 +79,7 @@ public class ClientDataServiceImpl implements ClientDataService {
     }
 
     @Override
-    public Mono<JsonNode> fetch(URI url, String fileName) {
+    public Mono<JsonNode> fetch(URI url) {
         return webClient.get()
                 .uri(url)
                 .retrieve()
@@ -107,7 +107,7 @@ public class ClientDataServiceImpl implements ClientDataService {
             return throttleService.fetchThrottle()
                     .flatMap(throttle -> {
                         long delay =  throttle.nextUseSeconds() > 0 ? throttle.nextUseSeconds() : RETRY_DELAY;
-                        log.warn("Rate limit exceeded. Waiting {} seconds (retry {}/{})", throttle, retrySignal.totalRetries() + 1, MAX_RETRIES);
+                        log.warn("Rate limit exceeded. Waiting {} seconds (retry {}/{})", delay, retrySignal.totalRetries() + 1, MAX_RETRIES);
                         return Mono.delay(Duration.ofSeconds(delay));
                     })
                     .thenReturn(retrySignal.totalRetries());

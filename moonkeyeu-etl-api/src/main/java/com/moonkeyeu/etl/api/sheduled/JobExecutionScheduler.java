@@ -22,7 +22,7 @@ public class JobExecutionScheduler {
         jobExecutionDecider.midnightJobExecution();
     }
 
-    @Scheduled(fixedRate = 10000)
+    //@Scheduled(fixedRate = 10000)
     @Profile("dev")
     public void scheduledBulkInsertJob() {
         jobExecutionDecider.bulkInsertJobExecution();

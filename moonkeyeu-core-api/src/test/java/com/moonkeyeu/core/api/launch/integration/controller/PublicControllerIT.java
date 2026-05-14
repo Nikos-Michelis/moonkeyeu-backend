@@ -28,7 +28,8 @@ public class PublicControllerIT {
         webTestClient.get()
                 .uri("/public/nasa/apod")
                 .exchange()
-                .expectStatus().is5xxServerError()
+                .expectStatus()
+                .is5xxServerError()
                 .expectBody()
                 .consumeWith(System.out::println);
     }
