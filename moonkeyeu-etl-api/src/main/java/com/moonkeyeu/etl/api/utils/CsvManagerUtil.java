@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Component
-public class CsvManager {
+public class CsvManagerUtil {
     public boolean deleteAllFiles(String folderPath) {
         Path folder = Paths.get(folderPath);
         if (!Files.exists(folder) || !Files.isDirectory(folder)) {

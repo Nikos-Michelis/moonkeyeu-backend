@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+
 
 @Service
 public class ClientThrottleServiceImpl implements ClientThrottleService {
@@ -25,8 +27,9 @@ public class ClientThrottleServiceImpl implements ClientThrottleService {
 
     @Override
     public Mono<ThrottleResponse> fetchThrottle() {
+        URI throttleUri = urlBuilderUtil.getThrottleUrl();
         return webClient.get()
-                .uri(urlBuilderUtil.getThrottleUrl())
+                .uri(throttleUri)
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         response ->

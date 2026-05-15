@@ -1,5 +1,6 @@
 package com.moonkeyeu.etl.api.integration.s3;
 
+import com.moonkeyeu.etl.api.config.TestContainerConfiguration;
 import com.moonkeyeu.etl.api.model.images.RocketImageEntity;
 import com.moonkeyeu.etl.api.service.S3CrudService;
 import com.moonkeyeu.etl.api.service.S3MediaService;
@@ -10,7 +11,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.junit.jupiter.Testcontainers;
 

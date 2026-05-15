@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moonkeyeu.etl.api.config.TestContainerConfiguration;
 import com.moonkeyeu.etl.api.config.TestEntity;
 import com.moonkeyeu.etl.api.dto.ThrottleResponse;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.service.impl.client.ClientDataServiceImpl;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
-import com.moonkeyeu.etl.api.utils.JsonStreamFileWriter;
+import com.moonkeyeu.etl.api.utils.JsonStreamFileWriterUtil;
 import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -17,7 +18,9 @@ import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -43,7 +46,7 @@ class ClientDataServiceImplIT {
     private ClientDataServiceImpl clientDataService;
     @Mock
     private ClientThrottleService clientThrottleService;
-    private JsonStreamFileWriter jsonStreamFileWriter;
+    private JsonStreamFileWriterUtil jsonStreamFileWriterUtil;
     private ObjectMapper objectMapper;
     private UrlBuilderUtil urlBuilderUtil;
     private JsonGenerator jsonGenerator;
@@ -92,11 +95,11 @@ class ClientDataServiceImplIT {
                         .defaultCodecs()
                         .maxInMemorySize(16 * 1024 * 1024))
                 .build();
-        jsonStreamFileWriter = new JsonStreamFileWriter(objectMapper);
+        jsonStreamFileWriterUtil = new JsonStreamFileWriterUtil(objectMapper);
         clientDataService = new ClientDataServiceImpl(
                 webClient,
                 clientThrottleService,
-                jsonStreamFileWriter
+                jsonStreamFileWriterUtil
         );
         ReflectionTestUtils.setField(urlBuilderUtil, "baseUrl", baseUrl);
         ReflectionTestUtils.setField(urlBuilderUtil, "version", "2.3.0");

@@ -131,8 +131,11 @@
             <version>5.0.0</version>
             <scope>test</scope>
         </dependency>
-
-
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mysql</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -174,7 +177,17 @@
                 <version>0.8.11</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/launch/dto/**</exclude>
+                        <exclude>**/dto</exclude>
+                        <exclude>**/model</exclude>
+                        <exclude>**/settings</exclude>
+                        <exclude>**/configuration/**/*Config.class</exclude>
+                        <exclude>**/configuration/**/flows</exclude>
+                        <exclude>**/configuration/**/jobs</exclude>
+                        <exclude>**/configuration/**/steps</exclude>
+                        <exclude>**/configuration/batch/listeners</exclude>
+                        <exclude>**/configuration/files</exclude>
+                        <exclude>**/configuration/mappers</exclude>
+                        <exclude>**/configuration/s3</exclude>
                         <exclude>**/MoonkeyEuEtlApplication.class</exclude>
                     </excludes>
                 </configuration>

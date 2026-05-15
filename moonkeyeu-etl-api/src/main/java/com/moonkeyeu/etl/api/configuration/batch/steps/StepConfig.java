@@ -8,7 +8,7 @@ import com.moonkeyeu.etl.api.configuration.batch.writers.ItemWriterRegistry;
 import com.moonkeyeu.etl.api.dto.storage.CleanupType;
 import com.moonkeyeu.etl.api.service.ClientDataService;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidCleanupOperationException;
-import com.moonkeyeu.etl.api.utils.CsvManager;
+import com.moonkeyeu.etl.api.utils.CsvManagerUtil;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
@@ -41,7 +41,7 @@ import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_LAUNCHES;
 public class StepConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
-    private final CsvManager csvManager;
+    private final CsvManagerUtil csvManagerUtil;
     private final RootConfig rootConfig;
     private final FilePathProvider filePathProvider;
     private final CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> compositeProcessor;
@@ -120,11 +120,11 @@ public class StepConfig {
                     CleanupType cleanupType = CleanupType.from(cleanup);
 
                     switch (cleanupType) {
-                        case ONLY_CSV -> csvManager.deleteAllFiles(rootConfig.getCsvRootFolder());
-                        case ONLY_JSON -> csvManager.deleteAllFiles(rootConfig.getJsonRootFolder());
+                        case ONLY_CSV -> csvManagerUtil.deleteAllFiles(rootConfig.getCsvRootFolder());
+                        case ONLY_JSON -> csvManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
                         case ALL -> {
-                            csvManager.deleteAllFiles(rootConfig.getCsvRootFolder());
-                            csvManager.deleteAllFiles(rootConfig.getJsonRootFolder());
+                            csvManagerUtil.deleteAllFiles(rootConfig.getCsvRootFolder());
+                            csvManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
                         }
                         default -> throw new InvalidCleanupOperationException("Unexpected operation: " + cleanup);
                     };

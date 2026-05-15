@@ -1,29 +1,12 @@
 spring:
-  datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:${LOCAL_MYSQL_PORT}}/${MYSQL_DATABASE:${LOCAL_MYSQL_DATABASE}}
-    username: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
-    password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: none
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: false
-        generate_statistics: false
-        jdbc:
-          batch_size: 20
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQL8Dialect
 
   batch:
     jdbc:
       table-prefix: BATCH_
-      initialize-schema: always
+      initialize-schema: never
       platform: mysql
     job:
       enabled: false

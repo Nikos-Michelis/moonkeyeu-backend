@@ -3,7 +3,7 @@ package com.moonkeyeu.etl.api.unit.utils;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moonkeyeu.etl.api.utils.JsonStreamFileWriter;
+import com.moonkeyeu.etl.api.utils.JsonStreamFileWriterUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,18 +22,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
-class JsonStreamFileWriterTest {
+class JsonStreamFileWriterUtilTest {
 
     @Mock
     private JsonGenerator generator;
     private ObjectMapper objectMapper;
-    private JsonStreamFileWriter jsonStreamFileWriter;
+    private JsonStreamFileWriterUtil jsonStreamFileWriterUtil;
     @TempDir
     private Path tempDir;
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        jsonStreamFileWriter = new JsonStreamFileWriter(objectMapper);
+        jsonStreamFileWriterUtil = new JsonStreamFileWriterUtil(objectMapper);
     }
 
     @Test
@@ -42,10 +42,10 @@ class JsonStreamFileWriterTest {
         // given
         String fileName = tempDir.resolve("test.json").toString();
         // when
-        StepVerifier.create(jsonStreamFileWriter.open(fileName))
+        StepVerifier.create(jsonStreamFileWriterUtil.open(fileName))
                 .assertNext(generator -> {
                     assertThat(generator).isNotNull();
-                    jsonStreamFileWriter.close(generator);
+                    jsonStreamFileWriterUtil.close(generator);
                 })
                 .verifyComplete();
 
@@ -58,7 +58,7 @@ class JsonStreamFileWriterTest {
         // given
         String fileName = tempDir.resolve("write-test.json").toString();
         JsonGenerator generator =
-                jsonStreamFileWriter.open(fileName).block();
+                jsonStreamFileWriterUtil.open(fileName).block();
         JsonNode node = objectMapper.readTree("""
                 {
                     "id": 1,
@@ -67,11 +67,11 @@ class JsonStreamFileWriterTest {
                 """);
 
         // when
-        StepVerifier.create(jsonStreamFileWriter.write(generator, node))
+        StepVerifier.create(jsonStreamFileWriterUtil.write(generator, node))
                 .verifyComplete();
 
         assertNotNull(generator);
-        jsonStreamFileWriter.close(generator);
+        jsonStreamFileWriterUtil.close(generator);
 
         // then
         String content = Files.readString(Path.of(fileName));
@@ -90,7 +90,7 @@ class JsonStreamFileWriterTest {
         String fileName = tempDir.resolve("skip-test.json").toString();
 
         JsonGenerator generator =
-                jsonStreamFileWriter.open(fileName).block();
+                jsonStreamFileWriterUtil.open(fileName).block();
 
         JsonNode node = objectMapper.readTree("""
                 {
@@ -99,11 +99,11 @@ class JsonStreamFileWriterTest {
                 """);
 
         // when
-        StepVerifier.create(jsonStreamFileWriter.write(generator, node))
+        StepVerifier.create(jsonStreamFileWriterUtil.write(generator, node))
                 .verifyComplete();
 
         assertNotNull(generator);
-        jsonStreamFileWriter.close(generator);
+        jsonStreamFileWriterUtil.close(generator);
 
         // then
         String content = Files.readString(Path.of(fileName));
@@ -120,11 +120,11 @@ class JsonStreamFileWriterTest {
         String fileName = tempDir.resolve("close-test.json").toString();
 
         JsonGenerator generator =
-                jsonStreamFileWriter.open(fileName).block();
+                jsonStreamFileWriterUtil.open(fileName).block();
 
         // when
         assertNotNull(generator);
-        jsonStreamFileWriter.close(generator);
+        jsonStreamFileWriterUtil.close(generator);
 
         // then
         String content = Files.readString(Path.of(fileName));
@@ -144,6 +144,6 @@ class JsonStreamFileWriterTest {
                 .writeEndArray();
 
         assertThrows(RuntimeException.class, () ->
-                jsonStreamFileWriter.close(generator));
+                jsonStreamFileWriterUtil.close(generator));
     }
 }

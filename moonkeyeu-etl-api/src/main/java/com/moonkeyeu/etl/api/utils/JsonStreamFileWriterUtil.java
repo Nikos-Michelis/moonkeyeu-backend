@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JsonStreamFileWriter {
+public class JsonStreamFileWriterUtil {
     private final ObjectMapper objectMapper;
 
     public Mono<JsonGenerator> open(String fileName) {

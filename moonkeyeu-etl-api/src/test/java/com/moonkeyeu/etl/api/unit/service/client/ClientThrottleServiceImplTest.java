@@ -14,6 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.net.URI;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,19 +35,27 @@ class ClientThrottleServiceImplTest {
     private WebClient.RequestHeadersSpec requestHeadersSpec;
     @Mock
     private WebClient.ResponseSpec responseSpec;
+    @Mock
+    private UrlBuilderUtil urlBuilderUtil;
     private ThrottleResponse responseZeroUseSeconds;
     private ThrottleResponse responseUseSeconds;
 
     @BeforeEach
     void setUp() {
-        when(webClientBuilder.baseUrl(anyString())).thenReturn(webClientBuilder);
-        when(webClientBuilder.build()).thenReturn(webClient);
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(java.util.function.Function.class)))
+        when(webClientBuilder.build())
+                .thenReturn(webClient);
+        when(webClient.get())
+                .thenReturn(requestHeadersUriSpec);
+        when(urlBuilderUtil.getThrottleUrl())
+                .thenReturn(URI.create("https://www.example.com/throttle"));
+        when(requestHeadersUriSpec.uri(any(URI.class)))
                 .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(requestHeadersSpec.retrieve())
+                .thenReturn(responseSpec);
 
-        throttleService = new ClientThrottleServiceImpl(webClientBuilder.build(), new UrlBuilderUtil());
+        throttleService =
+                new ClientThrottleServiceImpl(webClientBuilder.build(), urlBuilderUtil);
+
         responseZeroUseSeconds = new ThrottleResponse(
                 15,
                 10,
@@ -53,6 +63,7 @@ class ClientThrottleServiceImplTest {
                 3600L,
                 "123.123.2.123"
         );
+
         responseUseSeconds = new ThrottleResponse(
                 15,
                 15,

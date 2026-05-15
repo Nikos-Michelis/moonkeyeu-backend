@@ -1,6 +1,6 @@
 {
   "count": 1623,
-  "next": "https://ll.thespacedevs.com/2.3.0/launches/?format=json&limit=100&mode=detailed&net__gte=2021-05-04&offset=100&ordering=-last_updated",
+  "next": null,
   "previous": null,
   "results": [
     {

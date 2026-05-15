@@ -1,6 +1,7 @@
 package com.moonkeyeu.etl.api.integration.s3;
 
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
+import com.moonkeyeu.etl.api.config.TestContainerConfiguration;
 import com.moonkeyeu.etl.api.service.S3CrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +9,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.junit.jupiter.Container;

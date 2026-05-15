@@ -7,7 +7,7 @@ import com.moonkeyeu.etl.api.dto.ThrottleResponse;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.service.impl.client.ClientDataServiceImpl;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
-import com.moonkeyeu.etl.api.utils.JsonStreamFileWriter;
+import com.moonkeyeu.etl.api.utils.JsonStreamFileWriterUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class ClientDataServiceImplTest {
     @Mock
     private ClientThrottleService throttleService;
     @Mock
-    private JsonStreamFileWriter jsonStreamFileWriter;
+    private JsonStreamFileWriterUtil jsonStreamFileWriterUtil;
     @Mock
     private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
     @Mock
@@ -55,7 +55,7 @@ class ClientDataServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        clientDataService = new ClientDataServiceImpl(webClient, throttleService, jsonStreamFileWriter);
+        clientDataService = new ClientDataServiceImpl(webClient, throttleService, jsonStreamFileWriterUtil);
         responseZeroUseSeconds = new ThrottleResponse(
                 15,
                 10,
@@ -88,8 +88,8 @@ class ClientDataServiceImplTest {
         String fileName = tempDir.resolve("output.json").toString();
 
         when(throttleService.fetchThrottle()).thenReturn(Mono.just(responseZeroUseSeconds));
-        when(jsonStreamFileWriter.open(fileName)).thenReturn(Mono.just(jsonGenerator));
-        when(jsonStreamFileWriter.write(any(), any())).thenReturn(Mono.empty());
+        when(jsonStreamFileWriterUtil.open(fileName)).thenReturn(Mono.just(jsonGenerator));
+        when(jsonStreamFileWriterUtil.write(any(), any())).thenReturn(Mono.empty());
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
@@ -115,8 +115,8 @@ class ClientDataServiceImplTest {
         String fileName = tempDir.resolve("output.json").toString();
 
         when(throttleService.fetchThrottle()).thenReturn(Mono.just(responseZeroUseSeconds));
-        when(jsonStreamFileWriter.open(fileName)).thenReturn(Mono.just(jsonGenerator));
-        when(jsonStreamFileWriter.write(any(), any())).thenReturn(Mono.empty());
+        when(jsonStreamFileWriterUtil.open(fileName)).thenReturn(Mono.just(jsonGenerator));
+        when(jsonStreamFileWriterUtil.write(any(), any())).thenReturn(Mono.empty());
 
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
@@ -145,8 +145,8 @@ class ClientDataServiceImplTest {
 
         //when
         when(throttleService.fetchThrottle()).thenReturn(Mono.just(responseUseSeconds));
-        when(jsonStreamFileWriter.open(fileName)).thenReturn(Mono.just(jsonGenerator));
-        when(jsonStreamFileWriter.write(any(), any())).thenReturn(Mono.empty());
+        when(jsonStreamFileWriterUtil.open(fileName)).thenReturn(Mono.just(jsonGenerator));
+        when(jsonStreamFileWriterUtil.write(any(), any())).thenReturn(Mono.empty());
 
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
@@ -230,7 +230,7 @@ class ClientDataServiceImplTest {
         String fileName = tempDir.resolve("output.json").toString();
 
         when(throttleService.fetchThrottle()).thenReturn(Mono.just(responseZeroUseSeconds));
-        when(jsonStreamFileWriter.write(any(), any())).thenReturn(Mono.empty());
+        when(jsonStreamFileWriterUtil.write(any(), any())).thenReturn(Mono.empty());
 
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
@@ -247,7 +247,7 @@ class ClientDataServiceImplTest {
                 .verify();
 
         verify(webClient, times(3)).get();
-        verify(jsonStreamFileWriter, times(3)).write(any(), any());
+        verify(jsonStreamFileWriterUtil, times(3)).write(any(), any());
     }
 
     @Test
