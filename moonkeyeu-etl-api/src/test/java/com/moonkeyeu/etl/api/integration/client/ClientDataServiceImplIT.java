@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moonkeyeu.etl.api.config.TestContainerConfiguration;
 import com.moonkeyeu.etl.api.config.TestEntity;
 import com.moonkeyeu.etl.api.dto.ThrottleResponse;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
@@ -16,11 +15,10 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -38,21 +36,18 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @DisplayName("ClientDataServiceImpl Integration Tests")
 class ClientDataServiceImplIT {
-
-    private MockWebServer mockWebServer;
-    private ClientDataServiceImpl clientDataService;
     @Mock
     private ClientThrottleService clientThrottleService;
-    private JsonStreamFileWriterUtil jsonStreamFileWriterUtil;
+    private MockWebServer mockWebServer;
+    private ClientDataServiceImpl clientDataService;
     private ObjectMapper objectMapper;
     private UrlBuilderUtil urlBuilderUtil;
     private JsonGenerator jsonGenerator;
     private ThrottleResponse responseZeroUseSeconds;
     private ThrottleResponse responseUseSeconds;
-    private WebClient webClient;
     @TempDir
     Path tempDir;
 
@@ -74,33 +69,24 @@ class ClientDataServiceImplIT {
         String baseUrl = String.format("http://localhost:%d", mockWebServer.getPort());
         Path outputFile = tempDir.resolve("output.json");
         jsonGenerator = objectMapper.getFactory().createGenerator(Files.newOutputStream(outputFile), JsonEncoding.UTF8);
-        responseZeroUseSeconds = new ThrottleResponse(
-                15,
-                10,
-                1,
-                3600L,
-                "123.123.2.123"
-        );
-        responseUseSeconds = new ThrottleResponse(
-                15,
-                10,
-                1,
-                3600L,
-                "123.123.0.123"
-        );
-        webClient = WebClient.builder()
+        responseZeroUseSeconds = new ThrottleResponse(15, 10, 1, 3600L, "123.123.2.123");
+        responseUseSeconds = new ThrottleResponse(15, 10, 1, 3600L, "123.123.0.123");
+
+        WebClient webClient = WebClient.builder()
                 .baseUrl(mockWebServer.url(baseUrl).toString())
                 .defaultHeader(HttpHeaders.USER_AGENT, "Test Client")
                 .codecs(configurer -> configurer
                         .defaultCodecs()
                         .maxInMemorySize(16 * 1024 * 1024))
                 .build();
-        jsonStreamFileWriterUtil = new JsonStreamFileWriterUtil(objectMapper);
+
+        JsonStreamFileWriterUtil jsonStreamFileWriterUtil = new JsonStreamFileWriterUtil(objectMapper);
         clientDataService = new ClientDataServiceImpl(
                 webClient,
                 clientThrottleService,
                 jsonStreamFileWriterUtil
         );
+
         ReflectionTestUtils.setField(urlBuilderUtil, "baseUrl", baseUrl);
         ReflectionTestUtils.setField(urlBuilderUtil, "version", "2.3.0");
     }
@@ -232,9 +218,6 @@ class ClientDataServiceImplIT {
                         .setSocketPolicy(SocketPolicy.NO_RESPONSE)
                         .setBodyDelay(121, TimeUnit.SECONDS)
         );
-
-        when(clientThrottleService.fetchThrottle())
-                .thenReturn(Mono.just(responseUseSeconds));
 
         Mono<JsonNode> result = clientDataService.fetch(mockWebServer.url("/page1").uri()).timeout(Duration.ofSeconds(121));
         // when

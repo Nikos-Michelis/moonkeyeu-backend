@@ -1,6 +1,5 @@
 package com.moonkeyeu.etl.api.integration.client;
 
-import com.moonkeyeu.etl.api.config.TestContainerConfiguration;
 import com.moonkeyeu.etl.api.service.impl.client.ClientThrottleServiceImpl;
 import com.moonkeyeu.etl.api.settings.exceptions.RemoteServiceException;
 import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
@@ -12,21 +11,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
 import java.net.URI;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @DisplayName("ClientThrottleServiceImplIT Integration Tests")
 class ClientThrottleServiceImplIT {
 

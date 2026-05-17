@@ -180,10 +180,10 @@
                         <exclude>**/dto</exclude>
                         <exclude>**/model</exclude>
                         <exclude>**/settings</exclude>
-                        <exclude>**/configuration/**/*Config.class</exclude>
-                        <exclude>**/configuration/**/flows</exclude>
-                        <exclude>**/configuration/**/jobs</exclude>
-                        <exclude>**/configuration/**/steps</exclude>
+                        <exclude>**/*Config.class</exclude>
+                        <exclude>**/configuration/batch/flows</exclude>
+                        <exclude>**/configuration/batch/jobs</exclude>
+                        <exclude>**/configuration/batch/steps</exclude>
                         <exclude>**/configuration/batch/listeners</exclude>
                         <exclude>**/configuration/files</exclude>
                         <exclude>**/configuration/mappers</exclude>

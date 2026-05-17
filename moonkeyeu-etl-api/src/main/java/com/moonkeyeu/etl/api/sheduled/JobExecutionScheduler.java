@@ -17,7 +17,7 @@ public class JobExecutionScheduler {
     }
 
     //@Scheduled(cron = "0 0 0 * * *")
-    //@Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     public void scheduledMidnightJob() {
         jobExecutionDecider.midnightJobExecution();
     }

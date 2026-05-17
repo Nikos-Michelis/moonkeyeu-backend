@@ -1,6 +1,7 @@
 package com.moonkeyeu.etl.api.service.impl.s3;
 
 import com.moonkeyeu.etl.api.service.S3CrudService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -9,13 +10,10 @@ import software.amazon.awssdk.services.s3.model.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class S3CrudServiceImpl implements S3CrudService {
 
     private final S3Client s3Client;
-
-    public S3CrudServiceImpl(S3Client s3Client){
-        this.s3Client = s3Client;
-    }
 
     @Override
     public void putObject(String bucketName, String key,  RequestBody requestBody) {
