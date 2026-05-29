@@ -120,7 +120,7 @@ public class JsonObjectMapper {
         return stages;
     }
 
-    public  List<SpaceCraftStage> mapSpaceCraftStage(JsonNode resultsNode) throws Exception {
+    public List<SpaceCraftStage> mapSpaceCraftStage(JsonNode resultsNode) throws Exception {
         String id = resultsNode.get("id").asText();
         Integer rocket_id = resultsNode.path("rocket").get("id").asInt();
         JsonNode spacecraftStageNode = resultsNode.path("rocket").get("spacecraft_stage");

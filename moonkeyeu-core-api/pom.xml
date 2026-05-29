@@ -181,13 +181,6 @@
             <version>5.0.0-alpha.12</version>
             <scope>test</scope>
         </dependency>
-        <!-- Docker compose support -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-docker-compose</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
         <!-- Test Containers -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

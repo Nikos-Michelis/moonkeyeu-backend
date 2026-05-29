@@ -29,17 +29,9 @@ jobs:
         run: cd ${{ matrix.module }} && chmod +x ./mvnw
 
       - name: Running Unit Tests
-        if: ${{ matrix.module != 'moonkeyeu-etl-api' }}
         run: cd ${{ matrix.module }} && ./mvnw verify test -Punit-test
         env:
           API_PROFILE: test
-
-      - name: Skip Unit Test
-        if: ${{ matrix.module == 'moonkeyeu-etl-api' }}
-        run: |
-          echo "Tests Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "Module '${{ matrix.module }}' is excluded from unit tests. Marking as complete." >> $GITHUB_STEP_SUMMARY
-          echo "Skipping tests for ${{ matrix.module }}, but passing the job."
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -75,16 +67,8 @@ jobs:
         run: cd ${{ matrix.module }} && chmod +x ./mvnw
 
       - name: Running Integration Tests
-        if: matrix.module != 'moonkeyeu-etl-api'
         run: cd ${{ matrix.module }} && ./mvnw verify test -Pintegration-test
         env:
           API_PROFILE: test
           CLOUDFRONT_URL: https://cdn.example.com/
           NASA_APOD_KEY: nasa_apod_test_key
-
-      - name: Skip Integration Test
-        if: ${{ matrix.module == 'moonkeyeu-etl-api' }}
-        run: |
-          echo "Tests Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "Module '${{ matrix.module }}' is excluded from integration tests. Marking as complete." >> $GITHUB_STEP_SUMMARY
-          echo "Skipping tests for ${{ matrix.module }}, but passing the job."

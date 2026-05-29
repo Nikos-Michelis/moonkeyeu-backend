@@ -51,7 +51,7 @@ public class UrlBuilderUtil {
 
     public URI getAllLatestLaunchesUrl() {
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        String windowStart = now.toLocalDate().minusMonths(1).toString();
+        String windowStart = now.toLocalDate().minusYears(5).toString();
         return baseLaunchesUriBuilder()
                 .queryParam("ordering", "-last_updated")
                 .queryParam("net__gte", windowStart)
@@ -74,11 +74,9 @@ public class UrlBuilderUtil {
     public URI getThrottleUrl() {
         return UriComponentsBuilder
                 .fromUri(URI.create(baseUrl))
-                .pathSegment(version, "launches")
+                .pathSegment(version, "api-throttle")
                 .path("/")
                 .queryParam("format=json")
-                .queryParam("mode", "detailed")
-                .queryParam("limit", 100)
                 .build()
                 .toUri();
     }

@@ -18,4 +18,4 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar /app/
 EXPOSE 8081
 ENV JAR_VERSION=${APP_VERSION}
-ENTRYPOINT ["sh", "-c", "java -jar /app/*-${JAR_VERSION}.jar"]
+ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -jar /app/*-${JAR_VERSION}.jar"]

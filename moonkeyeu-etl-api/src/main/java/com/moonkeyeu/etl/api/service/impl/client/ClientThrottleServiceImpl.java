@@ -3,38 +3,33 @@ package com.moonkeyeu.etl.api.service.impl.client;
 import com.moonkeyeu.etl.api.dto.ThrottleResponse;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.settings.exceptions.RemoteServiceException;
-import org.springframework.beans.factory.annotation.Value;
+import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+
 
 @Service
 public class ClientThrottleServiceImpl implements ClientThrottleService {
     private final WebClient webClient;
-    @Value("${application.api.the-space-devs.version}")
-    private String version;
+    private final UrlBuilderUtil urlBuilderUtil;
 
-    public ClientThrottleServiceImpl(
-            WebClient.Builder webClientBuilder,
-            @Value("${application.api.the-space-devs.url}") String baseUrl
-    ) {
-        this.webClient = webClientBuilder
-                .baseUrl(baseUrl)
-                .build();
+    @Autowired
+    public ClientThrottleServiceImpl(WebClient webClient, UrlBuilderUtil urlBuilderUtil) {
+        this.webClient = webClient;
+        this.urlBuilderUtil = urlBuilderUtil;
     }
 
     @Override
     public Mono<ThrottleResponse> fetchThrottle() {
+        URI throttleUri = urlBuilderUtil.getThrottleUrl();
         return webClient.get()
-                .uri(uriBuilder ->
-                        uriBuilder.pathSegment(version, "api-throttle")
-                                .path("/")
-                                .queryParam("format", "json")
-                                .build()
-                )
+                .uri(throttleUri)
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         response ->

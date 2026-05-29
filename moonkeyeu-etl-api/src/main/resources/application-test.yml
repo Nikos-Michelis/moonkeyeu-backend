@@ -1,0 +1,84 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  batch:
+    jdbc:
+      table-prefix: BATCH_
+      initialize-schema: never
+      platform: mysql
+    job:
+      enabled: false
+
+  main:
+    allow-bean-definition-overriding: true
+  http:
+    codecs:
+      max-in-memory-size: 20MB
+
+aws:
+  region: ${S3_REGION}
+  s3:
+    buckets:
+      root: ${S3_BUCKET_ROOT}
+      bucket-name: ${S3_BUCKET}
+  cloudfront:
+    url: ${CLOUDFRONT_URL}
+
+application:
+  backend:
+    url: http://localhost:8080/api/v1
+  path:
+    root:
+      data:
+        folder:
+          csv: ${user.home}/${DATA_PATH}/backend/data/csv-dataset
+          json: ${user.home}/${DATA_PATH}/backend/data/json-dataset
+          images: ${user.home}/${DATA_PATH}/backend/data/images
+  api:
+    the-space-devs:
+      url: https://ll.thespacedevs.com
+      cdn: ${THE_SPACE_DEVS_CDN}
+      version: ${THE_SPACE_DEVS_VERSION}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [ "health", "prometheus", "metrics" ]
+
+  endpoint:
+    health:
+      show-details: always
+      group:
+        etl-api:
+          include: db
+  health:
+    db:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+server:
+  port: ${API_ETL_PORT:8081}
+  servlet:
+    context-path: /api/v1
+
+logging:
+  level:
+    security:
+      web: DEBUG
+    org:
+      springframework:
+        jdbc:
+          datasource:
+            DriverManagerDataSource: DEBUG
+      hibernate:
+        SQL: off
+        type:
+          descriptor:
+            sql:
+              BasicBinder: off

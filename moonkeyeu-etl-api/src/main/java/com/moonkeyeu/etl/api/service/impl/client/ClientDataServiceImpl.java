@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.service.ClientDataService;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
-import com.moonkeyeu.etl.api.utils.JsonStreamFileWriter;
+import com.moonkeyeu.etl.api.utils.JsonStreamFileWriterUtil;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,21 +28,21 @@ public class ClientDataServiceImpl implements ClientDataService {
 
     private final WebClient webClient;
     private final ClientThrottleService throttleService;
-    private final JsonStreamFileWriter jsonStreamFileWriter;
+    private final JsonStreamFileWriterUtil jsonStreamFileWriterUtil;
     private final Integer MAX_RETRIES = 30;
     private final Integer RETRY_DELAY = 1;
     @Autowired
-    public ClientDataServiceImpl(WebClient webClient, ClientThrottleService clientThrottleService, JsonStreamFileWriter jsonStreamFileWriter) {
+    public ClientDataServiceImpl(WebClient webClient, ClientThrottleService clientThrottleService, JsonStreamFileWriterUtil jsonStreamFileWriterUtil) {
         this.webClient = webClient;
         this.throttleService = clientThrottleService;
-        this.jsonStreamFileWriter = jsonStreamFileWriter;
+        this.jsonStreamFileWriterUtil = jsonStreamFileWriterUtil;
     }
 
     @Override
     public Mono<Void> fetchAll(URI url, String fileName) {
-        return jsonStreamFileWriter.open(fileName)
+        return jsonStreamFileWriterUtil.open(fileName)
                 .flatMap(generator ->
-                        fetchNext(url, fileName, generator).doOnTerminate(() -> jsonStreamFileWriter.close(generator))
+                        fetchNext(url, fileName, generator).doOnTerminate(() -> jsonStreamFileWriterUtil.close(generator))
                 )
                 .doOnSuccess(done -> log.info("Fetching process successfully completed."))
                 .doOnError(error -> log.error("An error occurred during fetching: {}", error.getMessage()));
@@ -56,8 +56,8 @@ public class ClientDataServiceImpl implements ClientDataService {
         }
 
         return fetchThrottle()
-                .then(fetch(url, fileName))
-                .flatMap(response -> jsonStreamFileWriter.write(generator, response).thenReturn(response))
+                .then(fetch(url))
+                .flatMap(response -> jsonStreamFileWriterUtil.write(generator, response).thenReturn(response))
                 .flatMap(response -> {
                     if (!hasNextPage(response)) return Mono.empty();
                     URI nextUrl = getNextPageUrl(response);
@@ -79,7 +79,7 @@ public class ClientDataServiceImpl implements ClientDataService {
     }
 
     @Override
-    public Mono<JsonNode> fetch(URI url, String fileName) {
+    public Mono<JsonNode> fetch(URI url) {
         return webClient.get()
                 .uri(url)
                 .retrieve()
@@ -107,7 +107,7 @@ public class ClientDataServiceImpl implements ClientDataService {
             return throttleService.fetchThrottle()
                     .flatMap(throttle -> {
                         long delay =  throttle.nextUseSeconds() > 0 ? throttle.nextUseSeconds() : RETRY_DELAY;
-                        log.warn("Rate limit exceeded. Waiting {} seconds (retry {}/{})", throttle, retrySignal.totalRetries() + 1, MAX_RETRIES);
+                        log.warn("Rate limit exceeded. Waiting {} seconds (retry {}/{})", delay, retrySignal.totalRetries() + 1, MAX_RETRIES);
                         return Mono.delay(Duration.ofSeconds(delay));
                     })
                     .thenReturn(retrySignal.totalRetries());
