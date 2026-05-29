@@ -10,6 +10,7 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,10 @@ public class ClientDataServiceImpl implements ClientDataService {
     private final WebClient webClient;
     private final ClientThrottleService throttleService;
     private final JsonStreamFileWriterUtil jsonStreamFileWriterUtil;
-    private final Integer MAX_RETRIES = 30;
-    private final Integer RETRY_DELAY = 1;
+    @Value("${application.webclient.max-retries}")
+    private Integer MAX_RETRIES;
+    @Value("${application.webclient.retry-delay-seconds}")
+    private Integer RETRY_DELAY;
     @Autowired
     public ClientDataServiceImpl(WebClient webClient, ClientThrottleService clientThrottleService, JsonStreamFileWriterUtil jsonStreamFileWriterUtil) {
         this.webClient = webClient;

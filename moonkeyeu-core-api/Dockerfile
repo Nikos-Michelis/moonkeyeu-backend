@@ -11,11 +11,11 @@ RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Run the application
 FROM eclipse-temurin:21-jdk-jammy
-ARG APP_VERSION=0.0.1-SNAPSHOT
+ARG APP_VERSION=2.0.0-SNAPSHOT
 # Install curl and jq for health checks
 RUN apt-get update && apt-get install -y jq curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/
 EXPOSE 8081
 ENV JAR_VERSION=${APP_VERSION}
-ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -jar /app/*-${JAR_VERSION}.jar"]
+ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -jar /app/*-${JAR_VERSION}.jar"]

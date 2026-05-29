@@ -44,6 +44,9 @@ aws:
     url: ${CLOUDFRONT_URL}
 
 application:
+  webclient:
+    max-retries: 30
+    retry-delay-seconds: 60
   backend:
     url: http://localhost:8080/api/v1
   path:
