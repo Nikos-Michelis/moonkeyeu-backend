@@ -1,6 +1,7 @@
 package com.moonkeyeu.core.api.launch.controller;
 import com.moonkeyeu.core.api.launch.services.*;
 import com.moonkeyeu.core.api.security.limiter.RateLimited;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -89,7 +90,7 @@ public class CrawlerController {
    @GetMapping("/astronaut/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<Object> getAstronautPreview(
-            @PathVariable Integer id,
+            @PathVariable @PositiveOrZero(message = "invalid path variable") Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
        String url = UriComponentsBuilder
@@ -112,7 +113,7 @@ public class CrawlerController {
     @GetMapping("/program/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<Object> getProgramPreview(
-            @PathVariable Integer id,
+            @PathVariable @PositiveOrZero(message = "invalid path variable") Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
         String url = UriComponentsBuilder
@@ -135,7 +136,7 @@ public class CrawlerController {
     @GetMapping("/spacecraft/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<Object> getSpacecraftPreview(
-            @PathVariable Integer id,
+            @PathVariable @PositiveOrZero(message = "invalid path variable") Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
 
@@ -161,7 +162,7 @@ public class CrawlerController {
     @GetMapping("/launch-pad/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<Object> getLaunchPadPreview(
-            @PathVariable Integer id,
+            @PathVariable @PositiveOrZero(message = "invalid path variable") Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
         String url = UriComponentsBuilder
@@ -184,7 +185,7 @@ public class CrawlerController {
     @GetMapping("/agency/{id}")
     @RateLimited(requests = 100, durationSeconds = 60)
     public ResponseEntity<Object> getAgencyPreview(
-            @PathVariable Integer id,
+            @PathVariable @PositiveOrZero(message = "invalid path variable") Integer id,
             @RequestHeader(value = "User-Agent", required = false) String userAgent
     ) {
 

@@ -3,13 +3,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.9</version>
+        <version>3.5.14</version>
         <relativePath/>
         <!--  lookup parent from repository  -->
     </parent>
     <groupId>com.moonkeyeu</groupId>
     <artifactId>moonkeyeu-etl-api</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>moonkeyeu-etl-api</name>
     <description>moonkeyeu-etl-api</description>
     <url/>
@@ -27,63 +27,39 @@
     </scm>
     <properties>
         <java.version>21</java.version>
-        <testcontainers.version>1.19.8</testcontainers.version>
+        <s3.version>2.43.2</s3.version>
+        <mockwebserver.version>5.3.2</mockwebserver.version>
+        <okhttp.version>5.3.2</okhttp.version>
+        <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+        <s3mock.version>5.0.0</s3mock.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-rest</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- webflux -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-        <!-- Mockito http and mockwebserver -->
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>5.0.0-alpha.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>mockwebserver</artifactId>
-            <version>5.0.0-alpha.12</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- Spring Data JPA-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        <!--  MySql  -->
+        <!--  MySQL  -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- Jackson CSV dataformat  -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-csv</artifactId>
-            <version>2.20.0</version>
         </dependency>
-        <!--  Jackson module for Java 8 Time support  -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.13.3</version>
-        </dependency>
-        <!-- Spring batch-->
+        <!-- Spring Batch-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-batch</artifactId>
@@ -93,11 +69,22 @@
             <artifactId>spring-batch-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--  Caching  -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
         <!--  AWS S3 -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>2.30.2</version>
+            <version>${s3.version}</version>
+        </dependency>
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
         <!--  Grafana Prometheus -->
         <dependency>
@@ -109,12 +96,7 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!--  Caching  -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-        </dependency>
-         <!-- Test Containers -->
+        <!-- Test Containers -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-testcontainers</artifactId>
@@ -128,12 +110,25 @@
         <dependency>
             <groupId>com.adobe.testing</groupId>
             <artifactId>s3mock-testcontainers</artifactId>
-            <version>5.0.0</version>
+            <version>${s3mock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Mockito http and mockwebserver -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>mysql</artifactId>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>${mockwebserver.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -174,7 +169,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>${jacoco-maven-plugin.version}</version>
                 <configuration>
                     <excludes>
                         <exclude>**/dto</exclude>
