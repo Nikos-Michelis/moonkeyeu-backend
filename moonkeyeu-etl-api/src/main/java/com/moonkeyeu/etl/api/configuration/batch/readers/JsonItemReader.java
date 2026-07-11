@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.*;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Slf4j
-public class JsonItemReader implements ItemReader<JsonNode>, ItemStream {
+public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNode>, ItemStream {
     private ObjectMapper mapper;
     private Resource resource;
     private JsonParser parser;
