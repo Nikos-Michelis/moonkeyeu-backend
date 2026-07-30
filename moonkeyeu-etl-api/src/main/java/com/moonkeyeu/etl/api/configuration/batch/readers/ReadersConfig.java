@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+
+import java.io.IOException;
 
 @Slf4j
 @Configuration
@@ -28,20 +32,13 @@ public class ReadersConfig {
 
     @Bean
     @StepScope
-    public MultiResourceItemReader<JsonNode> jsonMultiResourceItemReader(@Value("#{stepExecutionContext['jsonFolderPath']}") Resource[] fileResources) {
+    public MultiResourceItemReader<JsonNode> multiResourceItemReader(@Value("#{stepExecutionContext['jsonFolderPath']}") String folderPath) throws IOException {
         MultiResourceItemReader<JsonNode> multiResourceItemReader = new MultiResourceItemReader<>();
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        Resource[] resources = resolver.getResources("file:" + folderPath + "/*.json");
         JsonItemReader jsonItemReader = new JsonItemReader();
+        multiResourceItemReader.setResources(resources);
         multiResourceItemReader.setDelegate(jsonItemReader);
-        multiResourceItemReader.setResources(fileResources);
         return multiResourceItemReader;
     }
-
-   /* @Bean
-    @StepScope
-    public JsonItemReader jsonItemReader(@Value("#{stepExecutionContext['jsonFilePath']}") String jsonFilePath) {
-        JsonItemReader jsonItemReader = new JsonItemReader();
-        jsonItemReader.setResource(new FileSystemResource(jsonFilePath));
-        return jsonItemReader;
-    }*/
-
 }

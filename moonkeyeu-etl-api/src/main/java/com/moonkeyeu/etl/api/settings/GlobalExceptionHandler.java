@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.settings;
 
-import com.moonkeyeu.etl.api.settings.exceptions.InvalidCleanupOperationException;
+import com.moonkeyeu.etl.api.settings.exceptions.CleanupException;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreOperationException;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreProviderException;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
@@ -28,8 +28,8 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(value = InvalidCleanupOperationException.class)
-    public ResponseEntity<ExceptionResponse> handleInvalidCleanupOperationException(InvalidCleanupOperationException ex, WebRequest request) {
+    @ExceptionHandler(value = CleanupException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidCleanupOperationException(CleanupException ex, WebRequest request) {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(ExceptionResponse.builder()

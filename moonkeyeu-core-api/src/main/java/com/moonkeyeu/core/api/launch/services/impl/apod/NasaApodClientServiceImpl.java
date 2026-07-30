@@ -44,7 +44,7 @@ public class NasaApodClientServiceImpl implements NasaApodClientService {
                                 )
                 )
                 .bodyToMono(NasaApodDTO.class)
-                .doOnError(error -> log.error("Error fetching data: " + error.getMessage()))
+                .doOnError(error -> log.error("Error fetching data: {}", error.getMessage()))
                 .block();
     }
     private boolean isErrorStatus(HttpStatusCode response) {

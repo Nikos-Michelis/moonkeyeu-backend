@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
-import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.configuration.mappers.MappersConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +27,6 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
     private Class<?> type;
     private BufferedWriter bufferedWriter;
     private SequenceWriter writer;
-    private RootConfig rootConfig;
     private FilePathProvider filePathProvider;
     private Chunk<?> data;
     private boolean headerWritten = false;
@@ -46,7 +44,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
 
             if (!isHeaderWritten()) {
                 String[] headers = getHeaders(chunk.getItems().getFirst());
-                CsvSchema csvSchema =  buildSchema(headers);
+                CsvSchema csvSchema = buildSchema(headers);
                 writer = buildSequenceWriter(csvSchema);
                 setHeaderWritten(true);
             }

@@ -51,7 +51,7 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
              * move the parser to the start of the array (the value of "results")
              * and set inResultsArray = true so that subsequent objects can be read one by one (it reads the nest result array node).
              */
-            if (parser.currentToken() == JsonToken.FIELD_NAME && "results".equals(parser.getCurrentName())) {
+            if (parser.currentToken() == JsonToken.FIELD_NAME && "results".equals(parser.currentName())) {
                 parser.nextToken();
                 inResultsArray = true;
             }
@@ -84,7 +84,7 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
              * parse the next field until finds the all_results field
              **/
             while (parser.nextToken() != null) {
-                if (parser.currentToken() == JsonToken.FIELD_NAME && "all_results".equals(parser.getCurrentName())) {
+                if (parser.currentToken() == JsonToken.FIELD_NAME && "all_results".equals(parser.currentName())) {
                     parser.nextToken();
                     break;
                 }

@@ -22,13 +22,10 @@ class S3StorageServiceImplTest {
 
     @Mock
     private S3CrudService s3CrudService;
-
     @Mock
     private CacheManager cacheManager;
-
     @Mock
     private Cache cache;
-
     @InjectMocks
     private S3StorageServiceImpl s3StorageService;
 

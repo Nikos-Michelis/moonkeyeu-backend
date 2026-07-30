@@ -39,9 +39,9 @@ public class FlowConfig {
     public Flow allLatestLaunchesFlow() {
         return new FlowBuilder<Flow>("allLatestLaunchesFlow")
                 .start(cleanupStep)
-                .next(fetchAllLatestDataStep)
-                .next(readLaunchesJsonStep)
-                .next(importToDatabaseFlow())
+                //.next(fetchAllLatestDataStep)
+                //.next(readLaunchesJsonStep)
+                //.next(importToDatabaseFlow())
                 .build();
     }
 

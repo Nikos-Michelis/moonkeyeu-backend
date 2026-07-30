@@ -17,12 +17,16 @@ public class FilePathProvider {
         this.rootConfig = rootConfig;
     }
 
-    public String getJsonSource(String filename) {
-        return Paths.get(rootConfig.getJsonRootFolder(), filename).toString();
+    public String getJsonSource(String segment, String filename) {
+        return Paths.get(rootConfig.getJsonRootFolder(), segment, filename).toString();
     }
 
     public String getCsvSource(String filename) {
         return Paths.get(rootConfig.getCsvRootFolder(), filename).toString();
+    }
+
+    public String getJsonDir(String segment) {
+        return Paths.get(rootConfig.getJsonRootFolder(), segment).toString();
     }
 
     public String getImagesDir(String dirName) {

@@ -4,16 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum JsonGroup {
-    JSON_AGENCIES("all-agencies.json"),
-    JSON_LAUNCHES("space-missions.json");
+    JSON_AGENCIES("agencies", "agencies.json"),
+    JSON_LAUNCHES("missions", "missions.json");
 
-    private final String csvSource;
+    private final String folder;
+    private final String file;
 
-    JsonGroup(String csvSource) {
-        this.csvSource = csvSource;
-    }
-
-    public String getJsonFile() {
-        return this.csvSource;
+    JsonGroup(String folder, String file) {
+        this.folder = folder;
+        this.file = file;
     }
 }
