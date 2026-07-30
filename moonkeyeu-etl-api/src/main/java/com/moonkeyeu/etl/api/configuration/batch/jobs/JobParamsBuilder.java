@@ -24,14 +24,14 @@ public class JobParamsBuilder {
                 .addString("storage", storage.name())
                 .addString("operation", operation.name())
                 .addString("cleanup", cleanup.name())
-                .addString("startTimestamp", Instant.now().toString())
+                .addString("start_at", Instant.now().toString())
                 .addString("uniqueId", UUID.randomUUID().toString())
                 .toJobParameters();
     }
 
     public static JobParameters addRetryTimestamp(JobParameters original) {
         return new JobParametersBuilder(original)
-                .addString("retryTimestamp", Instant.now().toString())
+                .addString("retry_at", Instant.now().toString())
                 .toJobParameters();
     }
 }

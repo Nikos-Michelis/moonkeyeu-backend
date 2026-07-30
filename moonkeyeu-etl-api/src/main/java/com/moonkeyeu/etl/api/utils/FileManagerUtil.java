@@ -11,22 +11,23 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Component
-public class CsvManagerUtil {
+public class FileManagerUtil {
     public boolean deleteAllFiles(String folderPath) {
-        Path folder = Paths.get(folderPath);
-        if (!Files.exists(folder) || !Files.isDirectory(folder)) {
+        Path root = Paths.get(folderPath);
+        if (!Files.exists(root)) {
             log.error("Invalid path: {} is not a directory or does not exist.", folderPath);
             return false;
         }
 
-        try (Stream<Path> files = Files.walk(folder)) {
-            files.filter(Files::isRegularFile).forEach(this::deleteFile);
+        try (Stream<Path> paths = Files.walk(root)) {
+            paths.filter(Files::isRegularFile).forEach(this::deleteFile);
             return true;
         } catch (IOException e) {
-            log.error("An error occurred while reading the directory: " + folderPath, e);
+            log.error("An error occurred while reading the directory: {}", folderPath, e);
             return false;
         }
     }
+
     private void deleteFile(Path file) {
         try {
             boolean deleted = Files.deleteIfExists(file);

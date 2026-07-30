@@ -51,7 +51,7 @@ public class UrlBuilderUtil {
 
     public URI getAllLatestLaunchesUrl() {
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        String windowStart = now.toLocalDate().minusYears(5).toString();
+        String windowStart = now.toLocalDate().minusYears(5).toString(); // 1 month
         return baseLaunchesUriBuilder()
                 .queryParam("ordering", "-last_updated")
                 .queryParam("net__gte", windowStart)

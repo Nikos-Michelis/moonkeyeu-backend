@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.dto.storage;
 
-import com.moonkeyeu.etl.api.settings.exceptions.InvalidCleanupOperationException;
+import com.moonkeyeu.etl.api.settings.exceptions.CleanupException;
 import lombok.Getter;
 
 @Getter
@@ -13,7 +13,7 @@ public enum CleanupType {
         try {
             return CleanupType.valueOf(value.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new InvalidCleanupOperationException("Unsupported cleanup type: " + value);
+            throw new CleanupException("Unsupported cleanup type: " + value);
         }
     }
 }

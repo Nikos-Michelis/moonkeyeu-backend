@@ -33,10 +33,11 @@ public class JobExecutionDecider {
                 .build()
                 .toJobParameters();
 
+        if (jobExecutionService.hasAnyRunningJobs()) jobExecutionService.stopAllRunningJobs();
+
         JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", jobParameters, runDailyUpdateJob);
-        if (launchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
-            log.warn("dailyJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
-        }
+        if (launchesUpdateJob.getStatus() == BatchStatus.COMPLETED) return BatchStatus.COMPLETED;
+        log.warn("dailyJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
 
         JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);
         if (updateAgenciesJob.getStatus() != BatchStatus.COMPLETED) {
@@ -61,10 +62,11 @@ public class JobExecutionDecider {
                 .build()
                 .toJobParameters();
 
+        if (jobExecutionService.hasAnyRunningJobs()) jobExecutionService.stopAllRunningJobs();
+
         JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", jobParameters, runLaunchesUpdateJob);
-        if (launchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
-            log.warn("midnightJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
-        }
+        if (launchesUpdateJob.getStatus() == BatchStatus.COMPLETED) return BatchStatus.COMPLETED;
+        log.warn("midnightJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
 
         JobExecution updateAgenciesJob = jobExecutionService.jobLauncher("runUpdateAgenciesJob", jobParameters, runUpdateAgenciesJob);
         if (updateAgenciesJob.getStatus() != BatchStatus.COMPLETED) {
@@ -88,6 +90,8 @@ public class JobExecutionDecider {
                  .cleanup(CleanupType.ONLY_CSV)
                  .build()
                  .toJobParameters();
+
+         if (jobExecutionService.hasAnyRunningJobs()) jobExecutionService.stopAllRunningJobs();
 
          JobExecution bulkInsertJob = jobExecutionService.jobLauncher("runBulkInsertJob", jobParameters, runBulkInsertJob);
          if (bulkInsertJob.getStatus() != BatchStatus.COMPLETED) {

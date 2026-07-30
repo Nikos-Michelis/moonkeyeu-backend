@@ -1,7 +1,6 @@
 package com.moonkeyeu.core.api.launch.scheduled;
 
 import com.moonkeyeu.core.api.launch.services.NasaApodService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,12 +11,7 @@ public class ScheduledNasaApodTasks {
 
     private final NasaApodService nasaApodService;
 
-    @PostConstruct
-    public void initNasaApodCache() {
-        //nasaApodService.refreshNasaApod();
-    }
-
-    @Scheduled(cron = "0 0 */4 * * *")
+    @Scheduled(cron = "0 0 */4 * * *", initialDelay = 1000)
     public void refreshNasaApodCache(){
        nasaApodService.refreshNasaApod();
     }

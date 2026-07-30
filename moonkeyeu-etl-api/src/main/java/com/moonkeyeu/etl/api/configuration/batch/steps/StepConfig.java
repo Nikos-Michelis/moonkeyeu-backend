@@ -3,12 +3,11 @@ package com.moonkeyeu.etl.api.configuration.batch.steps;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepCompletionListener;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepContextSetter;
-import com.moonkeyeu.etl.api.configuration.batch.readers.JsonItemReader;
 import com.moonkeyeu.etl.api.configuration.batch.writers.ItemWriterRegistry;
 import com.moonkeyeu.etl.api.dto.storage.CleanupType;
 import com.moonkeyeu.etl.api.service.ClientDataService;
-import com.moonkeyeu.etl.api.settings.exceptions.InvalidCleanupOperationException;
-import com.moonkeyeu.etl.api.utils.CsvManagerUtil;
+import com.moonkeyeu.etl.api.settings.exceptions.CleanupException;
+import com.moonkeyeu.etl.api.utils.FileManagerUtil;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
@@ -23,6 +22,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +30,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.io.FileNotFoundException;
 import java.util.*;
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_AGENCIES;
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_LAUNCHES;
@@ -41,7 +40,7 @@ import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_LAUNCHES;
 public class StepConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
-    private final CsvManagerUtil csvManagerUtil;
+    private final FileManagerUtil fileManagerUtil;
     private final RootConfig rootConfig;
     private final FilePathProvider filePathProvider;
     private final CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> compositeProcessor;
@@ -50,7 +49,7 @@ public class StepConfig {
     private final ItemWriter<Object> jpaEntityWriter;
     private final ItemWriter<ChunkStore> itemWriter;
     private final ItemWriterRegistry itemWriterRegistry;
-    private final JsonItemReader jsonItemReader;
+    private final MultiResourceItemReader<JsonNode> multiResourceItemReader;
     private final ItemReader<CsvEntity<?>> itemReader;
     private final ClientDataService clientDataService;
     private final UrlBuilderUtil urlBuilderUtil;
@@ -58,7 +57,7 @@ public class StepConfig {
 
     @Bean
     public Step fetchLatestDataStep() {
-        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
+        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
         return new StepBuilder("fetchLatestDataStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     clientDataService.fetchAll(urlBuilderUtil.getLaunchesUrlForWindow(), launchesJsonFile).block();
@@ -70,7 +69,7 @@ public class StepConfig {
 
     @Bean
     public Step fetchAllLatestDataStep() {
-        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
+        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
         return new StepBuilder("fetchAllLatestDataStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     clientDataService.fetchAll(urlBuilderUtil.getAllLatestLaunchesUrl(), launchesJsonFile).block();
@@ -82,7 +81,7 @@ public class StepConfig {
 
     @Bean
     public Step fetchAgenciesDataStep() {
-        String agenciesJsonFile = filePathProvider.getJsonSource(JSON_AGENCIES.getJsonFile());
+        String agenciesJsonFile = filePathProvider.getJsonSource(JSON_AGENCIES.getFolder(), JSON_AGENCIES.getFile());
         return new StepBuilder("fetchAgenciesStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     clientDataService.fetchAll(urlBuilderUtil.baseAgenciesUrl(), agenciesJsonFile).block();
@@ -95,7 +94,7 @@ public class StepConfig {
 
     @Bean
     public Step fetchLaunchesDataStep() {
-        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
+        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
         return new StepBuilder("fetchLaunchesStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     clientDataService.fetchAll(urlBuilderUtil.baseLaunchesUrl(), launchesJsonFile).block();
@@ -114,19 +113,19 @@ public class StepConfig {
                     String cleanup = jobParametersMap.getOrDefault("cleanup", null).toString();
 
                     if (cleanup == null) {
-                        throw new RuntimeException("Cleanup step requires parameters for cleanup");
+                        throw new CleanupException("Cleanup step requires parameters for cleanup");
                     }
 
                     CleanupType cleanupType = CleanupType.from(cleanup);
 
                     switch (cleanupType) {
-                        case ONLY_CSV -> csvManagerUtil.deleteAllFiles(rootConfig.getCsvRootFolder());
-                        case ONLY_JSON -> csvManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
+                        case ONLY_CSV -> fileManagerUtil.deleteAllFiles(rootConfig.getCsvRootFolder());
+                        case ONLY_JSON -> fileManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
                         case ALL -> {
-                            csvManagerUtil.deleteAllFiles(rootConfig.getCsvRootFolder());
-                            csvManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
+                            fileManagerUtil.deleteAllFiles(rootConfig.getCsvRootFolder());
+                            fileManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
                         }
-                        default -> throw new InvalidCleanupOperationException("Unexpected operation: " + cleanup);
+                        default -> throw new CleanupException("Unexpected operation: " + cleanup);
                     };
 
                     return RepeatStatus.FINISHED;
@@ -137,36 +136,37 @@ public class StepConfig {
     }
 
     @Bean
-    public Step readLaunchesJsonStep() throws FileNotFoundException {
-        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getJsonFile());
-        if (launchesJsonFile.isBlank()) throw new FileNotFoundException("Json file not found.");
+    public Step readLaunchesJsonStep() throws RuntimeException {
+        String folderPath = filePathProvider.getJsonDir(JSON_LAUNCHES.getFolder());
+        if (folderPath.isBlank()) throw new RuntimeException("Json folder not found.");
         return new StepBuilder("process_launches", jobRepository)
                 .<JsonNode, ChunkStore>chunk(CHUNK_SIZE, platformTransactionManager)
-                .reader(jsonItemReader)
+                .reader(multiResourceItemReader)
                 .processor(launchesProcessor)
                 .writer(itemWriter)
                 .stream(itemWriterRegistry)
                 .faultTolerant()
                 .retry(WebClientResponseException.class)
                 .retryLimit(2)
-                .listener(new StepContextSetter<>("jsonFilePath", launchesJsonFile))
+                .listener(new StepContextSetter<>("jsonFolderPath", folderPath))
                 .listener(new StepCompletionListener())
                 .build();
     }
 
     @Bean
-    public Step readAgenciesJsonStep() {
-        String agenciesJsonFile = filePathProvider.getJsonSource(JSON_AGENCIES.getJsonFile());
+    public Step readAgenciesJsonStep() throws RuntimeException {
+        String folderPath = filePathProvider.getJsonDir(JSON_AGENCIES.getFolder());
+        if (folderPath.isBlank()) throw new RuntimeException("Json folder not found.");
         return new StepBuilder("process_agencies", jobRepository)
                 .<JsonNode, ChunkStore>chunk(CHUNK_SIZE, platformTransactionManager)
-                .reader(jsonItemReader)
+                .reader(multiResourceItemReader)
                 .processor(agenciesProcessor)
                 .writer(itemWriter)
                 .stream(itemWriterRegistry)
                 .faultTolerant()
                 .retry(WebClientResponseException.class)
                 .retryLimit(2)
-                .listener(new StepContextSetter<>("jsonFilePath", agenciesJsonFile))
+                .listener(new StepContextSetter<>("jsonFolderPath", folderPath))
                 .listener(new StepCompletionListener())
                 .build();
     }

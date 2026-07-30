@@ -18,7 +18,7 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterWrite(1, TimeUnit.HOURS)
+                .expireAfterWrite(70, TimeUnit.MINUTES)
                 .maximumSize(5000));
         cacheManager.registerCustomCache(
                 CacheNames.NASA_APOD_CACHE,
