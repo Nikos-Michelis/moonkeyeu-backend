@@ -16,15 +16,15 @@ import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.MultiResourceItemReader;
-import org.springframework.batch.item.support.CompositeItemProcessor;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
+import org.springframework.batch.infrastructure.item.support.CompositeItemProcessor;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -56,9 +56,9 @@ public class StepConfig {
     private final int CHUNK_SIZE = 150;
 
     @Bean
-    public Step fetchLatestDataStep() {
+    public Step fetchYearlyLaunchesStep() {
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
-        return new StepBuilder("fetchLatestDataStep", jobRepository)
+        return new StepBuilder("step-fetch-yearly-launches", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     clientDataService.fetchAll(urlBuilderUtil.getLaunchesUrlForWindow(), launchesJsonFile).block();
                     return RepeatStatus.FINISHED;
@@ -68,9 +68,9 @@ public class StepConfig {
     }
 
     @Bean
-    public Step fetchAllLatestDataStep() {
+    public Step fetchAllLaunchesStep() {
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
-        return new StepBuilder("fetchAllLatestDataStep", jobRepository)
+        return new StepBuilder("step-fetch-all-launches", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     clientDataService.fetchAll(urlBuilderUtil.getAllLatestLaunchesUrl(), launchesJsonFile).block();
                     return RepeatStatus.FINISHED;
@@ -80,9 +80,9 @@ public class StepConfig {
     }
 
     @Bean
-    public Step fetchAgenciesDataStep() {
+    public Step fetchAgenciesStep() {
         String agenciesJsonFile = filePathProvider.getJsonSource(JSON_AGENCIES.getFolder(), JSON_AGENCIES.getFile());
-        return new StepBuilder("fetchAgenciesStep", jobRepository)
+        return new StepBuilder("step-fetch-agencies", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     clientDataService.fetchAll(urlBuilderUtil.baseAgenciesUrl(), agenciesJsonFile).block();
                     return RepeatStatus.FINISHED;
@@ -93,21 +93,8 @@ public class StepConfig {
     }
 
     @Bean
-    public Step fetchLaunchesDataStep() {
-        String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
-        return new StepBuilder("fetchLaunchesStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    clientDataService.fetchAll(urlBuilderUtil.baseLaunchesUrl(), launchesJsonFile).block();
-                    return RepeatStatus.FINISHED;
-                }, platformTransactionManager)
-                .listener(new StepCompletionListener())
-                .transactionManager(platformTransactionManager)
-                .build();
-    }
-
-    @Bean
     public Step cleanupStep() {
-        return new StepBuilder("cleanupStep", jobRepository)
+        return new StepBuilder("step-cleanup", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     Map<String, Object> jobParametersMap = chunkContext.getStepContext().getJobParameters();
                     String cleanup = jobParametersMap.getOrDefault("cleanup", null).toString();
@@ -136,11 +123,12 @@ public class StepConfig {
     }
 
     @Bean
-    public Step readLaunchesJsonStep() throws RuntimeException {
+    public Step LaunchesETLStep() throws RuntimeException {
         String folderPath = filePathProvider.getJsonDir(JSON_LAUNCHES.getFolder());
         if (folderPath.isBlank()) throw new RuntimeException("Json folder not found.");
-        return new StepBuilder("process_launches", jobRepository)
-                .<JsonNode, ChunkStore>chunk(CHUNK_SIZE, platformTransactionManager)
+        return new StepBuilder("step-process-launches", jobRepository)
+                .<JsonNode, ChunkStore>chunk(CHUNK_SIZE)
+                .transactionManager(platformTransactionManager)
                 .reader(multiResourceItemReader)
                 .processor(launchesProcessor)
                 .writer(itemWriter)
@@ -157,8 +145,9 @@ public class StepConfig {
     public Step readAgenciesJsonStep() throws RuntimeException {
         String folderPath = filePathProvider.getJsonDir(JSON_AGENCIES.getFolder());
         if (folderPath.isBlank()) throw new RuntimeException("Json folder not found.");
-        return new StepBuilder("process_agencies", jobRepository)
-                .<JsonNode, ChunkStore>chunk(CHUNK_SIZE, platformTransactionManager)
+        return new StepBuilder("step-process-agencies", jobRepository)
+                .<JsonNode, ChunkStore>chunk(CHUNK_SIZE)
+                .transactionManager(platformTransactionManager)
                 .reader(multiResourceItemReader)
                 .processor(agenciesProcessor)
                 .writer(itemWriter)
@@ -186,8 +175,8 @@ public class StepConfig {
      * Related: CreateStepForEntity.createStepForEntity(), importToDatabaseFlow()
      */
     public Step createImportStep(EntityConfig config) {
-        String stepName = "process_" + config.getEntityClass().getSimpleName() + "_" + config.getOrder();
-        return new StepBuilder(stepName, jobRepository).<CsvEntity<?>, CsvEntity<?>>chunk(CHUNK_SIZE, platformTransactionManager)
+        String stepName = "step-process-" + config.getEntityClass().getSimpleName() + "-" + config.getOrder();
+        return new StepBuilder(stepName, jobRepository).<CsvEntity<?>, CsvEntity<?>>chunk(CHUNK_SIZE)
                 .reader(itemReader)
                 .processor(compositeProcessor)
                 .writer(jpaEntityWriter)

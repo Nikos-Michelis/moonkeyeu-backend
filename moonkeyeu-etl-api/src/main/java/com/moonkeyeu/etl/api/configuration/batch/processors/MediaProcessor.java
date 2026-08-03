@@ -11,12 +11,11 @@ import com.moonkeyeu.etl.api.service.LocalMediaService;
 import com.moonkeyeu.etl.api.service.S3MediaService;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreOperationException;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreProviderException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;

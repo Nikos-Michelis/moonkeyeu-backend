@@ -5,11 +5,12 @@ import com.moonkeyeu.etl.api.dto.storage.StorageType;
 import com.moonkeyeu.etl.api.dto.storage.StoreOperation;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Data
@@ -24,14 +25,14 @@ public class JobParamsBuilder {
                 .addString("storage", storage.name())
                 .addString("operation", operation.name())
                 .addString("cleanup", cleanup.name())
-                .addString("start_at", Instant.now().toString())
+                .addLocalDateTime("start_at", LocalDateTime.now().atOffset(ZoneOffset.UTC).toLocalDateTime())
                 .addString("uniqueId", UUID.randomUUID().toString())
                 .toJobParameters();
     }
 
     public static JobParameters addRetryTimestamp(JobParameters original) {
         return new JobParametersBuilder(original)
-                .addString("retry_at", Instant.now().toString())
+                .addLocalDateTime("retry_at",LocalDateTime.now().atOffset(ZoneOffset.UTC).toLocalDateTime())
                 .toJobParameters();
     }
 }

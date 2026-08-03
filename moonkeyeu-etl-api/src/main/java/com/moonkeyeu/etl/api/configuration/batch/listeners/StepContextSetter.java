@@ -1,9 +1,10 @@
 package com.moonkeyeu.etl.api.configuration.batch.listeners;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+
 /**
  * @param key   Key to store in ExecutionContext
  * @param value Value to store (can be Object or primitive wrapper)

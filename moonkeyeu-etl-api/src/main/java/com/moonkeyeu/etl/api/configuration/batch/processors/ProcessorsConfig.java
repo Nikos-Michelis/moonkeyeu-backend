@@ -1,6 +1,7 @@
 package com.moonkeyeu.etl.api.configuration.batch.processors;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.configuration.files.CsvSource;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
@@ -13,8 +14,8 @@ import com.moonkeyeu.etl.api.service.S3MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.support.CompositeItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.support.CompositeItemProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -49,8 +50,8 @@ public class ProcessorsConfig {
     }
 
     @Bean
-    public ItemProcessor<JsonNode, ChunkStore> launchesProcessor() {
-        JsonObjectMapper jsonObjectMapper = new JsonObjectMapper();
+    public ItemProcessor<JsonNode, ChunkStore> launchesProcessor(ObjectMapper objectMapper) {
+        JsonObjectMapper jsonObjectMapper = new JsonObjectMapper(objectMapper);
         return jsonNode -> {
             ChunkStore chunk = jsonObjectMapper.jsonToLaunchesMapper(jsonNode, new ChunkStore());
             chunk.add(chunk.getLaunches(), CsvSource.RAW_LAUNCHES_CSV);
@@ -76,8 +77,8 @@ public class ProcessorsConfig {
     }
 
     @Bean
-    public ItemProcessor<JsonNode, ChunkStore> agenciesProcessor() {
-        JsonObjectMapper jsonObjectMapper = new JsonObjectMapper();
+    public ItemProcessor<JsonNode, ChunkStore> agenciesProcessor(ObjectMapper objectMapper) {
+        JsonObjectMapper jsonObjectMapper = new JsonObjectMapper(objectMapper);
         return jsonNode -> {
             ChunkStore chunk = jsonObjectMapper.JsonToAgenciesMapper(jsonNode, new ChunkStore());
             chunk.add(chunk.getAgencies(), CsvSource.RAW_AGENCIES_CSV);

@@ -4,7 +4,7 @@ import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.settings.exceptions.DataCleaningException;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;

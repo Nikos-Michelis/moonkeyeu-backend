@@ -4,13 +4,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moonkeyeu.etl.api.configuration.mappers.MappersConfig;
+import com.moonkeyeu.etl.api.configuration.mappers.JacksonConfig;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidFileTypeException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.*;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStream;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
+import org.springframework.batch.infrastructure.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -25,8 +27,8 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
     private JsonParser parser;
     private boolean inResultsArray = false;
 
-    public JsonItemReader() {
-        this.mapper = new MappersConfig().objectMapper();
+    public JsonItemReader(ObjectMapper objectMapper) {
+        this.mapper = objectMapper;
     }
     /**
      * Reads the result array nodes one by one and extract their objects

@@ -1,9 +1,22 @@
 prometheus.scrape "actuator_metrics" {
-  targets = [
-    {"__address__" = "moonkeyeu-core-api:8080"},
-    {"__address__" = "moonkeyeu-etl-api:8081"},
-  ]
+  targets = discovery.relabel.actuator_metrics.output
   metrics_path = "/api/v1/actuator/prometheus"
   scrape_interval = "15s"
   forward_to = [prometheus.remote_write.default.receiver]
 }
+
+discovery.relabel "actuator_metrics" {
+  targets = [
+    {"__address__" = "moonkeyeu-core-api:8080", "__scheme__" = "http", "service" = "core-api"},
+    {"__address__" = "moonkeyeu-etl-api:8081", "__scheme__" = "http", "service" = "etl-api"},
+  ]
+
+  rule {
+    source_labels = ["__name__"]
+    regex         = "spring_batch_(.*)"
+    action        = "replace"
+    target_label  = "component"
+    replacement   = "spring-batch"
+  }
+}
+

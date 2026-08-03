@@ -3,13 +3,12 @@ package com.moonkeyeu.etl.api.configuration.batch.readers;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.moonkeyeu.etl.api.configuration.mappers.MappersConfig;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidFileTypeException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.*;
+import org.springframework.batch.infrastructure.item.*;
 import org.springframework.core.io.Resource;
 
 import java.io.*;
@@ -20,14 +19,14 @@ import java.util.Objects;
 @Setter
 @Getter
 public class CustomItemReader implements ItemReader<CsvEntity<?>>, ItemStream {
-     private CsvMapper csvMapper;
      private Resource resource;
      private Class<?> type;
      private MappingIterator<CsvEntity<?>> iterator;
      private BufferedReader reader;
+     private final CsvMapper csvMapper;
 
-     public CustomItemReader() {
-         this.csvMapper = new MappersConfig().csvMapper();
+     public CustomItemReader(CsvMapper csvMapper) {
+        this.csvMapper = csvMapper;
      }
 
      @Override

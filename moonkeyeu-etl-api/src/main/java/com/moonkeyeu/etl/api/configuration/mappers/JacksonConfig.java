@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
-public class MappersConfig {
+public class JacksonConfig {
     @Bean
     public CsvMapper csvMapper() {
         CsvMapper mapper = new CsvMapper();

@@ -1,6 +1,7 @@
 package com.moonkeyeu.etl.api.unit.configuration.readers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.configuration.batch.readers.JsonItemReader;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidFileTypeException;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.core.io.ClassPathResource;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -27,7 +28,7 @@ class JsonItemReaderTest {
 
     @BeforeEach
     void setUp() {
-        jsonItemReader = new JsonItemReader();
+        jsonItemReader = new JsonItemReader(new ObjectMapper());
         executionContext = new ExecutionContext();
         resource = new ClassPathResource("allResults.json");
     }
@@ -47,7 +48,7 @@ class JsonItemReaderTest {
     @DisplayName("Should throw exception when file type is invalid")
     void open_shouldThrowException_whenInvalidFileType() {
         // given
-        JsonItemReader reader = new JsonItemReader();
+        JsonItemReader reader = new JsonItemReader(new ObjectMapper());
         reader.setResource(new ClassPathResource("invalid.txt"));
         // when - then
         assertThatThrownBy(() ->
@@ -82,7 +83,7 @@ class JsonItemReaderTest {
     @DisplayName("Should return null when all_results array is empty")
     void read_shouldReturnNull_whenArrayEmpty() throws Exception {
         // given
-        JsonItemReader reader = new JsonItemReader();
+        JsonItemReader reader = new JsonItemReader(new ObjectMapper());
         reader.setResource(new ClassPathResource("json/empty-results.json"));
         // when
         reader.open(new ExecutionContext());
@@ -96,7 +97,7 @@ class JsonItemReaderTest {
     @DisplayName("Should return null when parser is not initialized")
     void read_shouldReturnNull_whenParserIsNull() throws Exception {
         // given
-        JsonItemReader reader = new JsonItemReader();
+        JsonItemReader reader = new JsonItemReader(new ObjectMapper());
         // when
         JsonNode result = reader.read();
         // then

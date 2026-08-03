@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
-import com.moonkeyeu.etl.api.configuration.mappers.MappersConfig;
+import com.moonkeyeu.etl.api.configuration.mappers.JacksonConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.*;
+import org.springframework.batch.infrastructure.item.*;
 import org.springframework.core.io.Resource;
 import java.io.*;
 import java.lang.reflect.Field;
@@ -31,8 +31,8 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
     private Chunk<?> data;
     private boolean headerWritten = false;
 
-    public CustomItemWriter() {
-        this.csvMapper = new MappersConfig().csvMapper();
+    public CustomItemWriter(CsvMapper csvMapper) {
+        this.csvMapper = csvMapper;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
 
         for (Field field : obj.getClass().getDeclaredFields()) {
 
-            if (Modifier.isStatic(field.getModifiers()) || field.isSynthetic()) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers()) || field.isSynthetic()) {
                 continue;
             }
 
@@ -132,7 +132,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
         Set<String> headers = new LinkedHashSet<>();
         for (Field field : clazz.getDeclaredFields()) {
 
-            if (Modifier.isStatic(field.getModifiers()) || field.isSynthetic()) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers()) || field.isSynthetic()) {
                 continue;
             }
 
@@ -145,6 +145,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
         }
         return headers;
     }
+
 
     private boolean isPrimitiveOrString(Class<?> type) {
         return type.isPrimitive()
