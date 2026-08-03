@@ -5,9 +5,9 @@ import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.step.Step;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.util.LinkedList;
@@ -17,58 +17,58 @@ import java.util.LinkedList;
 @RequiredArgsConstructor
 public class FlowConfig {
     private final Step readAgenciesJsonStep;
-    private final Step fetchAgenciesDataStep;
-    private final Step fetchAllLatestDataStep;
+    private final Step fetchAgenciesStep;
+    private final Step fetchAllLaunchesStep;
     private final Step readLaunchesJsonStep;
-    private final Step fetchLatestDataStep;
+    private final Step fetchYearlyLaunchesStep;
     private final Step cleanupStep;
     private final StepConfig createStepForEntity;
     private final FilePathProvider filePathProvider;
 
     @Bean
-    public Flow agenciesFlow() {
-        return new FlowBuilder<Flow>("agenciesFlow")
+    public Flow syncAllAgenciesFlow() {
+        return new FlowBuilder<Flow>("flow-all-agencies")
                 .start(cleanupStep)
-                .next(fetchAgenciesDataStep)
+                .next(fetchAgenciesStep)
                 .next(readAgenciesJsonStep)
-                .next(importToDatabaseFlow())
+                .next(importCsvDataFlow())
                 .build();
     }
 
     @Bean
-    public Flow allLatestLaunchesFlow() {
-        return new FlowBuilder<Flow>("allLatestLaunchesFlow")
+    public Flow syncYealyLaunchesFlow() {
+        return new FlowBuilder<Flow>("flow-yearly-launches")
                 .start(cleanupStep)
-                .next(fetchAllLatestDataStep)
+                .next(fetchYearlyLaunchesStep)
                 .next(readLaunchesJsonStep)
-                .next(importToDatabaseFlow())
+                .next(importCsvDataFlow())
                 .build();
     }
 
     @Bean
-    public Flow latestLaunchesUntilFlow() {
-        return new FlowBuilder<Flow>("latestLaunchesUntilFlow")
+    public Flow syncAllLaunchesFlow() {
+        return new FlowBuilder<Flow>("flow-all-launches")
                 .start(cleanupStep)
-                .next(fetchLatestDataStep)
+                .next(fetchAllLaunchesStep)
                 .next(readLaunchesJsonStep)
-                .next(importToDatabaseFlow())
+                .next(importCsvDataFlow())
                 .build();
     }
 
     @Bean
     public Flow bulkInsertFlow() {
-        return new FlowBuilder<Flow>("bulkInsertFlow")
+        return new FlowBuilder<Flow>("flow-bulk-insert")
                 .start(cleanupStep)
                 .next(readAgenciesJsonStep)
                 .next(readLaunchesJsonStep)
-                .next(importToDatabaseFlow())
+                .next(importCsvDataFlow())
                 .build();
     }
 
     @Bean
-    public Flow importToDatabaseFlow() {
+    public Flow importCsvDataFlow() {
         LinkedList<EntityConfig> configs = filePathProvider.getCsvGroups();
-        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("importToDatabaseFlow");
+        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("import-csv-data-flow");
         if (!configs.isEmpty()) {
             flowBuilder.start(createStepForEntity.createImportStep(configs.getFirst()));
             for (int i = 1; i < configs.size(); i++) {

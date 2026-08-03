@@ -33,8 +33,8 @@ import java.util.stream.StreamSupport;
 public class JsonObjectMapper {
     public final ObjectMapper objectMapper;
 
-    public JsonObjectMapper() {
-        this.objectMapper = new ObjectMapper();
+    public JsonObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     public ChunkStore JsonToAgenciesMapper(JsonNode rootNode, ChunkStore chunkStore) throws Exception {

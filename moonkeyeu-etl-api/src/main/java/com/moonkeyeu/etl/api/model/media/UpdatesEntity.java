@@ -1,9 +1,7 @@
 package com.moonkeyeu.etl.api.model.media;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.utils.TimestampDeserializer;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,7 +34,6 @@ public class UpdatesEntity implements CsvEntity<Object> {
     private String created_by;
     @Basic
     @Column(name = "created_on")
-    @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp created_on;
     @Basic
     @Column(name = "launch_id")

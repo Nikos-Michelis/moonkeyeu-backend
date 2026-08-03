@@ -2,40 +2,39 @@ package com.moonkeyeu.etl.api.service.impl.job;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.*;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class JobExecutionService {
-    private final JobLauncher jobLauncher;
-    private final JobExplorer jobExplorer;
     private final JobOperator jobOperator;
+    private final JobRepository jobRepository;
 
-    public JobExecutionService(JobLauncher jobLauncher, JobExplorer jobExplorer, JobOperator jobOperator) {
-        this.jobLauncher = jobLauncher;
-        this.jobExplorer = jobExplorer;
+
+    public JobExecutionService(JobOperator jobOperator, JobRepository jobRepository) {
         this.jobOperator = jobOperator;
+        this.jobRepository = jobRepository;
     }
 
     public boolean hasAnyRunningJobs() {
-        return jobExplorer.getJobNames().stream()
-                .flatMap(jobName -> jobExplorer.findRunningJobExecutions(jobName).stream())
+        return jobRepository.getJobNames().stream()
+                .flatMap(jobName -> jobRepository.findRunningJobExecutions(jobName).stream())
                 .anyMatch(jobExecution -> jobExecution.getStatus() == BatchStatus.STARTED);
     }
 
     public void stopAllRunningJobs() {
-        List<String> jobNames = jobExplorer.getJobNames();
+        List<String> jobNames = jobRepository.getJobNames();
         for (String jobName : jobNames) {
-            Set<JobExecution> runningExecutions = jobExplorer.findRunningJobExecutions(jobName);
+            Set<JobExecution> runningExecutions = jobRepository.findRunningJobExecutions(jobName);
             for (JobExecution execution : runningExecutions) {
                 stopExecution(execution);
             }
@@ -44,8 +43,8 @@ public class JobExecutionService {
 
     private void stopExecution(JobExecution execution) {
         try {
-            jobOperator.stop(execution.getId());
-        } catch (NoSuchJobExecutionException | JobExecutionNotRunningException e) {
+            jobOperator.stop(execution);
+        } catch (JobExecutionNotRunningException e) {
             throw new RuntimeException(e);
         }
     }
@@ -53,9 +52,9 @@ public class JobExecutionService {
     public JobExecution jobLauncher(String jobName, JobParameters jobParameters, Job dataProcessingJob) {
         try {
             log.debug("Started new job execution for {}: {}", jobName, jobParameters);
-            return jobLauncher.run(dataProcessingJob, jobParameters);
+            return jobOperator.start(dataProcessingJob, jobParameters);
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException |
-                 JobParametersInvalidException e) {
+                 InvalidJobParametersException e) {
             throw new RuntimeException(e);
         }
     }

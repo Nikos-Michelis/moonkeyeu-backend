@@ -61,6 +61,8 @@ services:
     depends_on:
       mysqldb:
         condition: service_healthy
+    ports:
+      - "8081:8081"
     networks:
       - private-internal-network
     healthcheck:
@@ -163,6 +165,8 @@ services:
       - alloy_data:/var/lib/alloy/data:rw
       - ./monitoring/alloy:/etc/alloy:ro
       - ./nginx/logs:/var/log/myapp:ro
+    ports:
+      - "12345:12345"
     networks:
       - private-internal-network
     restart: unless-stopped

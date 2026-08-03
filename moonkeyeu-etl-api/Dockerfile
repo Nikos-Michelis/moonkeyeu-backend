@@ -15,6 +15,6 @@ ARG APP_VERSION=2.0.0-SNAPSHOT
 RUN apt-get update && apt-get install -y jq curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/
-EXPOSE 8082
+EXPOSE 8081
 ENV JAR_VERSION=${APP_VERSION}
 ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -jar /app/*-${JAR_VERSION}.jar"]

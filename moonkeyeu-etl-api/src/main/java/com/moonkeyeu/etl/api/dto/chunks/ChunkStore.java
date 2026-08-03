@@ -15,7 +15,7 @@ import com.moonkeyeu.etl.api.dto.program.ProgramHasAgencies;
 import com.moonkeyeu.etl.api.dto.spacecraft.SpaceCraftStage;
 import lombok.Data;
 import lombok.Getter;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 import java.util.ArrayList;
 import java.util.List;

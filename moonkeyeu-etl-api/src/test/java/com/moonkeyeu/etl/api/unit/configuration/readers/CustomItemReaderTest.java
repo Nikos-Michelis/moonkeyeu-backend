@@ -15,10 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,7 +46,7 @@ class CustomItemReaderTest {
 
     @BeforeEach
     void setUp() {
-        customItemReader = new CustomItemReader();
+        customItemReader = new CustomItemReader(new CsvMapper());
         customItemReader.setType(TestEntity.class);
         customItemReader.setIterator(iterator);
         customItemReader.setReader(bufferedReader);

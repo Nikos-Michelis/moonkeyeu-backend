@@ -2,14 +2,11 @@ package com.moonkeyeu.etl.api.repository.persistence.impl;
 
 import com.moonkeyeu.etl.api.repository.persistence.GenericPersistenceService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.Chunk;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j

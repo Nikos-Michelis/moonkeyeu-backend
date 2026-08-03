@@ -1,12 +1,13 @@
 package com.moonkeyeu.etl.api.configuration.batch.writers;
 
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.moonkeyeu.etl.api.configuration.files.CsvSource;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
 import com.moonkeyeu.etl.api.repository.persistence.GenericPersistenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -25,11 +26,11 @@ public class WritersConfig {
     }
 
     @Bean
-    public ItemWriter<ChunkStore> itemWriter() {
+    public ItemWriter<ChunkStore> itemWriter(CsvMapper csvMapper) {
         return chunks -> {
             chunks.getItems().forEach(chunk -> {
                 chunk.getTasks().forEach(task -> {
-                    CustomItemWriter writer = itemWriterRegistry().get(task.target());
+                    CustomItemWriter writer = itemWriterRegistry(csvMapper).get(task.target());
                     writer.write(task.data());
                 });
             });
@@ -37,10 +38,10 @@ public class WritersConfig {
     }
 
     @Bean
-    public ItemWriterRegistry itemWriterRegistry() {
+    public ItemWriterRegistry itemWriterRegistry(CsvMapper csvMapper) {
         ItemWriterRegistry registry = new ItemWriterRegistry();
         for (CsvSource source : CsvSource.values()) {
-            CustomItemWriter writer = new CustomItemWriter();
+            CustomItemWriter writer = new CustomItemWriter(csvMapper);
             writer.setResource(new FileSystemResource(filePathProvider.getCsvSource(source.getCsvFile())));
             registry.register(source, writer);
         }

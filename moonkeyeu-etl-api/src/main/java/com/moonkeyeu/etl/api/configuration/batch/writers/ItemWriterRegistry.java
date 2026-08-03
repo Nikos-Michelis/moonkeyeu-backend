@@ -1,8 +1,8 @@
 package com.moonkeyeu.etl.api.configuration.batch.writers;
 
 import com.moonkeyeu.etl.api.configuration.files.CsvSource;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStream;
 
 import java.util.EnumMap;
 import java.util.Map;
