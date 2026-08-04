@@ -12,7 +12,7 @@ RUN ./mvnw clean package -DskipTests
 FROM eclipse-temurin:21-jdk-jammy
 ARG APP_VERSION=2.0.0-SNAPSHOT
 # Install curl to enable health checks using Spring Boot Actuator
-RUN apt-get update && apt-get install -y jq curl && rm -rf /var/lib/apt/lists/*
+RUN apt-getRegistry update && apt-getRegistry install -y jq curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/
 EXPOSE 8081

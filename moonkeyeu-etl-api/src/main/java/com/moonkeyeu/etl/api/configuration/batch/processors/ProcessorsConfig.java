@@ -3,50 +3,27 @@ package com.moonkeyeu.etl.api.configuration.batch.processors;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.configuration.files.CsvSource;
-import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
-import com.moonkeyeu.etl.api.configuration.files.RootConfig;
 import com.moonkeyeu.etl.api.configuration.mappers.JsonObjectMapper;
-import com.moonkeyeu.etl.api.configuration.s3.S3Buckets;
 import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.service.LocalMediaService;
-import com.moonkeyeu.etl.api.service.S3MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.support.CompositeItemProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import java.util.List;
 
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class ProcessorsConfig {
-    private final S3MediaService s3MediaService;
-    private final LocalMediaService localMediaService;
-    private final S3Buckets s3Buckets;
-    private final RootConfig rootConfig;
-    private final FilePathProvider filePathProvider;
 
     @Bean
-    public CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> compositeProcessor() {
+    public CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> compositeProcessor(MediaProcessor mediaProcessor, CleaningProcessor cleaningProcessor) {
         CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> processor = new CompositeItemProcessor<>();
-        processor.setDelegates(List.of(cleaningProcessor(), mediaProcessor()));
+        processor.setDelegates(List.of(cleaningProcessor, mediaProcessor));
         return processor;
-    }
-
-    @Bean
-    public CleaningProcessor cleaningProcessor() {
-        return new CleaningProcessor();
-    }
-
-    @Bean
-    @StepScope
-    public MediaProcessor mediaProcessor() {
-        return new MediaProcessor(localMediaService, s3MediaService, rootConfig, filePathProvider, s3Buckets);
     }
 
     @Bean

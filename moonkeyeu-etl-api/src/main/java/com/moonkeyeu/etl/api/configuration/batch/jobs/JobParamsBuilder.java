@@ -16,13 +16,13 @@ import java.util.UUID;
 @Data
 @Builder
 public class JobParamsBuilder {
-    private StorageType storage;
+    private String storage;
     private StoreOperation operation;
     private CleanupType cleanup;
 
     public JobParameters toJobParameters() {
         return new JobParametersBuilder()
-                .addString("storage", storage.name())
+                .addString("storage", storage)
                 .addString("operation", operation.name())
                 .addString("cleanup", cleanup.name())
                 .addLocalDateTime("start_at", LocalDateTime.now().atOffset(ZoneOffset.UTC).toLocalDateTime())

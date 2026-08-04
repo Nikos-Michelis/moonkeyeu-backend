@@ -125,7 +125,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
     }
 
     /**
-     * @param clazz use clazz instead of object instance in order to get the class structure of the code
+     * @param clazz use clazz instead of object instance in order to getRegistry the class structure of the code
      * @return A set of headers namely the class attribute names
      */
     private Set<String> flattenAndExtractHeaders(Class<?> clazz) {

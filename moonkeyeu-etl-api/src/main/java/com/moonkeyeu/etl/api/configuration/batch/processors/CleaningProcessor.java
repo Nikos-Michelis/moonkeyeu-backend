@@ -5,16 +5,18 @@ import com.moonkeyeu.etl.api.settings.exceptions.DataCleaningException;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;
 
 @Slf4j
+@Component
 public class CleaningProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>> {
     private static final String UNKNOWN_VALUE = "Unknown";
 
     @Override
-    public CsvEntity<?> process(@NonNull CsvEntity<?> item) {
+    public CsvEntity<?> process(CsvEntity<?> item) {
 
         if (item.getPrimaryKey() == null) return null;
 
