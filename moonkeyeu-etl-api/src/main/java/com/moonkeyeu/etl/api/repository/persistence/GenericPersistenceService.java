@@ -7,5 +7,5 @@ import java.sql.SQLException;
 
 public interface GenericPersistenceService {
     <T> T save(T object) throws SQLException;
-    <T> void saveAll(Chunk<?> entities) throws SQLException;
+    <T> void saveAll(Chunk<T> entities) throws SQLException;
 }

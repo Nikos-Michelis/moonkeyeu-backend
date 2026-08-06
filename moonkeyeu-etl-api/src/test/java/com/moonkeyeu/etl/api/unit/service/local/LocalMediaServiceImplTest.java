@@ -118,7 +118,7 @@ class LocalMediaServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should use correct local path for RocketImageEntity")
+    @DisplayName("Should use correct local path for RocketMediaEntity")
     void getLocalHostUrl_shouldUseCorrectRootPath() throws Exception {
 
         imageEntity.setImageUrl("https://images.test.com/test-image.png");
@@ -146,6 +146,17 @@ class LocalMediaServiceImplTest {
                 localMediaService.saveMediaLocal(imageEntity, localDir))
                 .isInstanceOf(IOException.class)
                 .hasMessage("Download failed");
+
+    }
+
+    @Test
+    @DisplayName("Should propagate exception when download fails")
+    void test() {
+
+        assertThatThrownBy(() ->
+                localMediaService.saveMediaLocal(null, null))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Media entity should not be null or empty");
 
     }
 }

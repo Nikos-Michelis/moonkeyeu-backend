@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface MissionRepository extends JpaRepository<MissionEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<MissionEntity> findByName(String name);
-    // Example: Optional<MissionEntity> findById(Long id);
-    
-}
+public interface MissionRepository extends JpaRepository<MissionEntity, Long> {}

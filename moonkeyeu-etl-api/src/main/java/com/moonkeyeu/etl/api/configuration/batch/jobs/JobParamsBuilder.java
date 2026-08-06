@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
@@ -16,13 +14,13 @@ import java.util.UUID;
 @Data
 @Builder
 public class JobParamsBuilder {
-    private String storage;
+    private StorageType storage;
     private StoreOperation operation;
     private CleanupType cleanup;
 
     public JobParameters toJobParameters() {
         return new JobParametersBuilder()
-                .addString("storage", storage)
+                .addString("storage", storage.name())
                 .addString("operation", operation.name())
                 .addString("cleanup", cleanup.name())
                 .addLocalDateTime("start_at", LocalDateTime.now().atOffset(ZoneOffset.UTC).toLocalDateTime())

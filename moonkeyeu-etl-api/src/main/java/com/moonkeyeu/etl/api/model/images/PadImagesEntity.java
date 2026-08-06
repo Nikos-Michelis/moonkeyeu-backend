@@ -3,7 +3,6 @@ package com.moonkeyeu.etl.api.model.images;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.model.ImageEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -146,7 +146,7 @@ class ClientDataServiceImplIT {
     }
 
     @Test
-    @DisplayName("Should retry when reponed with status code 429 and apply throttle")
+    @DisplayName("Should retry when reponed with status code 429 and applyStrategy throttle")
     void fetchAll_shouldRetry_whenStatusCode429() throws IOException {
         // given
         String page1 = createResponse("/page2", TestEntity.builder().id("1").value("Launch 1").build());

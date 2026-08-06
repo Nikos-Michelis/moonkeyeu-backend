@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface RocketRepository extends JpaRepository<RocketEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<RocketEntity> findByName(String name);
-    // Example: Optional<RocketEntity> findById(Long id);
-    
-}
+public interface RocketRepository extends JpaRepository<RocketEntity, Long> {}

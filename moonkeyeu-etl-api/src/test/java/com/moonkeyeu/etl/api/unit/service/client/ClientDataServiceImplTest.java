@@ -136,7 +136,7 @@ class ClientDataServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should apply throttle delay when throttle service returns delay")
+    @DisplayName("Should applyStrategy throttle delay when throttle service returns delay")
     void fetchAll_shouldApplyThrottle_whenDelayIsProvided() throws IOException {
         // given
         JsonNode singlePage = jsonFromFile("/page_final.json");

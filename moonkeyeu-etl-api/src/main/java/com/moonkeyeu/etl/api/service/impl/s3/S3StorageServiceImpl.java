@@ -2,6 +2,7 @@ package com.moonkeyeu.etl.api.service.impl.s3;
 
 import com.moonkeyeu.etl.api.service.S3StorageService;
 import com.moonkeyeu.etl.api.service.S3CrudService;
+import com.moonkeyeu.etl.api.settings.exceptions.S3StorageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
@@ -53,7 +54,7 @@ public class S3StorageServiceImpl implements S3StorageService {
             s3CrudService.putObject(bucketName, s3Key, requestBody);
             log.info("Uploaded {} to S3 bucket {}", s3Key, bucketName);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to upload " + s3Key + " to S3", e);
+            throw new S3StorageException("Failed to upload " + s3Key + " to S3");
         }
     }
 }

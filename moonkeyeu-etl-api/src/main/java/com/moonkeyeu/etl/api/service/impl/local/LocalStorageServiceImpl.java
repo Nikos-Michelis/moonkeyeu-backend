@@ -1,5 +1,6 @@
 package com.moonkeyeu.etl.api.service.impl.local;
 import com.moonkeyeu.etl.api.service.LocalStorageService;
+import com.moonkeyeu.etl.api.settings.exceptions.LocalStorageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
         try (OutputStream outputStream = Files.newOutputStream(filePath)) {
             outputStream.write(data);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save image: " + e.getMessage(), e);
+            throw new LocalStorageException("Failed to save image: " + e.getMessage());
         }
     }
 }

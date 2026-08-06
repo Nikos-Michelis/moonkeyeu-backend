@@ -43,8 +43,7 @@ class S3StorageServiceImplTest {
         s3StorageService.save(data, s3Key, bucketName);
 
         verify(s3CrudService).putObject(eq(bucketName), eq(s3Key), any(RequestBody.class));
-        verify(cache)
-                .put(s3Key, true);
+        verify(cache).put(s3Key, true);
     }
 
     @Test

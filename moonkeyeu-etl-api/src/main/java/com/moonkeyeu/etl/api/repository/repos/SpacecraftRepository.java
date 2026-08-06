@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface SpacecraftRepository extends JpaRepository<SpacecraftEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<SpacecraftEntity> findByName(String name);
-    // Example: Optional<SpacecraftEntity> findById(Long id);
-    
-}
+public interface SpacecraftRepository extends JpaRepository<SpacecraftEntity, Long> {}

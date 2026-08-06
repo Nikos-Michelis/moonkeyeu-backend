@@ -68,7 +68,7 @@ public class FlowConfig {
     @Bean
     public Flow importCsvDataFlow() {
         LinkedList<EntityConfig> configs = filePathProvider.getCsvGroups();
-        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("import-csv-data-flow");
+        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flow-import-csv");
         if (!configs.isEmpty()) {
             flowBuilder.start(createStepForEntity.createImportStep(configs.getFirst()));
             for (int i = 1; i < configs.size(); i++) {
