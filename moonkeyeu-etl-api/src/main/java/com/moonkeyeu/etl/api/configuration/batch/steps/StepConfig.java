@@ -123,7 +123,7 @@ public class StepConfig {
     }
 
     @Bean
-    public Step LaunchesETLStep() throws RuntimeException {
+    public Step launchesETLStep() throws RuntimeException {
         String folderPath = filePathProvider.getJsonDir(JSON_LAUNCHES.getFolder());
         if (folderPath.isBlank()) throw new RuntimeException("Json folder not found.");
         return new StepBuilder("step-process-launches", jobRepository)
@@ -142,7 +142,7 @@ public class StepConfig {
     }
 
     @Bean
-    public Step readAgenciesJsonStep() throws RuntimeException {
+    public Step agenciesETLStep() throws RuntimeException {
         String folderPath = filePathProvider.getJsonDir(JSON_AGENCIES.getFolder());
         if (folderPath.isBlank()) throw new RuntimeException("Json folder not found.");
         return new StepBuilder("step-process-agencies", jobRepository)

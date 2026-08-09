@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface ProgramsRepository extends JpaRepository<ProgramsEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<ProgramsEntity> findByName(String name);
-    // Example: Optional<ProgramsEntity> findById(Long id);
-    
-}
+public interface ProgramsRepository extends JpaRepository<ProgramsEntity, Long> {}

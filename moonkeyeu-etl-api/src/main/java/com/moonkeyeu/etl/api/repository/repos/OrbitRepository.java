@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface OrbitRepository extends JpaRepository<OrbitEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<OrbitEntity> findByName(String name);
-    // Example: Optional<OrbitEntity> findById(Long id);
-    
-}
+public interface OrbitRepository extends JpaRepository<OrbitEntity, Long> {}

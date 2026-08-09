@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
-import com.moonkeyeu.etl.api.configuration.mappers.JacksonConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -125,7 +124,7 @@ public class CustomItemWriter implements ItemWriter<Object>, ItemStream {
     }
 
     /**
-     * @param clazz use clazz instead of object instance in order to get the class structure of the code
+     * @param clazz use clazz instead of object instance in order to getRegistry the class structure of the code
      * @return A set of headers namely the class attribute names
      */
     private Set<String> flattenAndExtractHeaders(Class<?> clazz) {

@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<VideoEntity> findByName(String name);
-    // Example: Optional<VideoEntity> findById(Long id);
-    
-}
+public interface VideoRepository extends JpaRepository<VideoEntity, Long> {}

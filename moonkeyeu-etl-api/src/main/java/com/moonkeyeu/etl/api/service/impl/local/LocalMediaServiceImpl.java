@@ -44,25 +44,24 @@ public class LocalMediaServiceImpl implements LocalMediaService {
             ProgramsImagesEntity.class, "programs"
     );
 
-    public String saveMediaLocal(ImageEntity imageEntity, String localDir) throws IOException {
-        String fileName = getFileName(imageEntity);
+    public String saveMediaLocal(ImageEntity media, String localDir) throws IOException {
+        String fileName = getFileName(media);
         Path filePath = Paths.get(localDir, fileName);
-        String localStorageUrl = getLocalHostUrl(imageEntity);
+        String localStorageUrl = getLocalHostUrl(media);
 
         if (localStorageService.existsByKey(filePath)) {
             return localStorageUrl;
         }
 
         Files.createDirectories(Paths.get(localDir));
-        byte[] data = mediaDownloadService.download(imageEntity.getImageUrl());
+        byte[] data = mediaDownloadService.download(media.getImageUrl());
         localStorageService.save(data, filePath);
         return localStorageUrl;
-
     }
 
-    public String getLocalHostUrl(ImageEntity imageEntity) throws MalformedURLException {
-        String basePath = getRootPath(imageEntity);
-        String fileName = getFileName(imageEntity);
+    public String getLocalHostUrl(ImageEntity media) throws MalformedURLException {
+        String basePath = getRootPath(media);
+        String fileName = getFileName(media);
         return UriComponentsBuilder
                 .fromUriString(this.localHostUrl)
                 .pathSegment(basePath)
@@ -70,8 +69,8 @@ public class LocalMediaServiceImpl implements LocalMediaService {
                 .toUriString();
     }
 
-    private String getFileName(ImageEntity item) throws MalformedURLException {
-        return ClientUtils.extractImageNameFromURL(item.getImageUrl());
+    private String getFileName(ImageEntity media) throws MalformedURLException {
+        return ClientUtils.extractImageNameFromURL(media.getImageUrl());
     }
 
     private String getRootPath(ImageEntity item) {

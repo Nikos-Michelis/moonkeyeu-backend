@@ -10,9 +10,4 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface SocialMediaRepository extends JpaRepository<SocialMediaEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<SocialMediaEntity> findByName(String name);
-    // Example: Optional<SocialMediaEntity> findById(Long id);
-    
 }

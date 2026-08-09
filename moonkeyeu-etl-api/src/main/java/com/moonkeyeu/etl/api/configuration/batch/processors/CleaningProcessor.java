@@ -3,18 +3,19 @@ package com.moonkeyeu.etl.api.configuration.batch.processors;
 import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.settings.exceptions.DataCleaningException;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;
 
 @Slf4j
+@Component
 public class CleaningProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<?>> {
     private static final String UNKNOWN_VALUE = "Unknown";
 
     @Override
-    public CsvEntity<?> process(@NonNull CsvEntity<?> item) {
+    public CsvEntity<?> process(CsvEntity<?> item) {
 
         if (item.getPrimaryKey() == null) return null;
 
@@ -22,7 +23,7 @@ public class CleaningProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<
             field.setAccessible(true);
             try {
                 Object original = field.get(item);
-                Object cleaned = handleNullEmptyValues(original);
+                Object cleaned = handleNullOrEmptyValues(original);
                 cleaned = handleSpecialCharacters(cleaned);
                 field.set(item, cleaned);
             } catch (IllegalAccessException e) {
@@ -32,12 +33,13 @@ public class CleaningProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<
         return item;
     }
 
-    private Object handleNullEmptyValues(Object value) {
-        if (value instanceof String str) {
-            str = str.trim();
-            return str.isEmpty() ? null : str;
+    private Object handleNullOrEmptyValues(Object value) {
+
+        if (!(value instanceof String str)) {
+            return value;
         }
-        return value;
+
+        return str.isBlank() ? null : str;
     }
 
     private Object handleSpecialCharacters(Object value) {

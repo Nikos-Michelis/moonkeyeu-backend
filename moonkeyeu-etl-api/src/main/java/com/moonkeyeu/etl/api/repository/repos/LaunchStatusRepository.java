@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface LaunchStatusRepository extends JpaRepository<LaunchStatusEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<LaunchStatusEntity> findByName(String name);
-    // Example: Optional<LaunchStatusEntity> findById(Long id);
-    
-}
+public interface LaunchStatusRepository extends JpaRepository<LaunchStatusEntity, Long> {}

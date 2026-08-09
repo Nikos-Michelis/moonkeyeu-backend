@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<RoleEntity> findByName(String name);
-    // Example: Optional<RoleEntity> findById(Long id);
-    
-}
+public interface RoleRepository extends JpaRepository<RoleEntity, Long> {}

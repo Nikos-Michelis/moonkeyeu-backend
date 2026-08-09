@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface LocationRepository extends JpaRepository<LocationEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<LocationEntity> findByName(String name);
-    // Example: Optional<LocationEntity> findById(Long id);
-    
-}
+public interface LocationRepository extends JpaRepository<LocationEntity, Long> {}

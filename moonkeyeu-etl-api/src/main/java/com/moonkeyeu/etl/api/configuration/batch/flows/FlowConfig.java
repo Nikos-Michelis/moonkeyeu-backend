@@ -16,10 +16,10 @@ import java.util.LinkedList;
 @Configuration
 @RequiredArgsConstructor
 public class FlowConfig {
-    private final Step readAgenciesJsonStep;
+    private final Step agenciesETLStep;
     private final Step fetchAgenciesStep;
     private final Step fetchAllLaunchesStep;
-    private final Step readLaunchesJsonStep;
+    private final Step launchesETLStep;
     private final Step fetchYearlyLaunchesStep;
     private final Step cleanupStep;
     private final StepConfig createStepForEntity;
@@ -30,7 +30,7 @@ public class FlowConfig {
         return new FlowBuilder<Flow>("flow-all-agencies")
                 .start(cleanupStep)
                 .next(fetchAgenciesStep)
-                .next(readAgenciesJsonStep)
+                .next(agenciesETLStep)
                 .next(importCsvDataFlow())
                 .build();
     }
@@ -40,7 +40,7 @@ public class FlowConfig {
         return new FlowBuilder<Flow>("flow-yearly-launches")
                 .start(cleanupStep)
                 .next(fetchYearlyLaunchesStep)
-                .next(readLaunchesJsonStep)
+                .next(launchesETLStep)
                 .next(importCsvDataFlow())
                 .build();
     }
@@ -50,7 +50,7 @@ public class FlowConfig {
         return new FlowBuilder<Flow>("flow-all-launches")
                 .start(cleanupStep)
                 .next(fetchAllLaunchesStep)
-                .next(readLaunchesJsonStep)
+                .next(launchesETLStep)
                 .next(importCsvDataFlow())
                 .build();
     }
@@ -59,8 +59,8 @@ public class FlowConfig {
     public Flow bulkInsertFlow() {
         return new FlowBuilder<Flow>("flow-bulk-insert")
                 .start(cleanupStep)
-                .next(readAgenciesJsonStep)
-                .next(readLaunchesJsonStep)
+                .next(agenciesETLStep)
+                .next(launchesETLStep)
                 .next(importCsvDataFlow())
                 .build();
     }
@@ -68,7 +68,7 @@ public class FlowConfig {
     @Bean
     public Flow importCsvDataFlow() {
         LinkedList<EntityConfig> configs = filePathProvider.getCsvGroups();
-        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("import-csv-data-flow");
+        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flow-import-csv");
         if (!configs.isEmpty()) {
             flowBuilder.start(createStepForEntity.createImportStep(configs.getFirst()));
             for (int i = 1; i < configs.size(); i++) {

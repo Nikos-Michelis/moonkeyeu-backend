@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class JobExecutionDecider {
-    @Qualifier("runLaunchesUpdateJob")
-    private final Job runLaunchesUpdateJob;
-    @Qualifier("runDailyUpdateJob")
-    private final Job runDailyUpdateJob;
+    @Qualifier("runUpdateAllLaunchesJob")
+    private final Job runUpdateAllLaunchesJob;
+    @Qualifier("runUpdateDailyLaunchesJob")
+    private final Job runUpdateDailyLaunchesJob;
     @Qualifier("runBulkInsertJob")
     private final Job runBulkInsertJob;
     @Qualifier("runUpdateAgenciesJob")
@@ -37,7 +37,7 @@ public class JobExecutionDecider {
 
         if (jobExecutionService.hasAnyRunningJobs()) jobExecutionService.stopAllRunningJobs();
 
-        JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", jobParameters, runDailyUpdateJob);
+        JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runUpdateDailyLaunchesJob", jobParameters, runUpdateDailyLaunchesJob);
         if (launchesUpdateJob.getStatus() == BatchStatus.COMPLETED) return BatchStatus.COMPLETED;
         log.warn("dailyJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
 
@@ -48,7 +48,7 @@ public class JobExecutionDecider {
         }
 
         JobParameters retryParams = JobParamsBuilder.addRetryTimestamp(jobParameters);
-        JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runDailyUpdateJob", retryParams, runDailyUpdateJob);
+        JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runUpdateDailyLaunchesJob", retryParams, runUpdateDailyLaunchesJob);
         if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
             log.error("dailyJobExecution: Launches fetching failed {} Abort the job execution", BatchStatus.FAILED);
             return BatchStatus.FAILED;
@@ -66,7 +66,7 @@ public class JobExecutionDecider {
 
         if (jobExecutionService.hasAnyRunningJobs()) jobExecutionService.stopAllRunningJobs();
 
-        JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", jobParameters, runLaunchesUpdateJob);
+        JobExecution launchesUpdateJob = jobExecutionService.jobLauncher("runUpdateAllLaunchesJob", jobParameters, runUpdateAllLaunchesJob);
         if (launchesUpdateJob.getStatus() == BatchStatus.COMPLETED) return BatchStatus.COMPLETED;
         log.warn("midnightJobExecution: Launches fetching failed {} try to syncing agencies", BatchStatus.FAILED);
 
@@ -77,7 +77,7 @@ public class JobExecutionDecider {
         }
 
         JobParameters retryParams = JobParamsBuilder.addRetryTimestamp(jobParameters);
-        JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runLaunchesUpdateJob", retryParams, runLaunchesUpdateJob);
+        JobExecution retryLaunchesUpdateJob = jobExecutionService.jobLauncher("runUpdateAllLaunchesJob", retryParams, runUpdateAllLaunchesJob);
         if (retryLaunchesUpdateJob.getStatus() != BatchStatus.COMPLETED) {
             log.error("midnightJobExecution: Launches fetching failed {} Abort the job execution", BatchStatus.FAILED);
             return BatchStatus.FAILED;

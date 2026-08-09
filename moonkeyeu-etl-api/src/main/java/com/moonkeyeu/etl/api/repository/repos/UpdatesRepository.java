@@ -9,10 +9,4 @@ import org.springframework.stereotype.Repository;
  * Provides CRUD operations and custom query methods
  */
 @Repository
-public interface UpdatesRepository extends JpaRepository<UpdatesEntity, Long> {
-    
-    // Custom query methods can be added here
-    // Example: List<UpdatesEntity> findByName(String name);
-    // Example: Optional<UpdatesEntity> findById(Long id);
-    
-}
+public interface UpdatesRepository extends JpaRepository<UpdatesEntity, Long> {}
