@@ -39,7 +39,7 @@ public class CleaningProcessor implements ItemProcessor<CsvEntity<?>, CsvEntity<
             return value;
         }
 
-        return str.isBlank() ? null : str;
+        return str.isBlank() ? null : str.trim();
     }
 
     private Object handleSpecialCharacters(Object value) {

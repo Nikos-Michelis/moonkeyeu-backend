@@ -17,7 +17,7 @@ import java.util.Set;
 @Table(name = "landing_zone", schema = "moonkey_db")
 public class LandingZone {
     @Id
-    @Column(name = "landing_zone_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long landingZoneId;
     @Basic

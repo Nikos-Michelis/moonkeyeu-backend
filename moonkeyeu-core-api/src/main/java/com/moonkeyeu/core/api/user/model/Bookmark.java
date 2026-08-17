@@ -28,7 +28,7 @@ import java.util.Set;
 public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bookmark_id")
+    @Column(name = "id")
     private Long bookmarkId;
     @Column(name = "bookmark_name", unique = true)
     private String bookmarkName;

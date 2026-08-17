@@ -20,7 +20,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgencyTypeEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "type_id", nullable = false)
+    @Column(name = "id", nullable = false)
     @JsonProperty("agency_type_id")
     @EqualsAndHashCode.Include
     private Long type_id;

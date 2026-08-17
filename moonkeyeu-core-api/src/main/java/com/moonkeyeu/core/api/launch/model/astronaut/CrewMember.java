@@ -15,7 +15,7 @@ import lombok.*;
 @Table(name = "crew_member", schema = "moonkey_db")
 public class CrewMember {
     @Id
-    @Column(name = "crew_member_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)

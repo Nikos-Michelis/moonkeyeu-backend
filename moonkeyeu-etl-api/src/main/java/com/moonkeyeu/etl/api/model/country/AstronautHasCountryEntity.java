@@ -17,7 +17,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AstronautHasCountryEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "astronaut_country_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private long id;
     @Basic

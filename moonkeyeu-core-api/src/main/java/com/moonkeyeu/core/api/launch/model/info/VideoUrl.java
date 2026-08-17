@@ -10,10 +10,10 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "video_url", schema = "moonkey_db")
+@Table(name = "videos", schema = "moonkey_db")
 public class VideoUrl {
     @Id
-    @Column(name = "video_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private String videoId;
     @Basic

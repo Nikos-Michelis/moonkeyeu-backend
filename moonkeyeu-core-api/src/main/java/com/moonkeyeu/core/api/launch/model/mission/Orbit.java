@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name = "orbit", schema = "moonkey_db")
 public class Orbit {
     @Id
-    @Column(name = "orbit_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long orbitId;
     @Basic

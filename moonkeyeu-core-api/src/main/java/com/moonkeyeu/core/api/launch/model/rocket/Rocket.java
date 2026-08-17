@@ -41,7 +41,7 @@ import java.util.Set;
 @Table(name = "rocket", schema = "moonkey_db")
 public class Rocket {
     @Id
-    @Column(name = "rocket_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long rocketId;
     @ManyToOne(fetch = FetchType.LAZY)

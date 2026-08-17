@@ -16,7 +16,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LauncherStatusEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "status_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long status_id;
     @Basic

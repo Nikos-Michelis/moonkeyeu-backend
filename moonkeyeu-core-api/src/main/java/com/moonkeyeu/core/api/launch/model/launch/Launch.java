@@ -75,7 +75,7 @@ import java.util.Set;
 @Table(name = "launch", schema = "moonkey_db")
 public class Launch {
     @Id
-    @Column(name = "launch_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private String launchId;
     @Basic

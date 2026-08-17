@@ -17,7 +17,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LaunchHasProgramsEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "launch_programs_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private String id;
     @Basic

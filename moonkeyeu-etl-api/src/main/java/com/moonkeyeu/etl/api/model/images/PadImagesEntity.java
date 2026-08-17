@@ -16,12 +16,12 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PadImagesEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "image_id", nullable = false)
+    @Column(name = "id", nullable = false)
     @JsonProperty("pad_image_id")
     @EqualsAndHashCode.Include
     private Long image_id;
     @Basic
-    @Column(name = "image_name", nullable = true, length = 255)
+    @Column(name = "name", nullable = true, length = 255)
     @JsonProperty("pad_image_name")
     private String image_name;
     @Basic

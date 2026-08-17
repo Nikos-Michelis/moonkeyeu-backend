@@ -18,7 +18,7 @@ import java.time.Instant;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LauncherEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "launcher_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long launcher_id;
     @Basic

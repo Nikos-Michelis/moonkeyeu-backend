@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AstronautEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "astronaut_id", nullable = false)
+    @Column(name = "id", nullable = false)
     @EqualsAndHashCode.Include
     private Long astronaut_id;
     @Basic

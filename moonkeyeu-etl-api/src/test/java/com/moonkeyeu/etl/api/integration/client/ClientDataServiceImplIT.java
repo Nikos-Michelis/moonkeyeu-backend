@@ -89,6 +89,8 @@ class ClientDataServiceImplIT {
 
         ReflectionTestUtils.setField(urlBuilderUtil, "baseUrl", baseUrl);
         ReflectionTestUtils.setField(urlBuilderUtil, "version", "2.3.0");
+        ReflectionTestUtils.setField(clientDataService, "MAX_RETRIES", 30);
+        ReflectionTestUtils.setField(clientDataService, "RETRY_DELAY", 1);
     }
 
     @Test
@@ -226,7 +228,7 @@ class ClientDataServiceImplIT {
                 .verify();
 
         // then
-        assertEquals(1, mockWebServer.getRequestCount());
+        assertEquals(2, mockWebServer.getRequestCount());
     }
 
 

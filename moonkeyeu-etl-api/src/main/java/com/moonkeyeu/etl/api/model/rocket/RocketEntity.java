@@ -18,7 +18,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RocketEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "rocket_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long rocket_id;
     private Long rocket_conf_id;

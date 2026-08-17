@@ -18,11 +18,11 @@ import java.sql.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SpacecraftConfigurationEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "spacecraft_conf_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long spacecraft_conf_id;
     @Basic
-    @Column(name = "spacecraft_conf_name")
+    @Column(name = "name")
     private String spacecraft_conf_name;
     @Column(name = "type_id")
     @JsonProperty("spacecraft_type_id")

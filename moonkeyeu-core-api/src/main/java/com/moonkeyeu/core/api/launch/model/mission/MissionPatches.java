@@ -15,12 +15,12 @@ import java.util.Objects;
 @Table(name = "mission_patches", schema = "moonkey_db")
 public class MissionPatches {
     @Id
-    @Column(name = "patch_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long patchId;
     @Basic
     @Column(name = "priority")
-    private String priority;
+    private Integer priority;
     @Basic
     @Column(name = "name")
     private String name;

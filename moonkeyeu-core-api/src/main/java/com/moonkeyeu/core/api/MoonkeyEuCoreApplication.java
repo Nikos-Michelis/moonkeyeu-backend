@@ -1,6 +1,9 @@
 package com.moonkeyeu.core.api;
 
+import com.moonkeyeu.core.api.security.model.SignUpMethod;
+import com.moonkeyeu.core.api.security.model.SignUpMethods;
 import com.moonkeyeu.core.api.security.repository.PermissionRepository;
+import com.moonkeyeu.core.api.security.repository.ProviderRepository;
 import com.moonkeyeu.core.api.security.repository.RoleRepository;
 import com.moonkeyeu.core.api.user.model.*;
 import org.springframework.boot.CommandLineRunner;
@@ -8,7 +11,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,7 +25,7 @@ public class MoonkeyEuCoreApplication {
 
     @Bean
     @Profile({"dev", "prod"})
-    public CommandLineRunner seedDatabase(RoleRepository roleRepository, PermissionRepository permissionRepository) {
+    public CommandLineRunner seedDatabase(RoleRepository roleRepository, PermissionRepository permissionRepository, ProviderRepository providerRepository) {
         return args -> {
             for (Permissions permissionEnum : Permissions.values()) {
                 permissionRepository.findByName(permissionEnum).orElseGet(() -> {
@@ -34,6 +36,7 @@ public class MoonkeyEuCoreApplication {
                     return permissionRepository.save(permission);
                 });
             }
+
             for (Role roleEnum : Role.values()) {
                 roleRepository.findByName(roleEnum.name()).orElseGet(() -> {
                     Set<Permission> permissions = roleEnum.getPermissions().stream()
@@ -49,15 +52,15 @@ public class MoonkeyEuCoreApplication {
                     return roleRepository.save(newRole);
                 });
             }
-           /* for (SignUpProvider signUpProviderEnum : SignUpProvider.values()) {
-                permissionRepository.findByName(signUpProviderEnum.name()).orElseGet(() -> {
-                    Permission permission = Permission.builder()
-                            .name(permissionEnum)
-                            .description(permissionEnum.getPermission())
+
+            for (SignUpMethod signUpMethod : SignUpMethod.values()) {
+                providerRepository.findByProvider(signUpMethod).orElseGet(() -> {
+                    SignUpMethods signUpMethods = SignUpMethods.builder()
+                            .provider(signUpMethod)
                             .build();
-                    return permissionRepository.save(permission);
+                    return providerRepository.save(signUpMethods);
                 });
-            }*/
+            }
         };
     }
 }

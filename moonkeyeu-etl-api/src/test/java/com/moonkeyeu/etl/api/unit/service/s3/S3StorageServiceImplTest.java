@@ -2,6 +2,7 @@ package com.moonkeyeu.etl.api.unit.service.s3;
 
 import com.moonkeyeu.etl.api.service.S3CrudService;
 import com.moonkeyeu.etl.api.service.impl.s3.S3StorageServiceImpl;
+import com.moonkeyeu.etl.api.settings.exceptions.S3StorageException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -181,8 +182,7 @@ class S3StorageServiceImplTest {
 
         assertThatThrownBy(() ->
                 s3StorageService.upload(s3Key, bucketName, data))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Failed to upload folder/file.txt to S3")
-                .hasCauseInstanceOf(RuntimeException.class);
+                .isInstanceOf(S3StorageException.class)
+                .hasMessage("Failed to upload folder/file.txt to S3");
     }
 }

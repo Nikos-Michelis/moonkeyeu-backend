@@ -17,6 +17,16 @@ spring:
     codecs:
       max-in-memory-size: 20MB
 
+  flyway:
+    clean-disabled: false
+    enabled: true
+    user: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
+    password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
+    locations:
+      - classpath:db/migration/schema
+      - classpath:db/migration/seed
+    baseline-version: 1
+
 aws:
   region: ${S3_REGION}
   s3:

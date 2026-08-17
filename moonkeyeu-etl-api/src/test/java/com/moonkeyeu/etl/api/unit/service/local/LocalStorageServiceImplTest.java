@@ -1,5 +1,6 @@
 package com.moonkeyeu.etl.api.unit.service.local;
 import com.moonkeyeu.etl.api.service.impl.local.LocalStorageServiceImpl;
+import com.moonkeyeu.etl.api.settings.exceptions.LocalStorageException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -95,9 +96,8 @@ class LocalStorageServiceImplTest {
 
             assertThatThrownBy(() ->
                     localStorageService.save(data, filePath))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("Failed to save image: Disk is full")
-                    .hasCauseInstanceOf(IOException.class);
+                    .isInstanceOf(LocalStorageException.class)
+                    .hasMessage("Failed to save image: Disk is full");
         }
     }
 
@@ -120,9 +120,8 @@ class LocalStorageServiceImplTest {
 
             assertThatThrownBy(() ->
                     localStorageService.save(data, filePath))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("Failed to save image: Write failed")
-                    .hasCauseInstanceOf(IOException.class);
+                    .isInstanceOf(LocalStorageException.class)
+                    .hasMessage("Failed to save image: Write failed");
         }
     }
 }

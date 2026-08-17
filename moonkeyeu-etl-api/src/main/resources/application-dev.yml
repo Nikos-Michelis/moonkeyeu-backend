@@ -28,6 +28,9 @@ spring:
     job:
       enabled: false
 
+  flyway:
+    enabled: false
+
   main:
     allow-bean-definition-overriding: true
   http:

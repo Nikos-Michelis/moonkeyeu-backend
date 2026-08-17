@@ -110,8 +110,9 @@ public class JsonObjectMapper {
         String id = resultsNode.get("id").asText();
         Integer rocket_id = resultsNode.path("rocket").get("id").asInt();
         JsonNode boostersNode = resultsNode.path("rocket").get("launcher_stage");
-        if (boostersNode == null  || !boostersNode.isArray()) return List.of();
-        List<LauncherStage> stages = objectMapper.convertValue(boostersNode, new TypeReference<>() {});
+        if (boostersNode == null || !boostersNode.isArray()) return List.of();
+        List<LauncherStage> stages = objectMapper.convertValue(boostersNode, new TypeReference<>() {
+        });
         stages.forEach(stage -> {
             stage.setLaunch_id(id);
             stage.setRocket_id(rocket_id);
@@ -125,7 +126,8 @@ public class JsonObjectMapper {
         Integer rocket_id = resultsNode.path("rocket").get("id").asInt();
         JsonNode spacecraftStageNode = resultsNode.path("rocket").get("spacecraft_stage");
         if (spacecraftStageNode == null || !spacecraftStageNode.isArray()) return List.of();
-        List<SpaceCraftStage> stages = objectMapper.convertValue(spacecraftStageNode, new TypeReference<>() {});
+        List<SpaceCraftStage> stages = objectMapper.convertValue(spacecraftStageNode, new TypeReference<>() {
+        });
         stages.forEach(stage -> {
             stage.setLaunch_id(id);
             stage.setRocket_id(rocket_id);
@@ -135,7 +137,8 @@ public class JsonObjectMapper {
 
     public List<LaunchCrew> mapAstronauts(JsonNode crewNodes, Integer spacecraftStageId, String launchId) throws IllegalArgumentException {
         if (crewNodes == null || !crewNodes.isArray()) return List.of();
-        List<LaunchCrew> crewList = objectMapper.convertValue(crewNodes, new TypeReference<>() {});
+        List<LaunchCrew> crewList = objectMapper.convertValue(crewNodes, new TypeReference<>() {
+        });
         crewList.forEach(crew -> {
             crew.setSpacecraft_stage_id(spacecraftStageId);
             crew.setLaunch_id(launchId);
@@ -165,7 +168,8 @@ public class JsonObjectMapper {
         return StreamSupport.stream(crewNodes.spliterator(), false)
                 .map(node -> node.path("astronaut").get("nationality"))
                 .filter(JsonNode::isArray)
-                .flatMap(flatNode -> objectMapper.convertValue(flatNode, new TypeReference<List<Country>>() {}).stream())
+                .flatMap(flatNode -> objectMapper.convertValue(flatNode, new TypeReference<List<Country>>() {
+                }).stream())
                 .toList();
     }
 
@@ -187,12 +191,13 @@ public class JsonObjectMapper {
     public List<Country> mapAgenciesCountries(JsonNode resultsNode) throws IllegalArgumentException {
         JsonNode countriesNode = resultsNode.get("country");
         if (countriesNode == null || !countriesNode.isArray()) return List.of();
-        return objectMapper.convertValue(countriesNode, new TypeReference<>() {});
+        return objectMapper.convertValue(countriesNode, new TypeReference<>() {
+        });
     }
 
     public List<SocialMedia> mapSocialMediaLinks(JsonNode crewNodes) throws Exception {
         List<SocialMedia> socialMediaList = new ArrayList<>();
-        if(crewNodes != null && !crewNodes.isEmpty() && crewNodes.isArray()) {
+        if (crewNodes != null && !crewNodes.isEmpty() && crewNodes.isArray()) {
             for (JsonNode crewNode : crewNodes) {
                 JsonNode socialMediaNodes = crewNode.path("astronaut").get("social_media_links");
                 if (socialMediaNodes != null && !socialMediaNodes.isEmpty() && socialMediaNodes.isArray()) {
@@ -233,7 +238,8 @@ public class JsonObjectMapper {
         JsonNode updatesNode = resultsNode.get("updates");
         if (updatesNode == null || !updatesNode.isArray()) return List.of();
         String id = resultsNode.get("id").asText();
-        List<Updates> updates = objectMapper.convertValue(updatesNode, new TypeReference<>() {});
+        List<Updates> updates = objectMapper.convertValue(updatesNode, new TypeReference<>() {
+        });
         updates.forEach(update -> update.setLaunch_id(id));
         return updates;
     }
@@ -241,7 +247,8 @@ public class JsonObjectMapper {
     public List<Video> mapVideos(JsonNode resultsNode) throws IllegalArgumentException {
         JsonNode videoNodes = resultsNode.get("vid_urls");
         if (videoNodes == null || !videoNodes.isArray()) return List.of();
-        List<Video> videos = objectMapper.convertValue(videoNodes, new TypeReference<>() {});
+        List<Video> videos = objectMapper.convertValue(videoNodes, new TypeReference<>() {
+        });
         String launchId = resultsNode.get("id").asText();
         videos.forEach(video -> video.setLaunch_id(launchId));
         return videos;
@@ -251,7 +258,8 @@ public class JsonObjectMapper {
         JsonNode patchNodes = resultsNode.get("mission_patches");
         if (patchNodes == null || !patchNodes.isArray()) return List.of();
         String id = resultsNode.get("id").asText();
-        List<MissionPatches> missionPatches = objectMapper.convertValue(patchNodes, new TypeReference<>() {});
+        List<MissionPatches> missionPatches = objectMapper.convertValue(patchNodes, new TypeReference<>() {
+        });
         missionPatches.forEach(missionPatch -> missionPatch.setLaunch_id(id));
         return missionPatches;
     }
@@ -260,7 +268,8 @@ public class JsonObjectMapper {
         JsonNode infoURLsNode = resultsNode.get("info_urls");
         if (infoURLsNode == null || !infoURLsNode.isArray()) return List.of();
         String id = resultsNode.get("id").asText();
-        List<InfoUrl> infoUrls = objectMapper.convertValue(infoURLsNode, new TypeReference<>() {});
+        List<InfoUrl> infoUrls = objectMapper.convertValue(infoURLsNode, new TypeReference<>() {
+        });
         infoUrls.forEach(infoUrl -> infoUrl.setLaunch_id(id));
         return infoUrls;
     }
@@ -293,10 +302,10 @@ public class JsonObjectMapper {
     }
 
     public Optional<Image> mapAstronautImages(JsonNode crewNodes) throws IOException {
-        for (JsonNode crewNode : crewNodes){
+        for (JsonNode crewNode : crewNodes) {
             JsonNode imageNode = crewNode.path("astronaut").get("image");
-            if (imageNode != null && !imageNode.isEmpty()){
-                Integer id =  crewNode.path("astronaut").get("id").asInt();
+            if (imageNode != null && !imageNode.isEmpty()) {
+                Integer id = crewNode.path("astronaut").get("id").asInt();
                 Image image = objectMapper.treeToValue(imageNode, Image.class);
                 image.setAstronaut_id(id);
                 return Optional.of(image);
@@ -308,7 +317,7 @@ public class JsonObjectMapper {
     public List<Image> mapLauncherImages(JsonNode resultsNode) throws IOException {
         List<Image> images = new ArrayList<>();
         JsonNode launcherStageNodes = resultsNode.path("rocket").get("launcher_stage");
-        if (launcherStageNodes != null && !launcherStageNodes.isEmpty() && launcherStageNodes.isArray()){
+        if (launcherStageNodes != null && !launcherStageNodes.isEmpty() && launcherStageNodes.isArray()) {
             for (JsonNode stage : launcherStageNodes) {
                 JsonNode imageNode = stage.path("launcher").get("image");
                 if (imageNode != null && !imageNode.isEmpty()) {

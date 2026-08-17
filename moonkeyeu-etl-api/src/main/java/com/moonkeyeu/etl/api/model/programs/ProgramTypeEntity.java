@@ -16,7 +16,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProgramTypeEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "type_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long type_id;
     @Basic

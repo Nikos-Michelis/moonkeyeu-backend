@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LaunchPadEntity implements CsvEntity<Object>, ImageEntity {
     @Id
-    @Column(name = "launch_pad_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long launch_pad_id;
     @Basic

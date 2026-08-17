@@ -17,7 +17,7 @@ import java.time.Instant;
 public class ResetToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "token_id")
+    @Column(name = "id")
     private Long id;
     @Column(name = "token", unique = true)
     private String token;

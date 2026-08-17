@@ -16,7 +16,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LandingTypeEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "landing_type_id", nullable = false)
+    @Column(name = "id", nullable = false)
     @JsonProperty("type_id")
     @EqualsAndHashCode.Include
     private Long landing_type_id;

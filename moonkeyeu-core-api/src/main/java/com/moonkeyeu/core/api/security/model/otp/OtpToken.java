@@ -20,7 +20,7 @@ import java.time.Instant;
 public class OtpToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "otp_id")
+    @Column(name = "id")
     private Long otpId;
     @Column(name = "otp_type")
     @Enumerated(EnumType.STRING)

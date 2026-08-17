@@ -15,11 +15,11 @@ import java.util.Set;
 public class RocketConfImages {
 
     @Id
-    @Column(name = "image_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long imageId;
     @Basic
-    @Column(name = "image_name")
+    @Column(name = "name")
     private String imageName;
     @Basic
     @Column(name = "image_url")

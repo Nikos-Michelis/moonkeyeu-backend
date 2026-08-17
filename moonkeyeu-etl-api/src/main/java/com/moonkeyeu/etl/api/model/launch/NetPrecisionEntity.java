@@ -19,7 +19,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NetPrecisionEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "net_precision_id", nullable = false)
+    @Column(name = "id", nullable = false)
     @EqualsAndHashCode.Include
     private Long net_precision_id;
 

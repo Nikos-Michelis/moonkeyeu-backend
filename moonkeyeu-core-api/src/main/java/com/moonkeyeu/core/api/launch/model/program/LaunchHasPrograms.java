@@ -14,9 +14,9 @@ import lombok.*;
 public class LaunchHasPrograms {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "launch_programs_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
-    private Long launchProgramsId;
+    private String launchProgramsId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "program_id")
     private Programs programId;

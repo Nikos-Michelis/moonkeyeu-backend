@@ -47,7 +47,7 @@ public class NasaApodServiceImpl implements NasaApodService {
             }
         } catch (NasaApodFetchException e){
             if (cached != null) {
-                log.info("Fetch failed, keeping cached NASA APOD from " + cached.getDate());
+                log.info("Fetch failed, keeping cached NASA APOD from {}", cached.getDate());
             }
             log.error("Fetch failed: {}", e.getMessage());
         }

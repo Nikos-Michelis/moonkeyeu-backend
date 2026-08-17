@@ -85,7 +85,7 @@ import java.util.Set;
 @Table(name = "astronaut", schema = "moonkey_db")
 public class Astronaut {
     @Id
-    @Column(name = "astronaut_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long astronautId;
     @Basic

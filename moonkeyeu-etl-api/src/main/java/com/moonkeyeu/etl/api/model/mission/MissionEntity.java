@@ -16,7 +16,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MissionEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "mission_id", nullable = false)
+    @Column(name = "id", nullable = false)
     @EqualsAndHashCode.Include
     private Long mission_id;
     @Basic

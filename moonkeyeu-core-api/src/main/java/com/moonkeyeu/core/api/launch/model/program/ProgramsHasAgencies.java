@@ -13,7 +13,7 @@ import lombok.*;
 @Table(name = "programs_has_agencies", schema = "moonkey_db")
 public class ProgramsHasAgencies {
     @Id
-    @Column(name = "program_agency_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long programAgencyId;
     @ManyToOne(fetch = FetchType.LAZY)

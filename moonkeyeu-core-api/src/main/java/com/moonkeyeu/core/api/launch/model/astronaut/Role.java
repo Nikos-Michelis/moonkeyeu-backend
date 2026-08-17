@@ -18,7 +18,7 @@ import java.util.Set;
 @Table(name = "role", schema = "moonkey_db")
 public class Role {
     @Id
-    @Column(name = "role_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long id;
 

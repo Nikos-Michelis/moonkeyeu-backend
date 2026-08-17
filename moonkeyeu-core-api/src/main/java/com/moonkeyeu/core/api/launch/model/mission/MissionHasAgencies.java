@@ -16,7 +16,7 @@ import java.util.Objects;
 public class MissionHasAgencies {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mission_agencies_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long missionAgenciesId;
     @ManyToOne(fetch = FetchType.LAZY)
