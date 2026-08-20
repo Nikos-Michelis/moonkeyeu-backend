@@ -17,12 +17,13 @@ public class JobExecutionScheduler {
     }
 
     //@Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(fixedRate = 10000)
     public void scheduledMidnightJob() {
         jobExecutionDecider.midnightJobExecution();
     }
 
-    @Profile("dev")
-    @Scheduled(fixedRate = 10000)
+    //@Profile("prod")
+    //@Scheduled(fixedRate = 10000)
     public void scheduledBulkInsertJob() {
         jobExecutionDecider.bulkInsertJobExecution();
     }

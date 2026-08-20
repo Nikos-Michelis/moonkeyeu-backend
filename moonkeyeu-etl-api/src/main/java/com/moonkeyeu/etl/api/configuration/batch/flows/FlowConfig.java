@@ -1,8 +1,5 @@
 package com.moonkeyeu.etl.api.configuration.batch.flows;
 
-import com.moonkeyeu.etl.api.configuration.batch.steps.StepConfig;
-import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
-import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.job.builder.FlowBuilder;
@@ -10,20 +7,27 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.step.Step;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.util.LinkedList;
 
+/**
+ * Every flow is now fetch → load → media.
+ * <p>
+ * {@code importCsvDataFlow} is gone. It generated fifty-three steps from {@code CsvGroup}, each one
+ * a full scan of a CSV file for a single target table, and because all four flows reused it the
+ * generated steps collided on name — the duplicate-step warning documented in the old
+ * {@code StepConfig} javadoc. Both the flow and the warning disappear with the CSV layer.
+ */
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class FlowConfig {
-    private final Step agenciesETLStep;
-    private final Step fetchAgenciesStep;
-    private final Step fetchAllLaunchesStep;
-    private final Step launchesETLStep;
-    private final Step fetchYearlyLaunchesStep;
+
     private final Step cleanupStep;
-    private final StepConfig createStepForEntity;
-    private final FilePathProvider filePathProvider;
+    private final Step fetchAgenciesStep;
+    private final Step agenciesETLStep;
+    private final Step fetchAllLaunchesStep;
+    private final Step fetchYearlyLaunchesStep;
+    private final Step launchesETLStep;
+    private final Step mediaStep;
 
     @Bean
     public Flow syncAllAgenciesFlow() {
@@ -31,7 +35,7 @@ public class FlowConfig {
                 .start(cleanupStep)
                 .next(fetchAgenciesStep)
                 .next(agenciesETLStep)
-                .next(importCsvDataFlow())
+                .next(mediaStep)
                 .build();
     }
 
@@ -41,7 +45,7 @@ public class FlowConfig {
                 .start(cleanupStep)
                 .next(fetchYearlyLaunchesStep)
                 .next(launchesETLStep)
-                .next(importCsvDataFlow())
+                .next(mediaStep)
                 .build();
     }
 
@@ -51,7 +55,7 @@ public class FlowConfig {
                 .start(cleanupStep)
                 .next(fetchAllLaunchesStep)
                 .next(launchesETLStep)
-                .next(importCsvDataFlow())
+                .next(mediaStep)
                 .build();
     }
 
@@ -61,20 +65,7 @@ public class FlowConfig {
                 .start(cleanupStep)
                 .next(agenciesETLStep)
                 .next(launchesETLStep)
-                .next(importCsvDataFlow())
+                .next(mediaStep)
                 .build();
-    }
-
-    @Bean
-    public Flow importCsvDataFlow() {
-        LinkedList<EntityConfig> configs = filePathProvider.getCsvGroups();
-        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flow-import-csv");
-        if (!configs.isEmpty()) {
-            flowBuilder.start(createStepForEntity.createImportStep(configs.getFirst()));
-            for (int i = 1; i < configs.size(); i++) {
-                flowBuilder.next(createStepForEntity.createImportStep(configs.get(i)));
-            }
-        }
-        return flowBuilder.build();
     }
 }

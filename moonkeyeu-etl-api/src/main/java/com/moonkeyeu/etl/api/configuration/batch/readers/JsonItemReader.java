@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moonkeyeu.etl.api.configuration.mappers.JacksonConfig;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidFileTypeException;
 import lombok.Getter;
 import lombok.Setter;

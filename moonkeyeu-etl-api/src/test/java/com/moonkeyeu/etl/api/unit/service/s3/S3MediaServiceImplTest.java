@@ -1,6 +1,7 @@
 package com.moonkeyeu.etl.api.unit.service.s3;
 
-import com.moonkeyeu.etl.api.model.images.RocketImageEntity;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.MediaTarget;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.PendingImage;
 import com.moonkeyeu.etl.api.service.S3StorageService;
 import com.moonkeyeu.etl.api.service.impl.MediaDownloadServiceImpl;
 import com.moonkeyeu.etl.api.service.impl.s3.S3MediaServiceImpl;
@@ -30,11 +31,11 @@ class S3MediaServiceImplTest {
     private MediaDownloadServiceImpl mediaDownloadService;
     @InjectMocks
     private S3MediaServiceImpl s3MediaService;
-    private RocketImageEntity imageEntity;
+    private PendingImage imageEntity;
 
     @BeforeEach
     void setUp() {
-        imageEntity = new RocketImageEntity();
+        imageEntity = new PendingImage(MediaTarget.ROCKET_CONF_IMAGES, 1L, null);
         ReflectionTestUtils.setField(s3MediaService, "s3KeyValue", "media");
         ReflectionTestUtils.setField(s3MediaService, "cloudFrontUrl", "https://cdn.test.com");
     }
@@ -84,7 +85,7 @@ class S3MediaServiceImplTest {
     @DisplayName("Should build correct CloudFront URL")
     void getCloudFrontUrl_shouldReturnCorrectUrl() throws Exception {
 
-        RocketImageEntity entity = new RocketImageEntity();
+        PendingImage entity = new PendingImage(MediaTarget.ROCKET_CONF_IMAGES, 1L, null);
         entity.setImageUrl("https://images.test.com/falcon-heavy.png");
 
         String result = s3MediaService.getCloudFrontUrl(entity);
@@ -103,7 +104,7 @@ class S3MediaServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should use correct S3 path for RocketImageEntity")
+    @DisplayName("Should use correct S3 path for PendingImage")
     void getCloudFrontUrl_shouldUseCorrectRootPath() throws Exception {
 
         imageEntity.setImageUrl("https://images.test.com/test-image.webp");

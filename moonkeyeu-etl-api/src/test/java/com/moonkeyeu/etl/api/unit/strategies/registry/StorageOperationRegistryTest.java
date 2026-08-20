@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.unit.strategies.registry;
 
-import com.moonkeyeu.etl.api.dto.storage.StoreOperation;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.StoreOperation;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreOperationException;
 import com.moonkeyeu.etl.api.strategy.registry.StorageOperationRegistry;
 import org.junit.jupiter.api.DisplayName;

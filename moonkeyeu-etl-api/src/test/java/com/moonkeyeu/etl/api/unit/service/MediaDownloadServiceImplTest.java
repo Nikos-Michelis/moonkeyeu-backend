@@ -1,9 +1,6 @@
 package com.moonkeyeu.etl.api.unit.service;
 
-import com.moonkeyeu.etl.api.dto.ThrottleResponse;
-import com.moonkeyeu.etl.api.service.ClientDataService;
 import com.moonkeyeu.etl.api.service.impl.MediaDownloadServiceImpl;
-import com.moonkeyeu.etl.api.service.impl.client.ClientDataServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

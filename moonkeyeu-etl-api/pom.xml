@@ -68,11 +68,6 @@
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- Jackson CSV dataformat  -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-csv</artifactId>
-        </dependency>
         <!-- Spring Batch-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

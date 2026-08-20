@@ -1,13 +1,9 @@
 package com.moonkeyeu.etl.api.service.impl.s3;
 
-import com.moonkeyeu.etl.api.model.ImageEntity;
-import com.moonkeyeu.etl.api.model.images.*;
-import com.moonkeyeu.etl.api.model.images.SpacecraftImagesEntity;
-import com.moonkeyeu.etl.api.model.media.MissionPatchesEntity;
-import com.moonkeyeu.etl.api.model.pad.LaunchPadEntity;
-import com.moonkeyeu.etl.api.service.impl.MediaDownloadServiceImpl;
-import com.moonkeyeu.etl.api.service.S3StorageService;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.StorableImage;
+import com.moonkeyeu.etl.api.service.MediaDownloadService;
 import com.moonkeyeu.etl.api.service.S3MediaService;
+import com.moonkeyeu.etl.api.service.S3StorageService;
 import com.moonkeyeu.etl.api.utils.ClientUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +13,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -28,57 +23,43 @@ public class S3MediaServiceImpl implements S3MediaService {
     private String s3KeyValue;
     @Value("${aws.cloudfront.url}")
     private String cloudFrontUrl;
-    private final S3StorageService s3StorageService;
-    private final MediaDownloadServiceImpl mediaDownloadService;
 
-    private final Map<Class<?>, String> entityToS3KeyMap = Map.of(
-            RocketImageEntity.class, "rockets",
-            LaunchImagesEntity.class, "launch",
-            LaunchPadEntity.class, "pads-locations",
-            LauncherImagesEntity.class, "launchers",
-            SpacecraftImagesEntity.class, "spacecraft",
-            AstronautImagesEntity.class, "astronauts",
-            AgenciesImagesEntity.class, "agencies",
-            MissionPatchesEntity.class, "missions-patches",
-            ProgramsImagesEntity.class, "programs"
-    );
+    private final S3StorageService s3StorageService;
+    private final MediaDownloadService mediaDownloadService;
 
     @Override
-    public String saveMediaToS3(ImageEntity imageEntity, String bucketName) throws IOException {
-        String s3Key = getS3Key(imageEntity);
-        String cloudFrontUrl = getCloudFrontUrl(imageEntity);
+    public String saveMediaToS3(StorableImage image, String bucketName) throws IOException {
+        String s3Key = getS3Key(image);
+        String url = getCloudFrontUrl(image);
 
         if (s3StorageService.existsByKey(s3Key, bucketName)) {
-            return cloudFrontUrl;
+            return url;
         }
 
-        byte[] data = mediaDownloadService.download(imageEntity.getImageUrl());
+        byte[] data = mediaDownloadService.download(image.getImageUrl());
         s3StorageService.save(data, s3Key, bucketName);
-        return cloudFrontUrl;
+        return url;
     }
 
     @Override
-    public String getCloudFrontUrl(ImageEntity imageEntity) throws MalformedURLException {
-        String basePath = getRootPath(imageEntity);
-        String fileName = getFileName(imageEntity);
+    public String getCloudFrontUrl(StorableImage image) throws MalformedURLException {
         return UriComponentsBuilder
                 .fromUriString(this.cloudFrontUrl)
                 .path(s3KeyValue)
-                .pathSegment(basePath, fileName)
+                .pathSegment(image.getFolder(), getFileName(image))
                 .toUriString();
     }
 
-    private String getS3Key(ImageEntity imageEntity) throws MalformedURLException {
-        String basePath = getRootPath(imageEntity);
-        String fileName = getFileName(imageEntity);
-        return String.format("%s/%s/%s", s3KeyValue, basePath, fileName);
+    @Override
+    public String getBaseUrl() {
+        return cloudFrontUrl;
     }
 
-    private String getFileName(ImageEntity item) throws MalformedURLException {
-        return ClientUtils.extractImageNameFromURL(item.getImageUrl());
+    private String getS3Key(StorableImage image) throws MalformedURLException {
+        return String.format("%s/%s/%s", s3KeyValue, image.getFolder(), getFileName(image));
     }
 
-    private String getRootPath(ImageEntity item) {
-        return entityToS3KeyMap.get(item.getClass());
+    private String getFileName(StorableImage image) throws MalformedURLException {
+        return ClientUtils.extractImageNameFromURL(image.getImageUrl());
     }
 }

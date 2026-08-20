@@ -3,16 +3,17 @@ package com.moonkeyeu.etl.api.configuration.batch.steps;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepCompletionListener;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepContextSetter;
-import com.moonkeyeu.etl.api.configuration.batch.writers.ItemWriterRegistry;
-import com.moonkeyeu.etl.api.dto.storage.CleanupType;
+import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
+import com.moonkeyeu.etl.api.configuration.files.RootConfig;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.CleanupType;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.StorageType;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.StoreOperation;
+import com.moonkeyeu.etl.api.pipeline.core.RowSink;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.MediaMigrationService;
+import com.moonkeyeu.etl.api.configuration.batch.writers.UpsertWriter;
 import com.moonkeyeu.etl.api.service.ClientDataService;
 import com.moonkeyeu.etl.api.settings.exceptions.CleanupException;
 import com.moonkeyeu.etl.api.utils.FileManagerUtil;
-import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
-import com.moonkeyeu.etl.api.configuration.files.RootConfig;
-import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
-import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
-import com.moonkeyeu.etl.api.model.CsvEntity;
 import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,17 +21,15 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
-import org.springframework.batch.infrastructure.item.ItemReader;
-import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
-import org.springframework.batch.infrastructure.item.support.CompositeItemProcessor;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.*;
+import java.util.Map;
+
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_AGENCIES;
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_LAUNCHES;
 
@@ -38,22 +37,20 @@ import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_LAUNCHES;
 @Configuration
 @RequiredArgsConstructor
 public class StepConfig {
+
+    private static final int CHUNK_SIZE = 500;
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
     private final FileManagerUtil fileManagerUtil;
     private final RootConfig rootConfig;
     private final FilePathProvider filePathProvider;
-    private final CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> compositeProcessor;
-    private final ItemProcessor<JsonNode, ChunkStore> launchesProcessor;
-    private final ItemProcessor<JsonNode, ChunkStore> agenciesProcessor;
-    private final ItemWriter<Object> jpaEntityWriter;
-    private final ItemWriter<ChunkStore> itemWriter;
-    private final ItemWriterRegistry itemWriterRegistry;
+    private final ItemProcessor<JsonNode, RowSink> launchesProcessor;
+    private final ItemProcessor<JsonNode, RowSink> agenciesProcessor;
+    private final UpsertWriter upsertWriter;
     private final MultiResourceItemReader<JsonNode> multiResourceItemReader;
-    private final ItemReader<CsvEntity<?>> itemReader;
     private final ClientDataService clientDataService;
     private final UrlBuilderUtil urlBuilderUtil;
-    private final int CHUNK_SIZE = 150;
+    private final MediaMigrationService mediaMigrationService;
 
     @Bean
     public Step fetchYearlyLaunchesStep() {
@@ -96,24 +93,17 @@ public class StepConfig {
     public Step cleanupStep() {
         return new StepBuilder("step-cleanup", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    Map<String, Object> jobParametersMap = chunkContext.getStepContext().getJobParameters();
-                    String cleanup = jobParametersMap.getOrDefault("cleanup", null).toString();
+                    Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
+                    Object cleanup = jobParameters.get("cleanup");
 
                     if (cleanup == null) {
                         throw new CleanupException("Cleanup step requires parameters for cleanup");
                     }
 
-                    CleanupType cleanupType = CleanupType.from(cleanup);
-
-                    switch (cleanupType) {
-                        case ONLY_CSV -> fileManagerUtil.deleteAllFiles(rootConfig.getCsvRootFolder());
-                        case ONLY_JSON -> fileManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
-                        case ALL -> {
-                            fileManagerUtil.deleteAllFiles(rootConfig.getCsvRootFolder());
-                            fileManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
-                        }
-                        default -> throw new CleanupException("Unexpected operation: " + cleanup);
-                    };
+                    switch (CleanupType.from(cleanup.toString())) {
+                        case ALL -> fileManagerUtil.deleteAllFiles(rootConfig.getJsonRootFolder());
+                        case NONE -> log.debug("Cleanup skipped; existing JSON retained");
+                    }
 
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
@@ -123,16 +113,26 @@ public class StepConfig {
     }
 
     @Bean
-    public Step launchesETLStep() throws RuntimeException {
-        String folderPath = filePathProvider.getJsonDir(JSON_LAUNCHES.getFolder());
-        if (folderPath.isBlank()) throw new RuntimeException("Json folder not found.");
-        return new StepBuilder("step-process-launches", jobRepository)
-                .<JsonNode, ChunkStore>chunk(CHUNK_SIZE)
+    public Step launchesETLStep() {
+        return loadStep("step-load-launches", JSON_LAUNCHES.getFolder(), launchesProcessor);
+    }
+
+    @Bean
+    public Step agenciesETLStep() {
+        return loadStep("step-load-agencies", JSON_AGENCIES.getFolder(), agenciesProcessor);
+    }
+
+    private Step loadStep(String name, String jsonFolder, ItemProcessor<JsonNode, RowSink> processor) {
+        String folderPath = filePathProvider.getJsonDir(jsonFolder);
+        if (folderPath.isBlank()) {
+            throw new IllegalStateException("Json folder not found for " + jsonFolder);
+        }
+        return new StepBuilder(name, jobRepository)
+                .<JsonNode, RowSink>chunk(CHUNK_SIZE)
                 .transactionManager(platformTransactionManager)
                 .reader(multiResourceItemReader)
-                .processor(launchesProcessor)
-                .writer(itemWriter)
-                .stream(itemWriterRegistry)
+                .processor(processor)
+                .writer(upsertWriter)
                 .faultTolerant()
                 .retry(WebClientResponseException.class)
                 .retryLimit(2)
@@ -141,46 +141,22 @@ public class StepConfig {
                 .build();
     }
 
-    @Bean
-    public Step agenciesETLStep() throws RuntimeException {
-        String folderPath = filePathProvider.getJsonDir(JSON_AGENCIES.getFolder());
-        if (folderPath.isBlank()) throw new RuntimeException("Json folder not found.");
-        return new StepBuilder("step-process-agencies", jobRepository)
-                .<JsonNode, ChunkStore>chunk(CHUNK_SIZE)
-                .transactionManager(platformTransactionManager)
-                .reader(multiResourceItemReader)
-                .processor(agenciesProcessor)
-                .writer(itemWriter)
-                .stream(itemWriterRegistry)
-                .faultTolerant()
-                .retry(WebClientResponseException.class)
-                .retryLimit(2)
-                .listener(new StepContextSetter<>("jsonFolderPath", folderPath))
-                .listener(new StepCompletionListener())
-                .build();
-    }
     /**
-     * KNOWN ISSUE: Duplicate Step Names
-     * <p>
-     * Both latestLaunchesFlow and agenciesFlow reuse importToDatabaseFlow, which creates
-     * steps with identical names (e.g., "process_CountryEntity_1"). This triggers a Spring
-     * Batch warning about duplicate steps affecting restart behavior.
-     * <p>
-     * Current status: Acceptable - steps are not restartable by design and always run from
-     * scratch. The warning is informational and doesn't affect normal operation.
-     * <p>
-     * Future fix: Pass flow context to createStepForEntity() to generate unique step names
-     * like "latestLaunches_process_CountryEntity_1" vs "agencies_process_CountryEntity_1"
-     * <p>
-     * Related: CreateStepForEntity.createStepForEntity(), importToDatabaseFlow()
+     * Copies images into our own storage after the rows are in place. Runs last because it is the
+     * slow, network-bound part and nothing else depends on it.
      */
-    public Step createImportStep(EntityConfig config) {
-        String stepName = "step-process-" + config.getEntityClass().getSimpleName() + "-" + config.getOrder();
-        return new StepBuilder(stepName, jobRepository).<CsvEntity<?>, CsvEntity<?>>chunk(CHUNK_SIZE)
-                .reader(itemReader)
-                .processor(compositeProcessor)
-                .writer(jpaEntityWriter)
-                .listener(new StepContextSetter<>("entityConfig", config))
+    @Bean
+    public Step mediaStep() {
+        return new StepBuilder("step-migrate-media", jobRepository)
+                .tasklet((contribution, chunkContext) -> {
+                    Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
+                    StorageType storage = StorageType.from(String.valueOf(jobParameters.get("storage")));
+                    StoreOperation operation = StoreOperation.from(String.valueOf(jobParameters.get("operation")));
+
+                    int migrated = mediaMigrationService.migrate(storage, operation);
+                    contribution.incrementWriteCount(migrated);
+                    return RepeatStatus.FINISHED;
+                }, platformTransactionManager)
                 .listener(new StepCompletionListener())
                 .transactionManager(platformTransactionManager)
                 .build();

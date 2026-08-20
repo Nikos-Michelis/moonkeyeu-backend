@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.unit.strategies.registry;
 
-import com.moonkeyeu.etl.api.dto.storage.StorageType;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.StorageType;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidStoreProviderException;
 import com.moonkeyeu.etl.api.strategy.StorageStrategy;
 import com.moonkeyeu.etl.api.strategy.registry.StorageStrategyRegistry;

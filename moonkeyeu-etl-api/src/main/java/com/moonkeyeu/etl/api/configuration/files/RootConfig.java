@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Configuration;
 public class RootConfig {
     @Value("${application.path.root.data.folder.json}")
     private String jsonRootFolder;
-    @Value("${application.path.root.data.folder.csv}")
-    private String csvRootFolder;
     @Value("${application.path.root.data.folder.images}")
     private String imagesRootFolder;
 }

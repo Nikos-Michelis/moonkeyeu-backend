@@ -2,10 +2,9 @@ package com.moonkeyeu.etl.api.integration.client;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.config.TestEntity;
-import com.moonkeyeu.etl.api.dto.ThrottleResponse;
+import com.moonkeyeu.etl.api.dto.LL2Throttle;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.service.impl.client.ClientDataServiceImpl;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
@@ -24,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import tools.jackson.databind.JsonNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,8 +46,8 @@ class ClientDataServiceImplIT {
     private ObjectMapper objectMapper;
     private UrlBuilderUtil urlBuilderUtil;
     private JsonGenerator jsonGenerator;
-    private ThrottleResponse responseZeroUseSeconds;
-    private ThrottleResponse responseUseSeconds;
+    private LL2Throttle responseZeroUseSeconds;
+    private LL2Throttle responseUseSeconds;
     @TempDir
     Path tempDir;
 
@@ -69,8 +69,8 @@ class ClientDataServiceImplIT {
         String baseUrl = String.format("http://localhost:%d", mockWebServer.getPort());
         Path outputFile = tempDir.resolve("output.json");
         jsonGenerator = objectMapper.getFactory().createGenerator(Files.newOutputStream(outputFile), JsonEncoding.UTF8);
-        responseZeroUseSeconds = new ThrottleResponse(15, 10, 1, 3600L, "123.123.2.123");
-        responseUseSeconds = new ThrottleResponse(15, 10, 1, 3600L, "123.123.0.123");
+        responseZeroUseSeconds = new LL2Throttle(15, 10, 1, 3600L, "123.123.2.123");
+        responseUseSeconds = new LL2Throttle(15, 10, 1, 3600L, "123.123.0.123");
 
         WebClient webClient = WebClient.builder()
                 .baseUrl(mockWebServer.url(baseUrl).toString())

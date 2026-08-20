@@ -1,6 +1,7 @@
 package com.moonkeyeu.etl.api.unit.service.local;
 
-import com.moonkeyeu.etl.api.model.images.RocketImageEntity;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.MediaTarget;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.PendingImage;
 import com.moonkeyeu.etl.api.service.LocalStorageService;
 import com.moonkeyeu.etl.api.service.MediaDownloadService;
 import com.moonkeyeu.etl.api.service.impl.local.LocalMediaServiceImpl;
@@ -35,11 +36,11 @@ class LocalMediaServiceImplTest {
 
     @InjectMocks
     private LocalMediaServiceImpl localMediaService;
-    private RocketImageEntity imageEntity;
+    private PendingImage imageEntity;
 
     @BeforeEach
     void setUp() {
-        imageEntity = new RocketImageEntity();
+        imageEntity = new PendingImage(MediaTarget.ROCKET_CONF_IMAGES, 1L, null);
         ReflectionTestUtils.setField(localMediaService, "localHostUrl", "http://localhost:8080/images");
     }
 
@@ -51,7 +52,7 @@ class LocalMediaServiceImplTest {
 
         String localDir = "storage/rockets";
 
-        Path expectedPath = Paths.get(localDir, "falcon9.png");
+        Path expectedPath = Paths.get(localDir, "rockets", "falcon9.png");
 
         when(localStorageService.existsByKey(expectedPath))
                 .thenReturn(true);
@@ -73,7 +74,7 @@ class LocalMediaServiceImplTest {
 
         imageEntity.setImageUrl("https://images.test.com/starship.jpg");
         String localDir = "storage/rockets";
-        Path expectedPath = Paths.get(localDir, "starship.jpg");
+        Path expectedPath = Paths.get(localDir, "rockets", "starship.jpg");
         byte[] data = "image-content".getBytes();
 
         when(localStorageService.existsByKey(expectedPath))
@@ -87,7 +88,7 @@ class LocalMediaServiceImplTest {
             assertThat(result)
                     .isEqualTo("http://localhost:8080/images/rockets/starship.jpg");
             filesMock.verify(() ->
-                    Files.createDirectories(Paths.get(localDir)));
+                    Files.createDirectories(Paths.get(localDir, "rockets")));
 
             verify(mediaDownloadService)
                     .download(imageEntity.getImageUrl());
@@ -135,7 +136,7 @@ class LocalMediaServiceImplTest {
 
         imageEntity.setImageUrl("https://images.test.com/image.png");
         String localDir = "storage/rockets";
-        Path expectedPath = Paths.get(localDir, "image.png");
+        Path expectedPath = Paths.get(localDir, "rockets", "image.png");
 
         when(localStorageService.existsByKey(expectedPath))
                 .thenReturn(false);

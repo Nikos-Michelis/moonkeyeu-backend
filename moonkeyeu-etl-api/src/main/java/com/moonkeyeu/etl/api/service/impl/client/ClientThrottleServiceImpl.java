@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.service.impl.client;
 
-import com.moonkeyeu.etl.api.dto.ThrottleResponse;
+import com.moonkeyeu.etl.api.dto.LL2Throttle;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.settings.exceptions.RemoteServiceException;
 import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
@@ -26,7 +26,7 @@ public class ClientThrottleServiceImpl implements ClientThrottleService {
     }
 
     @Override
-    public Mono<ThrottleResponse> fetchThrottle() {
+    public Mono<LL2Throttle> fetchThrottle() {
         URI throttleUri = urlBuilderUtil.getThrottleUrl();
         return webClient.get()
                 .uri(throttleUri)
@@ -41,6 +41,6 @@ public class ClientThrottleServiceImpl implements ClientThrottleService {
                                 Mono.error(new RemoteServiceException("Bad request to remote service.", HttpStatus.BAD_REQUEST)
                         )
                 )
-                .bodyToMono(ThrottleResponse.class);
+                .bodyToMono(LL2Throttle.class);
     }
 }

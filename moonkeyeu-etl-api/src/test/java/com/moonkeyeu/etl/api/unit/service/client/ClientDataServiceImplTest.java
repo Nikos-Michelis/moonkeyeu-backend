@@ -3,7 +3,7 @@ package com.moonkeyeu.etl.api.unit.service.client;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moonkeyeu.etl.api.dto.ThrottleResponse;
+import com.moonkeyeu.etl.api.dto.LL2Throttle;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.service.impl.client.ClientDataServiceImpl;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
@@ -50,20 +50,20 @@ class ClientDataServiceImplTest {
     @TempDir
     Path tempDir;
     private ClientDataServiceImpl clientDataService;
-    private ThrottleResponse responseZeroUseSeconds;
-    private ThrottleResponse responseUseSeconds;
+    private LL2Throttle responseZeroUseSeconds;
+    private LL2Throttle responseUseSeconds;
 
     @BeforeEach
     void setUp() {
         clientDataService = new ClientDataServiceImpl(webClient, throttleService, jsonStreamFileWriterUtil);
-        responseZeroUseSeconds = new ThrottleResponse(
+        responseZeroUseSeconds = new LL2Throttle(
                 15,
                 10,
                 0,
                 3600L,
                 "123.123.0.123"
         );
-        responseUseSeconds = new ThrottleResponse(
+        responseUseSeconds = new LL2Throttle(
                 15,
                 10,
                 10,

@@ -1,9 +1,9 @@
 package com.moonkeyeu.etl.api.service.impl.job;
 
 import com.moonkeyeu.etl.api.configuration.batch.jobs.JobParamsBuilder;
-import com.moonkeyeu.etl.api.dto.storage.CleanupType;
-import com.moonkeyeu.etl.api.dto.storage.StorageType;
-import com.moonkeyeu.etl.api.dto.storage.StoreOperation;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.CleanupType;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.StorageType;
+import com.moonkeyeu.etl.api.configuration.batch.jobs.StoreOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
@@ -89,7 +89,7 @@ public class JobExecutionDecider {
          JobParameters jobParameters = JobParamsBuilder.builder()
                  .storage(StorageType.S3_STORAGE)
                  .operation(StoreOperation.GET_URL)
-                 .cleanup(CleanupType.ONLY_CSV)
+                 .cleanup(CleanupType.NONE)
                  .build()
                  .toJobParameters();
 
