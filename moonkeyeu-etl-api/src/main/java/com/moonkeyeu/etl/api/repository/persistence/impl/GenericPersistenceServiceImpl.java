@@ -22,7 +22,7 @@ public class GenericPersistenceServiceImpl implements GenericPersistenceService 
         Object repository = repositories.getRepositoryFor(object.getClass())
                 .orElseThrow(() -> new IllegalStateException("Can't find repository for entity of type " + object.getClass()));
         JpaRepository<T, Long> jpaRepository = (JpaRepository<T, Long>) repository;
-        return jpaRepository.saveAndFlush(object);
+        return jpaRepository.save(object);
     }
 
     @Override
@@ -33,6 +33,6 @@ public class GenericPersistenceServiceImpl implements GenericPersistenceService 
         Object repository = repositories.getRepositoryFor(first.getClass())
                 .orElseThrow(() -> new IllegalStateException("Can't find repository for entity of type " + first.getClass()));
         JpaRepository<T, Long> jpaRepository = (JpaRepository<T, Long>) repository;
-        jpaRepository.saveAllAndFlush(entities.getItems());
+        jpaRepository.saveAll(entities.getItems());
     }
 }

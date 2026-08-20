@@ -15,7 +15,7 @@ import java.util.Set;
 @Table(name = "net_precision", schema = "moonkey_db")
 public class NetPrecision {
     @Id
-    @Column(name = "net_precision_id", nullable = false)
+    @Column(name = "id", nullable = false)
     @EqualsAndHashCode.Include
     private Integer netPrecisionId;
     @Size(max = 45)

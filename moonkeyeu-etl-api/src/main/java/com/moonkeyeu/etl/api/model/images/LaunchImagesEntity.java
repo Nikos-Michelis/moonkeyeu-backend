@@ -17,7 +17,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LaunchImagesEntity implements CsvEntity<Object>, ImageEntity {
     @Id
-    @Column(name = "image_id")
+    @Column(name = "id")
     @JsonProperty("launch_image_id")
     @EqualsAndHashCode.Include
     private Long image_id;

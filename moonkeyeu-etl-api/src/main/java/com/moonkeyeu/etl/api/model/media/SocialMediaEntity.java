@@ -14,7 +14,7 @@ import lombok.*;
 @Table(name = "social_media", schema = "moonkey_db")
 public class SocialMediaEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "social_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long social_id;
     @Basic

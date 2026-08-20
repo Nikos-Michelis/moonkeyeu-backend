@@ -16,7 +16,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrbitEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "orbit_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long orbit_id;
     @Basic

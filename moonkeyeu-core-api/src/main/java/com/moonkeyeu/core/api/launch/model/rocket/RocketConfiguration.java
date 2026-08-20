@@ -43,7 +43,7 @@ import java.util.Set;
 @Table(name = "rocket_configuration", schema = "moonkey_db")
 public class RocketConfiguration {
     @Id
-    @Column(name = "rocket_conf_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long rocketConfId;
     @Basic

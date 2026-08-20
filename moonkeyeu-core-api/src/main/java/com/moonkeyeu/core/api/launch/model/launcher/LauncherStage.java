@@ -14,7 +14,7 @@ import lombok.*;
 @Table(name = "launcher_stage", schema = "moonkey_db")
 public class LauncherStage {
     @Id
-    @Column(name = "launcher_stage_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long launcherStageId;
     @Basic

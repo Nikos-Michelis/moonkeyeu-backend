@@ -15,7 +15,7 @@ import java.util.Objects;
 @Table(name = "social_media", schema = "moonkey_db")
 public class SocialMedia {
     @Id
-    @Column(name = "social_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long socialId;
     @Basic

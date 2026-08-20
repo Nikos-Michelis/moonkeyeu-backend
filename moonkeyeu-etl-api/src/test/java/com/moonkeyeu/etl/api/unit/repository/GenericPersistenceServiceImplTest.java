@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.infrastructure.item.Chunk;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -23,11 +23,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class GenericPersistenceServiceImplTest {
     @Mock
-    private WebApplicationContext applicationContext;
-    @Mock
     private Repositories repositories;
     @Mock
-    private CrudRepository<TestEntity, Long> crudRepository;
+    private JpaRepository<TestEntity, Long> jpaRepository;
     @InjectMocks
     private GenericPersistenceServiceImpl genericPersistenceService;
     private TestEntity testEntity;
@@ -42,14 +40,14 @@ class GenericPersistenceServiceImplTest {
     void save_shouldSaveEntity() {
 
         when(repositories.getRepositoryFor(TestEntity.class))
-                .thenReturn(Optional.of(crudRepository));
-        when(crudRepository.save(testEntity))
+                .thenReturn(Optional.of(jpaRepository));
+        when(jpaRepository.save(testEntity))
                 .thenReturn(testEntity);
 
         TestEntity result = genericPersistenceService.save(testEntity);
 
         assertThat(result).isEqualTo(testEntity);
-        verify(crudRepository).save(testEntity);
+        verify(jpaRepository).save(testEntity);
     }
 
     @Test
@@ -72,11 +70,11 @@ class GenericPersistenceServiceImplTest {
         Chunk<Object> chunk = new Chunk<>(List.of(testEntity));
 
         when(repositories.getRepositoryFor(TestEntity.class))
-                .thenReturn(Optional.of(crudRepository));
+                .thenReturn(Optional.of(jpaRepository));
 
         genericPersistenceService.saveAll(chunk);
 
-        verify(crudRepository).saveAll(List.of(testEntity));
+        verify(jpaRepository).saveAll(List.of(testEntity));
     }
 
     @Test

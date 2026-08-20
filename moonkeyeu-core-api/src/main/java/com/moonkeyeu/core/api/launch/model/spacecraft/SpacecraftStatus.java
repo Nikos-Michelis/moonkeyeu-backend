@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name = "spacecraft_status", schema = "moonkey_db")
 public class SpacecraftStatus {
     @Id
-    @Column(name = "status_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long statusId;
     @Basic

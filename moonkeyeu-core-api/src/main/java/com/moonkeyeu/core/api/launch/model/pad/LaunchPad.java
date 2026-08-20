@@ -47,7 +47,7 @@ import java.util.Set;
 @Table(name = "launch_pad", schema = "moonkey_db")
 public class LaunchPad {
     @Id
-    @Column(name = "launch_pad_id")
+    @Column(name = "id")
     private Long launchPadId;
     @Basic
     @Column(name = "name")

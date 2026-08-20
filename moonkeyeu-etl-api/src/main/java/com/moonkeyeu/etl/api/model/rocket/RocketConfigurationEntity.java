@@ -18,7 +18,7 @@ import java.sql.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RocketConfigurationEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "rocket_conf_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long rocket_conf_id;
     @Basic

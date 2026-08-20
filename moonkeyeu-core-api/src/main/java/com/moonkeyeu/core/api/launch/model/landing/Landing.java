@@ -18,12 +18,12 @@ import java.util.Set;
 @Table(name = "landing", schema = "moonkey_db")
 public class Landing {
     @Id
-    @Column(name = "landing_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long landingId;
     @Basic
     @Column(name = "attempt")
-    private Byte attempt;
+    private Boolean attempt;
     @Basic
     @Column(name = "success")
     private String success;

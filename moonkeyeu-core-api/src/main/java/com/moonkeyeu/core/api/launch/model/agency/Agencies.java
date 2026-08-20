@@ -52,7 +52,7 @@ import java.util.Set;
 @Table(name = "agencies", schema = "moonkey_db")
 public class Agencies {
     @Id
-    @Column(name = "agency_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long agencyId;
     @Basic

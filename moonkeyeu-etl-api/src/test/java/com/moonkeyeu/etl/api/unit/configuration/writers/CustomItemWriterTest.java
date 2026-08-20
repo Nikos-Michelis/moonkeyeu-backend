@@ -1,5 +1,6 @@
 package com.moonkeyeu.etl.api.unit.configuration.writers;
 
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.moonkeyeu.etl.api.config.TestEntity;
 import com.moonkeyeu.etl.api.configuration.batch.writers.CustomItemWriter;
 import com.moonkeyeu.etl.api.model.CsvEntity;
@@ -30,6 +31,8 @@ class CustomItemWriterTest {
 
     @Mock
     private Resource resource;
+    @Mock
+    private CsvMapper csvMapper;
     @InjectMocks
     @Spy
     private CustomItemWriter customItemWriter;

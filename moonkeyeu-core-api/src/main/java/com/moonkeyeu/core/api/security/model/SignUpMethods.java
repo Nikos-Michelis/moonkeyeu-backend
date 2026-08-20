@@ -6,9 +6,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -18,14 +18,16 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "entry_methods")
+@EntityListeners(AuditingEntityListener.class)
 @EqualsAndHashCode(of = "id")
 public class SignUpMethods {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "method_id")
+    @Column(name = "id")
     private Long id;
     @Column(name = "provider")
-    private String provider;
+    @Enumerated(EnumType.STRING)
+    private SignUpMethod provider;
     @ManyToMany(mappedBy = "signUpMethods")
     @JsonIgnore
     private Set<User> users;
@@ -35,8 +37,4 @@ public class SignUpMethods {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false, unique = false)
     private Instant updatedAt;
-    public void deleteSignUpMethods(SignUpMethods signUpMethods) {
-        signUpMethods.getUsers().removeIf(method -> method.getSignUpMethods().remove(signUpMethods));
-        this.users.clear();
-    }
 }

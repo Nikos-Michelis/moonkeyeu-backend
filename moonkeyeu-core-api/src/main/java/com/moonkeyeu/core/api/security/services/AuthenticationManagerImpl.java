@@ -1,6 +1,6 @@
 package com.moonkeyeu.core.api.security.services;
 
-import com.moonkeyeu.core.api.security.model.SignUpProvider;
+import com.moonkeyeu.core.api.security.model.SignUpMethod;
 import com.moonkeyeu.core.api.security.services.lock.UserStatusService;
 import com.moonkeyeu.core.api.user.model.User;
 import com.moonkeyeu.core.api.user.services.impl.UserDetailsServiceImpl;
@@ -37,7 +37,7 @@ public class AuthenticationManagerImpl implements AuthenticationManager {
             User user = (User) userDetailsService.loadUserByUsername(authentication.getName());
 
             boolean hasSignUpMethod = user.getSignUpMethods().stream()
-                    .anyMatch(method -> method.getProvider().equalsIgnoreCase(SignUpProvider.Password.name()));
+                    .anyMatch(method -> method.getProvider().name().equalsIgnoreCase(SignUpMethod.Password.name()));
 
             if (hasSignUpMethod) {
                 userStatusService.attemptsIncrement(user);

@@ -12,15 +12,24 @@ jwt:
     refresh:
       key: classpath:jwt-keys/refresh-token/refresh-token-private.pem
 spring:
-  sql:
-    init:
-      mode: always
-      data-locations: classpath:test_db/*.sql
 
   jpa:
-    defer-datasource-initialization: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  flyway:
+    clean-disabled: false
+    enabled: true
+    user: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
+    password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
+    locations:
+      - classpath:db/migration/schema
+      - classpath:db/migration/seed
+    baseline-version: 1
 
   mail:
     host: localhost

@@ -16,7 +16,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SpacecraftEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "spacecraft_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long spacecraft_id;
     @Basic

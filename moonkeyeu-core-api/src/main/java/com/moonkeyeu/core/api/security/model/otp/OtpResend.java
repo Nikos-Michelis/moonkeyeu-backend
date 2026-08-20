@@ -15,7 +15,7 @@ import java.time.Instant;
 public class OtpResend {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "resend_id")
+    @Column(name = "id")
     private Long resendId;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")

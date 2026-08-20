@@ -15,7 +15,7 @@ import java.util.Objects;
 public class AstronautHasCountry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "astronaut_country_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long astronautCountryId;
     @ManyToOne(fetch = FetchType.LAZY)

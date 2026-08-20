@@ -12,7 +12,7 @@ import lombok.*;
 @Table(name = "info_urls", schema = "moonkey_db")
 public class InfoUrlEntity {
     @Id
-    @Column(name = "info_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private String infoId;
     @Basic

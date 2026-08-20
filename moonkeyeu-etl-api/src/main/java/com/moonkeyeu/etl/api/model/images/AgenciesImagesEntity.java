@@ -16,11 +16,11 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgenciesImagesEntity implements CsvEntity<Object>, ImageEntity {
     @Id
-    @Column(name = "image_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long image_id;
     @Basic
-    @Column(name = "image_name")
+    @Column(name = "name")
     private String image_name;
     @Basic
     @Column(name = "image_url")

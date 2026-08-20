@@ -4,13 +4,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum SignUpProvider {
+public enum SignUpMethod {
     Google("google"),
     Github("github"),
     Facebook("facebook"),
-
     Password("password");
 
     @Getter
-    private final String providers;
+    private final String provider;
 }

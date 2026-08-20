@@ -14,11 +14,11 @@ import java.util.Objects;
 @Table(name = "agencies_images", schema = "moonkey_db")
 public class AgenciesImages {
     @Id
-    @Column(name = "image_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long imageId;
     @Basic
-    @Column(name = "image_name")
+    @Column(name = "name")
     private String imageName;
     @Basic
     @Column(name = "image_url")

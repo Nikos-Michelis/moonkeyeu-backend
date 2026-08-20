@@ -13,7 +13,7 @@ import lombok.*;
 @Table(name = "info_urls", schema = "moonkey_db")
 public class InfoUrlsEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "info_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private String info_id;
     @Basic

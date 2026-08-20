@@ -17,12 +17,12 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RocketImageEntity implements CsvEntity<Object>, ImageEntity {
     @Id
-    @Column(name = "image_id")
+    @Column(name = "id")
     @JsonProperty("rocket_image_id")
     @EqualsAndHashCode.Include
     private Long image_id;
     @Basic
-    @Column(name = "image_name")
+    @Column(name = "name")
     @JsonProperty("rocket_image_name")
     private String image_name;
     @Basic

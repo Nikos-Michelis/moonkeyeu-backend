@@ -39,11 +39,11 @@ import java.util.Set;
 @Table(name = "spacecraft_configuration", schema = "moonkey_db")
 public class SpacecraftConfiguration {
     @Id
-    @Column(name = "spacecraft_conf_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long spacecraftConfId;
     @Basic
-    @Column(name = "spacecraft_conf_name")
+    @Column(name = "name")
     private String spacecraftConfName;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")

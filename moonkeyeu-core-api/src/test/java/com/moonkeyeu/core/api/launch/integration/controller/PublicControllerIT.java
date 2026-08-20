@@ -29,7 +29,7 @@ public class PublicControllerIT {
                 .uri("/public/nasa/apod")
                 .exchange()
                 .expectStatus()
-                .is5xxServerError()
+                .is2xxSuccessful()
                 .expectBody()
                 .consumeWith(System.out::println);
     }

@@ -16,7 +16,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LauncherStageEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "launcher_stage_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long launcher_stage_id;
     @Basic
@@ -28,7 +28,7 @@ public class LauncherStageEntity implements CsvEntity<Object> {
     private Boolean reused;
     @Basic
     @Column(name = "launcher_flight_number")
-    private String launcher_flight_number;
+    private Integer launcher_flight_number;
     @Basic
     @Column(name = "rocket_id")
     private Long rocket_id;

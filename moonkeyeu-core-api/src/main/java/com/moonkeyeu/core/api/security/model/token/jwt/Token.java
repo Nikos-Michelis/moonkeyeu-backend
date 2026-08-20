@@ -17,8 +17,8 @@ import java.time.Instant;
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "token_id", unique = true)
-    private Integer id;
+    @Column(name = "id")
+    private Long id;
     @Column(name = "jti")
     private String jti;
     @Column(name = "token", unique = true)

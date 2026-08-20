@@ -21,7 +21,7 @@ import java.time.Instant;
 public class BookmarkList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bookmark_list_id")
+    @Column(name = "id")
     private Long bookmarkListId;
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "bookmark_id")

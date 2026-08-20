@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdatesEntity implements CsvEntity<Object> {
     @Id
-    @Column(name = "update_id")
+    @Column(name = "id")
     @EqualsAndHashCode.Include
     private Long update_id;
     @Basic

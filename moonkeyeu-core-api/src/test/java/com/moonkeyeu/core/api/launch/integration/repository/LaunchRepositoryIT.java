@@ -69,7 +69,7 @@ class LaunchRepositoryIT {
     void findUpcomingLaunchesByAgencyId() {
         Integer nasa = 44;
         Optional<Launch> launch = launchRepository.findUpcomingLaunchesByAgencyId(nasa);
-        assertFalse(launch.isPresent());
+        assertTrue(launch.isPresent());
     }
 
     @Test
@@ -83,7 +83,7 @@ class LaunchRepositoryIT {
     void findUpcomingLaunchesByLaunchPadId() {
         Integer location = 87;
         Optional<Launch> launch = launchRepository.findUpcomingLaunchesByLaunchPadId(location);
-        assertFalse(launch.isPresent());
+        assertTrue(launch.isPresent());
     }
     @Test
     void findAll() {
