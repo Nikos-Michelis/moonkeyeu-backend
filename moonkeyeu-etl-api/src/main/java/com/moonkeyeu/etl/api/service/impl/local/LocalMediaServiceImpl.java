@@ -4,6 +4,7 @@ import com.moonkeyeu.etl.api.pipeline.ll2.media.StorableImage;
 import com.moonkeyeu.etl.api.service.LocalMediaService;
 import com.moonkeyeu.etl.api.service.LocalStorageService;
 import com.moonkeyeu.etl.api.service.MediaDownloadService;
+import com.moonkeyeu.etl.api.settings.exceptions.LocalStorageException;
 import com.moonkeyeu.etl.api.utils.ClientUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,11 @@ public class LocalMediaServiceImpl implements LocalMediaService {
 
     @Override
     public String saveMediaLocal(StorableImage media, String localDir) throws IOException {
+
+        if (media == null) {
+            throw new LocalStorageException("Media entity should not be null or empty");
+        }
+
         String fileName = getFileName(media);
         Path directory = Paths.get(localDir, media.getFolder());
         Path filePath = directory.resolve(fileName);

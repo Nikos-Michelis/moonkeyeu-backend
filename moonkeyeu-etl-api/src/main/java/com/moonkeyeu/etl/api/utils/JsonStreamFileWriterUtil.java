@@ -1,16 +1,16 @@
 package com.moonkeyeu.etl.api.utils;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerator;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonEncoding;
+import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,12 +29,10 @@ public class JsonStreamFileWriterUtil {
                 Files.createDirectories(path.getParent());
             }
 
-            JsonGenerator generator = objectMapper
-                    .getFactory()
-                    .createGenerator(path.toFile(), JsonEncoding.UTF8);
+            JsonGenerator generator = objectMapper.createGenerator(path.toFile(), JsonEncoding.UTF8);
 
             generator.writeStartObject();
-            generator.writeArrayFieldStart("all_results");
+            generator.writeArrayPropertyStart("all_results");
 
                     return generator;
         }).subscribeOn(Schedulers.boundedElastic());
@@ -48,8 +46,8 @@ public class JsonStreamFileWriterUtil {
 
         return Mono.fromRunnable(() -> {
             try {
-                generator.writeObject(response);
-            } catch (IOException e) {
+                generator.writeTree(response);
+            } catch (JacksonException e) {
                 throw new RuntimeException("Error writing response", e);
             }
         }).subscribeOn(Schedulers.boundedElastic()).then();
@@ -60,7 +58,7 @@ public class JsonStreamFileWriterUtil {
             generator.writeEndArray();
             generator.writeEndObject();
             generator.close();
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("Error closing generator: " + e.getMessage());
         }
     }

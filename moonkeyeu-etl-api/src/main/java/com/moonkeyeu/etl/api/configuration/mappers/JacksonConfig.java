@@ -1,11 +1,10 @@
 package com.moonkeyeu.etl.api.configuration.mappers;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 public class JacksonConfig {
@@ -14,8 +13,6 @@ public class JacksonConfig {
     @Primary
     public ObjectMapper objectMapper() {
         JsonFactory jsonFactory = new JsonFactory();
-        ObjectMapper objectMapper = new ObjectMapper(jsonFactory);
-        objectMapper.registerModule(new JavaTimeModule());
-        return objectMapper;
+        return new ObjectMapper(jsonFactory);
     }
 }

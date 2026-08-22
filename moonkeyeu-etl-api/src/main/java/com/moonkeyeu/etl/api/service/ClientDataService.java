@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.service;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.JsonNode;
 import reactor.core.publisher.Mono;
 

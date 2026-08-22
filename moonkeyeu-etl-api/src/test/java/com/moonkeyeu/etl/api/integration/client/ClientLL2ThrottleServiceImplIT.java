@@ -2,7 +2,7 @@ package com.moonkeyeu.etl.api.integration.client;
 
 import com.moonkeyeu.etl.api.service.impl.client.ClientThrottleServiceImpl;
 import com.moonkeyeu.etl.api.settings.exceptions.RemoteServiceException;
-import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
+import com.moonkeyeu.etl.api.utils.LL2URIBuilder;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -26,20 +26,20 @@ class ClientLL2ThrottleServiceImplIT {
 
     private MockWebServer mockWebServer;
     private ClientThrottleServiceImpl service;
-    private UrlBuilderUtil urlBuilderUtil;
+    private LL2URIBuilder LL2URIBuilder;
 
     @BeforeEach
     void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
 
-        urlBuilderUtil = mock(UrlBuilderUtil.class);
+        LL2URIBuilder = mock(LL2URIBuilder.class);
 
         WebClient webClient = WebClient.builder()
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
 
-        service = new ClientThrottleServiceImpl(webClient, urlBuilderUtil);
+        service = new ClientThrottleServiceImpl(webClient, LL2URIBuilder);
     }
 
     @AfterEach
@@ -65,7 +65,7 @@ class ClientLL2ThrottleServiceImplIT {
                 .setBody(body)
                 .addHeader("Content-Type", "application/json"));
 
-        when(urlBuilderUtil.getThrottleUrl())
+        when(LL2URIBuilder.throttleURI())
                 .thenReturn(URI.create(mockWebServer.url("/throttle").toString()));
 
         StepVerifier.create(service.fetchThrottle())
@@ -86,7 +86,7 @@ class ClientLL2ThrottleServiceImplIT {
                     .setResponseCode(i));
         }
 
-        when(urlBuilderUtil.getThrottleUrl())
+        when(LL2URIBuilder.throttleURI())
                 .thenReturn(URI.create(mockWebServer.url("/throttle").toString()));
 
         StepVerifier.create(service.fetchThrottle())
@@ -106,7 +106,7 @@ class ClientLL2ThrottleServiceImplIT {
                     .setResponseCode(i));
         }
 
-        when(urlBuilderUtil.getThrottleUrl())
+        when(LL2URIBuilder.throttleURI())
                 .thenReturn(URI.create(mockWebServer.url("/throttle").toString()));
 
         StepVerifier.create(service.fetchThrottle())

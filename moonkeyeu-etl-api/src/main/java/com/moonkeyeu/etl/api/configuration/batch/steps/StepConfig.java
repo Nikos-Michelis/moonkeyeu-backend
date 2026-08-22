@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.configuration.batch.steps;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepCompletionListener;
 import com.moonkeyeu.etl.api.configuration.batch.listeners.StepContextSetter;
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
@@ -14,7 +14,7 @@ import com.moonkeyeu.etl.api.configuration.batch.writers.UpsertWriter;
 import com.moonkeyeu.etl.api.service.ClientDataService;
 import com.moonkeyeu.etl.api.settings.exceptions.CleanupException;
 import com.moonkeyeu.etl.api.utils.FileManagerUtil;
-import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
+import com.moonkeyeu.etl.api.utils.LL2URIBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.repository.JobRepository;
@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.net.URI;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static com.moonkeyeu.etl.api.configuration.files.JsonGroup.JSON_AGENCIES;
@@ -49,15 +51,19 @@ public class StepConfig {
     private final UpsertWriter upsertWriter;
     private final MultiResourceItemReader<JsonNode> multiResourceItemReader;
     private final ClientDataService clientDataService;
-    private final UrlBuilderUtil urlBuilderUtil;
+    private final LL2URIBuilder LL2URIBuilder;
     private final MediaMigrationService mediaMigrationService;
 
     @Bean
     public Step fetchYearlyLaunchesStep() {
+        LocalDate windowStart = LocalDate.now().minusMonths(1);
+        LocalDate windowEnd =  LocalDate.now().plusMonths(12);
+        URI uri = LL2URIBuilder.launchesBetweenURI(windowStart, windowEnd);
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
+
         return new StepBuilder("step-fetch-yearly-launches", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    clientDataService.fetchAll(urlBuilderUtil.getLaunchesUrlForWindow(), launchesJsonFile).block();
+                    clientDataService.fetchAll(uri, launchesJsonFile).block();
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .transactionManager(platformTransactionManager)
@@ -66,10 +72,13 @@ public class StepConfig {
 
     @Bean
     public Step fetchAllLaunchesStep() {
+        LocalDate windowStart = LocalDate.now().minusYears(5);
+        URI uri = LL2URIBuilder.launchesFromURI(windowStart);
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
+
         return new StepBuilder("step-fetch-all-launches", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    clientDataService.fetchAll(urlBuilderUtil.getAllLatestLaunchesUrl(), launchesJsonFile).block();
+                    clientDataService.fetchAll(uri, launchesJsonFile).block();
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .transactionManager(platformTransactionManager)
@@ -79,9 +88,10 @@ public class StepConfig {
     @Bean
     public Step fetchAgenciesStep() {
         String agenciesJsonFile = filePathProvider.getJsonSource(JSON_AGENCIES.getFolder(), JSON_AGENCIES.getFile());
+        URI uri = LL2URIBuilder.allAgenciesURI();
         return new StepBuilder("step-fetch-agencies", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    clientDataService.fetchAll(urlBuilderUtil.baseAgenciesUrl(), agenciesJsonFile).block();
+                    clientDataService.fetchAll(uri, agenciesJsonFile).block();
                     return RepeatStatus.FINISHED;
                 }, platformTransactionManager)
                 .listener(new StepCompletionListener())
@@ -141,10 +151,6 @@ public class StepConfig {
                 .build();
     }
 
-    /**
-     * Copies images into our own storage after the rows are in place. Runs last because it is the
-     * slow, network-bound part and nothing else depends on it.
-     */
     @Bean
     public Step mediaStep() {
         return new StepBuilder("step-migrate-media", jobRepository)

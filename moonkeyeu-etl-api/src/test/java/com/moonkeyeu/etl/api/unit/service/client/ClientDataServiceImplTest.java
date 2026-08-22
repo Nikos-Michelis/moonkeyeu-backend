@@ -1,8 +1,9 @@
 package com.moonkeyeu.etl.api.unit.service.client;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.test.util.ReflectionTestUtils;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.dto.LL2Throttle;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.service.impl.client.ClientDataServiceImpl;
@@ -34,7 +35,7 @@ import static org.mockito.Mockito.*;
 class ClientDataServiceImplTest {
 
     @Mock
-    WebClient webClient;
+    private WebClient webClient;
     @Mock
     private ClientThrottleService throttleService;
     @Mock
@@ -70,6 +71,8 @@ class ClientDataServiceImplTest {
                 3600L,
                 "123.123.0.123"
         );
+        ReflectionTestUtils.setField(clientDataService, "MAX_RETRIES", 30);
+        ReflectionTestUtils.setField(clientDataService, "RETRY_DELAY", 1);
     }
 
     private JsonNode jsonFromFile(String pathResources) throws IOException {
@@ -171,7 +174,6 @@ class ClientDataServiceImplTest {
         JsonNode page1 = jsonFromFile("/page_1.json");
         JsonNode finalPage = jsonFromFile("/page_final.json");
         URI url = URI.create("https://api.example.com/data");
-        String fileName = tempDir.resolve("output.json").toString();
 
         // when
         when(throttleService.fetchThrottle()).thenReturn(Mono.just(responseUseSeconds));
@@ -199,7 +201,6 @@ class ClientDataServiceImplTest {
         JsonNode page1 = jsonFromFile("/page_1.json");
         JsonNode finalPage = jsonFromFile("/page_final.json");
         URI url = URI.create("https://api.example.com/data");
-        String fileName = tempDir.resolve("output.json").toString();
         // when
         when(throttleService.fetchThrottle()).thenReturn(Mono.just(responseZeroUseSeconds));
         when(webClient.get()).thenReturn(requestHeadersUriSpec);

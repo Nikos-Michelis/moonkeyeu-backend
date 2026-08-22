@@ -1,9 +1,9 @@
 package com.moonkeyeu.etl.api.configuration.batch.readers;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidFileTypeException;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +39,7 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
         }
 
         while (parser.nextToken() != null) {
-            /**
+            /*
              * If the parser is currently at the start of a JSON object inside a "results" array,
              * read the entire object into a JsonNode and return it.
              * This allows streaming one object at a time without loading the whole array into memory.
@@ -47,16 +47,16 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
             if (inResultsArray && parser.currentToken() == JsonToken.START_OBJECT) {
                 return mapper.readTree(parser);
             }
-            /**
+            /*
              * If the parser is currently at the field name "results",
              * move the parser to the start of the array (the value of "results")
              * and set inResultsArray = true so that subsequent objects can be read one by one (it reads the nest result array node).
              */
-            if (parser.currentToken() == JsonToken.FIELD_NAME && "results".equals(parser.currentName())) {
+            if (parser.currentToken() == JsonToken.PROPERTY_NAME && "results".equals(parser.currentName())) {
                 parser.nextToken();
                 inResultsArray = true;
             }
-            /**
+            /*
              * Marks the end of the "results" array by setting inResultsArray to false,
              * so the reader knows there are no more any objects to stream in this array.
              */
@@ -85,7 +85,7 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
              * parse the next field until finds the all_results field
              **/
             while (parser.nextToken() != null) {
-                if (parser.currentToken() == JsonToken.FIELD_NAME && "all_results".equals(parser.currentName())) {
+                if (parser.currentToken() == JsonToken.PROPERTY_NAME && "all_results".equals(parser.currentName())) {
                     parser.nextToken();
                     break;
                 }
@@ -99,11 +99,7 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
     @Override
     public void close() throws ItemStreamException {
         if (parser != null) {
-            try {
-                parser.close();
-            } catch (IOException e) {
-                throw new ItemStreamException("Failed to close JSON parser", e);
-            }
+            parser.close();
         }
     }
 }

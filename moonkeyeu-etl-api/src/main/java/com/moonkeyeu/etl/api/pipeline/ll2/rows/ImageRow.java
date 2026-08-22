@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.pipeline.ll2.rows;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.pipeline.core.JsonParser;
 
 /**

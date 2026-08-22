@@ -1,8 +1,9 @@
 package com.moonkeyeu.etl.api.unit.utils;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.utils.JsonStreamFileWriterUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -136,10 +137,10 @@ class JsonParserStreamFileWriterUtilTest {
     }
 
     @Test
-    @DisplayName("Should throw RuntimeException when generator close fails")
-    void close_shouldThrowRuntimeException_whenGeneratorFails() throws IOException {
+    @DisplayName("Should throw JacksonException when generator close fails")
+    void close_shouldThrowJacksonException_whenGeneratorFails() {
 
-        doThrow(new IOException("Something went wrong"))
+        doThrow(new RuntimeException("Something went wrong"))
                 .when(generator)
                 .writeEndArray();
 

@@ -1,15 +1,12 @@
 package com.moonkeyeu.etl.api.integration.client;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.config.TestEntity;
 import com.moonkeyeu.etl.api.dto.LL2Throttle;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.service.impl.client.ClientDataServiceImpl;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
 import com.moonkeyeu.etl.api.utils.JsonStreamFileWriterUtil;
-import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
+import com.moonkeyeu.etl.api.utils.LL2URIBuilder;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
@@ -23,13 +20,18 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import tools.jackson.core.JsonEncoding;
+import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -44,7 +46,7 @@ class ClientDataServiceImplIT {
     private MockWebServer mockWebServer;
     private ClientDataServiceImpl clientDataService;
     private ObjectMapper objectMapper;
-    private UrlBuilderUtil urlBuilderUtil;
+    private LL2URIBuilder LL2URIBuilder;
     private JsonGenerator jsonGenerator;
     private LL2Throttle responseZeroUseSeconds;
     private LL2Throttle responseUseSeconds;
@@ -55,7 +57,7 @@ class ClientDataServiceImplIT {
     void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        urlBuilderUtil = new UrlBuilderUtil();
+        LL2URIBuilder = new LL2URIBuilder();
         objectMapper = new ObjectMapper();
     }
 
@@ -68,7 +70,7 @@ class ClientDataServiceImplIT {
     void initialize() throws IOException {
         String baseUrl = String.format("http://localhost:%d", mockWebServer.getPort());
         Path outputFile = tempDir.resolve("output.json");
-        jsonGenerator = objectMapper.getFactory().createGenerator(Files.newOutputStream(outputFile), JsonEncoding.UTF8);
+        jsonGenerator = objectMapper.createGenerator(Files.newOutputStream(outputFile), JsonEncoding.UTF8);
         responseZeroUseSeconds = new LL2Throttle(15, 10, 1, 3600L, "123.123.2.123");
         responseUseSeconds = new LL2Throttle(15, 10, 1, 3600L, "123.123.0.123");
 
@@ -87,8 +89,8 @@ class ClientDataServiceImplIT {
                 jsonStreamFileWriterUtil
         );
 
-        ReflectionTestUtils.setField(urlBuilderUtil, "baseUrl", baseUrl);
-        ReflectionTestUtils.setField(urlBuilderUtil, "version", "2.3.0");
+        ReflectionTestUtils.setField(LL2URIBuilder, "baseUrl", baseUrl);
+        ReflectionTestUtils.setField(LL2URIBuilder, "version", "2.3.0");
         ReflectionTestUtils.setField(clientDataService, "MAX_RETRIES", 30);
         ReflectionTestUtils.setField(clientDataService, "RETRY_DELAY", 1);
     }
@@ -108,7 +110,7 @@ class ClientDataServiceImplIT {
         when(clientThrottleService.fetchThrottle())
                 .thenReturn(Mono.just(responseZeroUseSeconds));
         // when
-        StepVerifier.create(clientDataService.fetchAll(urlBuilderUtil.getAllLatestLaunchesUrl(), outputFile))
+        StepVerifier.create(clientDataService.fetchAll(LL2URIBuilder.launchesFromURI(LocalDate.now()), outputFile))
                 .expectComplete()
                 .verify();
 
@@ -137,7 +139,7 @@ class ClientDataServiceImplIT {
         when(clientThrottleService.fetchThrottle())
                 .thenReturn(Mono.just(responseZeroUseSeconds));
         // when
-        StepVerifier.create(clientDataService.fetchAll(urlBuilderUtil.getAllLatestLaunchesUrl(), outputFile))
+        StepVerifier.create(clientDataService.fetchAll(LL2URIBuilder.launchesFromURI(LocalDate.now()), outputFile))
                 .expectComplete()
                 .verify();
 

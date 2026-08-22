@@ -1,7 +1,7 @@
 package com.moonkeyeu.etl.api.unit.configuration.readers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.moonkeyeu.etl.api.configuration.batch.readers.JsonItemReader;
 import com.moonkeyeu.etl.api.settings.exceptions.InvalidFileTypeException;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +58,19 @@ class JsonParserItemReaderTest {
     }
 
     @Test
+    @DisplayName("Should skip opening when file does not exist")
+    void open_shouldSkip_whenFileDoesNotExist() {
+        // given
+        jsonItemReader.setResource(
+                new ClassPathResource("json/missing.json")
+        );
+        // when
+        jsonItemReader.open(executionContext);
+        // then
+        assertThat(jsonItemReader.getParser()).isNull();
+    }
+
+    @Test
     @DisplayName("Should read all JSON objects from all_results array")
     void read_shouldReturnJsonNodes() throws Exception {
         // given
@@ -65,14 +78,11 @@ class JsonParserItemReaderTest {
         // when
         jsonItemReader.open(executionContext);
         JsonNode first = jsonItemReader.read();
-        JsonNode second = jsonItemReader.read();
-        JsonNode third = jsonItemReader.read();
-
         // then
         assertThat(first).isNotNull();
         assertNotNull(first);
-        assertThat(first.get("id").asText()).isEqualTo("a0058cfb-c868-44b6-82cb-7f4ed286b272");
-        assertThat(first.get("name").asText()).isEqualTo("Falcon 9 Block 5 | Starlink Group 6-80");
+        assertThat(first.get("id").asString()).isEqualTo("a0058cfb-c868-44b6-82cb-7f4ed286b272");
+        assertThat(first.get("name").asString()).isEqualTo("Falcon 9 Block 5 | Starlink Group 6-80");
 
         assertThat(first.size()).isEqualTo(39);
 
@@ -124,18 +134,4 @@ class JsonParserItemReaderTest {
         // then
         assertThat(jsonItemReader.getParser()).isNull();
     }
-
-    @Test
-    @DisplayName("Should skip opening when file does not exist")
-    void open_shouldSkip_whenFileDoesNotExist() {
-        // given
-        jsonItemReader.setResource(
-                new ClassPathResource("json/missing.json")
-        );
-        // when
-        jsonItemReader.open(executionContext);
-        // then
-        assertThat(jsonItemReader.getParser()).isNull();
-    }
-
 }

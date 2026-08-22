@@ -1,13 +1,12 @@
 package com.moonkeyeu.etl.api.pipeline.core;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
+import tools.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.settings.exceptions.JsonParserException;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.node.MissingNode;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.regex.Pattern;
@@ -58,7 +57,7 @@ public final class JsonParser {
         if (!found.isValueNode() || found.isNull()) {
             return null;
         }
-        String value = found.asText();
+        String value = found.asString();
         if (value == null || value.isBlank()) {
             return null;
         }
@@ -84,9 +83,9 @@ public final class JsonParser {
         if (found.isNumber()) {
             return found.asLong();
         }
-        if (found.isTextual()) {
+        if (found.isString()) {
             try {
-                return Long.parseLong(found.asText().trim());
+                return Long.parseLong(found.asString().trim());
             } catch (NumberFormatException ignored) {
                 return null;
             }
@@ -99,9 +98,9 @@ public final class JsonParser {
         if (found.isNumber()) {
             return found.asInt();
         }
-        if (found.isTextual()) {
+        if (found.isString()) {
             try {
-                return Integer.valueOf(found.asText().trim());
+                return Integer.valueOf(found.asString().trim());
             } catch (NumberFormatException ignored) {
                 return null;
             }
@@ -114,9 +113,9 @@ public final class JsonParser {
         if (found.isNumber()) {
             return found.asDouble();
         }
-        if (found.isTextual()) {
+        if (found.isString()) {
             try {
-                return Double.valueOf(found.asText().trim());
+                return Double.valueOf(found.asString().trim());
             } catch (NumberFormatException ignored) {
                 return null;
             }

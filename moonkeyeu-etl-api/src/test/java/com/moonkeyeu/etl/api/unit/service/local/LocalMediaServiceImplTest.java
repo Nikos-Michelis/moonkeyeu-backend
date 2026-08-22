@@ -5,6 +5,7 @@ import com.moonkeyeu.etl.api.pipeline.ll2.media.PendingImage;
 import com.moonkeyeu.etl.api.service.LocalStorageService;
 import com.moonkeyeu.etl.api.service.MediaDownloadService;
 import com.moonkeyeu.etl.api.service.impl.local.LocalMediaServiceImpl;
+import com.moonkeyeu.etl.api.settings.exceptions.LocalStorageException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -153,10 +154,9 @@ class LocalMediaServiceImplTest {
     @Test
     @DisplayName("Should propagate exception when download fails")
     void test() {
-
         assertThatThrownBy(() ->
                 localMediaService.saveMediaLocal(null, null))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(LocalStorageException.class)
                 .hasMessage("Media entity should not be null or empty");
 
     }

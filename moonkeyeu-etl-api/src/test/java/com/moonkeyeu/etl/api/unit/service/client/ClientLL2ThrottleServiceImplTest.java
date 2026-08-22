@@ -3,7 +3,7 @@ package com.moonkeyeu.etl.api.unit.service.client;
 import com.moonkeyeu.etl.api.dto.LL2Throttle;
 import com.moonkeyeu.etl.api.service.impl.client.ClientThrottleServiceImpl;
 import com.moonkeyeu.etl.api.settings.exceptions.RemoteServiceException;
-import com.moonkeyeu.etl.api.utils.UrlBuilderUtil;
+import com.moonkeyeu.etl.api.utils.LL2URIBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ class ClientLL2ThrottleServiceImplTest {
     @Mock
     private WebClient.ResponseSpec responseSpec;
     @Mock
-    private UrlBuilderUtil urlBuilderUtil;
+    private LL2URIBuilder LL2URIBuilder;
     private LL2Throttle responseZeroUseSeconds;
     private LL2Throttle responseUseSeconds;
 
@@ -46,7 +46,7 @@ class ClientLL2ThrottleServiceImplTest {
                 .thenReturn(webClient);
         when(webClient.get())
                 .thenReturn(requestHeadersUriSpec);
-        when(urlBuilderUtil.getThrottleUrl())
+        when(LL2URIBuilder.throttleURI())
                 .thenReturn(URI.create("https://www.example.com/throttle"));
         when(requestHeadersUriSpec.uri(any(URI.class)))
                 .thenReturn(requestHeadersSpec);
@@ -54,7 +54,7 @@ class ClientLL2ThrottleServiceImplTest {
                 .thenReturn(responseSpec);
 
         throttleService =
-                new ClientThrottleServiceImpl(webClientBuilder.build(), urlBuilderUtil);
+                new ClientThrottleServiceImpl(webClientBuilder.build(), LL2URIBuilder);
 
         responseZeroUseSeconds = new LL2Throttle(
                 15,

@@ -1,6 +1,5 @@
 package com.moonkeyeu.etl.api.service.impl.client;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.moonkeyeu.etl.api.service.ClientDataService;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
@@ -17,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.JsonNode;
 
 import java.io.IOException;
@@ -135,6 +135,6 @@ public class ClientDataServiceImpl implements ClientDataService {
     }
 
     private URI getNextPageUrl(JsonNode response) {
-        return URI.create(response.get("next").asText());
+        return URI.create(response.get("next").asString());
     }
 }
