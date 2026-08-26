@@ -1,6 +1,6 @@
 package com.moonkeyeu.etl.api.integration.s3;
 
-import com.moonkeyeu.etl.api.config.S3TestConfig;
+import com.moonkeyeu.etl.api.config.S3TestContainerConfig;
 import com.moonkeyeu.etl.api.configuration.caching.CacheConfig;
 import com.moonkeyeu.etl.api.configuration.client.WebClientConfig;
 import com.moonkeyeu.etl.api.pipeline.ll2.media.MediaTarget;
@@ -18,11 +18,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,21 +33,23 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(
         classes = {
                 WebClientConfig.class,
-                S3TestConfig.class,
                 CacheConfig.class,
                 S3MediaServiceImpl.class,
                 S3CrudServiceImpl.class,
                 S3StorageServiceImpl.class,
                 MediaDownloadServiceImpl.class,
+                CacheConfig.class,
         },
         webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
-@Testcontainers
+@Import(S3TestContainerConfig.class)
 @DisplayName("S3MediaServiceImplTest Integration tests")
 class S3MediaServiceImplIT {
 
     @Autowired
     private S3MediaService s3MediaService;
+    @Autowired
+    private CacheManager cacheManager;
     @Autowired
     private S3CrudService s3CrudService;
     private PendingImage rocketImageEntity;
@@ -58,9 +63,12 @@ class S3MediaServiceImplIT {
 
     @BeforeEach
     void setup() {
+        cacheManager.getCacheNames()
+                .forEach(name -> Objects.requireNonNull(cacheManager.getCache(name)).clear());
+
         String sourceImageUrl = UriComponentsBuilder
-                .fromUri(URI.create(imageBytesSource))
-                .path("falcon_9_image_20230807133459.jpeg")
+                .fromUriString(imageBytesSource)
+                .pathSegment("falcon_9_image_20230807133459.jpeg")
                 .toUriString();
         cdnImageUrl =
                 UriComponentsBuilder

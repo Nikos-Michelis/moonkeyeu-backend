@@ -34,13 +34,13 @@ public class JsonStreamFileWriterUtil {
             generator.writeStartObject();
             generator.writeArrayPropertyStart("all_results");
 
-                    return generator;
+            return generator;
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
     public Mono<Void> write(JsonGenerator generator, JsonNode response) {
         if (response.has("detail")) {
-            log.warn("Skipping response with error detail: {}", response.get("detail").asText());
+            log.warn("Skipping response with error detail: {}", response.get("detail").asString());
             return Mono.empty();
         }
 

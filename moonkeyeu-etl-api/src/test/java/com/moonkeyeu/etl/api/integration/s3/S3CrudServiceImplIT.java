@@ -1,7 +1,7 @@
 package com.moonkeyeu.etl.api.integration.s3;
 
-import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
-import com.moonkeyeu.etl.api.config.S3TestConfig;
+import com.moonkeyeu.etl.api.config.S3TestContainerConfig;
+import com.moonkeyeu.etl.api.configuration.caching.CacheConfig;
 import com.moonkeyeu.etl.api.service.S3CrudService;
 import com.moonkeyeu.etl.api.service.impl.s3.S3CrudServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -11,13 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Import;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,41 +23,25 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(
         classes={
                 S3CrudServiceImpl.class,
-                S3TestConfig.class,
+                CacheConfig.class,
         },
         webEnvironment= SpringBootTest.WebEnvironment.NONE
 )
-@Testcontainers
+@Import(S3TestContainerConfig.class)
 @DisplayName("S3CrudServiceImpl Integration tests")
 class S3CrudServiceImplIT {
-
-    @Container
-    private static final S3MockContainer s3Mock = new S3MockContainer("latest");
 
     @Value("${aws.s3.buckets.bucket-name}")
     private String BUCKET;
     @Autowired
     private S3CrudService s3CrudService;
     @Autowired
-    private S3Client s3Client;
-
-    @DynamicPropertySource
-    static void configureS3Properties(DynamicPropertyRegistry registry) {
-        registry.add("aws.s3.endpoint", s3Mock::getHttpsEndpoint);
-        registry.add("aws.s3.region", () -> "eu-central-1");
-    }
+    private CacheManager cacheManager;
 
     @BeforeEach
     void init() {
-        try {
-            s3Client.headBucket(HeadBucketRequest.builder()
-                    .bucket(BUCKET)
-                    .build());
-            log.info("Bucket {} is ready", BUCKET);
-        } catch (Exception e) {
-            log.error("Bucket verification failed", e);
-            throw e;
-        }
+        cacheManager.getCacheNames()
+                .forEach(name -> Objects.requireNonNull(cacheManager.getCache(name)).clear());
     }
 
     @Test

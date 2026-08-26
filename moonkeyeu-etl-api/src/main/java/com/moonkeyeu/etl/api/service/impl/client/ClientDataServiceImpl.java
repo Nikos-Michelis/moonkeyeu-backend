@@ -4,16 +4,16 @@ import com.moonkeyeu.etl.api.service.ClientDataService;
 import com.moonkeyeu.etl.api.service.ClientThrottleService;
 import com.moonkeyeu.etl.api.settings.exceptions.RateLimitExceededException;
 import com.moonkeyeu.etl.api.utils.JsonStreamFileWriterUtil;
-import io.netty.handler.timeout.ReadTimeoutException;
-import io.netty.handler.timeout.WriteTimeoutException;
+import io.netty.handler.timeout.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import tools.jackson.core.JsonGenerator;
@@ -22,7 +22,6 @@ import tools.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
@@ -121,11 +120,8 @@ public class ClientDataServiceImpl implements ClientDataService {
     }
 
     private boolean isNetworkError(Throwable throwable) {
-        return throwable instanceof WebClientResponseException ||
-                throwable instanceof WriteTimeoutException ||
-                throwable instanceof ReadTimeoutException ||
-                throwable instanceof TimeoutException ||
-                throwable instanceof IOException;
+        return throwable instanceof WebClientException || throwable instanceof TimeoutException
+                || throwable instanceof HttpClientErrorException || throwable instanceof IOException;
     }
 
     private boolean hasNextPage(JsonNode response) {

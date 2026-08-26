@@ -1,8 +1,8 @@
 package com.moonkeyeu.etl.api.pipeline.ll2.extract;
 
+import com.moonkeyeu.etl.api.pipeline.core.JsonParser;
 import tools.jackson.databind.JsonNode;
 import com.moonkeyeu.etl.api.pipeline.ll2.Context;
-import com.moonkeyeu.etl.api.pipeline.core.JsonParser;
 import com.moonkeyeu.etl.api.pipeline.core.RowSink;
 import com.moonkeyeu.etl.api.pipeline.ll2.Table;
 import com.moonkeyeu.etl.api.pipeline.ll2.rows.CrewRows;

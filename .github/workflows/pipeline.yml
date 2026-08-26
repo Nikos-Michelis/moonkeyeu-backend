@@ -6,7 +6,7 @@ on:
       - 'backend/**'
       - 'moonkeyeu-core-api/**'
       - 'moonkeyeu-etl-api/**'
-    branches: [21-implement-cicd-pipeline-for-automated-vps-deployment]
+    branches: [refactor-etl-api]
 env:
   API_PROFILE: ${{ vars.API_PROFILE }}
   APP_NAME: ${{ vars.APP_NAME }}
@@ -15,6 +15,8 @@ env:
 permissions:
   contents: write
   id-token: write
+  pull-requests: write
+  checks: write
 
 jobs:
   setup:
@@ -32,13 +34,14 @@ jobs:
 
       - name: Download test database from S3
         run: |
-          aws s3 cp s3://fs-moonkeyeu-bucket-test/database/mysql/test/ ./test_db/ --recursive
+          aws s3 cp s3://fs-moonkeyeu-bucket-test/database/mysql/migrations/ ./db/migration/ --recursive
 
       - name: Upload SQL as artifact
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f #v7.0.0
         with:
-          name: test-db
-          path: ./test_db/
+          name: migration
+          path: ./db/migration/
+          if-no-files-found: error
 
   tests:
     name: Test ${{ matrix.module }}
@@ -51,6 +54,8 @@ jobs:
       module_name: ${{ matrix.module }}
     secrets:
       NASA_APOD_KEY: ${{ secrets.NASA_APOD_KEY }}
+      S3_REGION: ${{ secrets.S3_REGION }}
+      S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
   build:
     name: Build Image ${{ matrix.module }}

@@ -45,7 +45,7 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
              * This allows streaming one object at a time without loading the whole array into memory.
              */
             if (inResultsArray && parser.currentToken() == JsonToken.START_OBJECT) {
-                return mapper.readTree(parser);
+                return parser.readValueAsTree();
             }
             /*
              * If the parser is currently at the field name "results",
@@ -81,9 +81,7 @@ public class JsonItemReader implements ResourceAwareItemReaderItemStream<JsonNod
             }
 
             parser = mapper.createParser(resource.getInputStream());
-            /**
-             * parse the next field until finds the all_results field
-             **/
+            /* parse the next field until finds the all_results field*/
             while (parser.nextToken() != null) {
                 if (parser.currentToken() == JsonToken.PROPERTY_NAME && "all_results".equals(parser.currentName())) {
                     parser.nextToken();

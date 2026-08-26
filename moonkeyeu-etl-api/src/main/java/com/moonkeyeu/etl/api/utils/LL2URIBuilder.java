@@ -20,7 +20,8 @@ public class LL2URIBuilder {
 
     private UriComponentsBuilder base(String resource) {
         return UriComponentsBuilder.fromUriString(baseUrl)
-                .pathSegment(version, resource, "")
+                .pathSegment(version, resource)
+                .path("/")
                 .queryParam("format", "json");
     }
 
@@ -45,10 +46,6 @@ public class LL2URIBuilder {
                 .queryParam("net__lte", to)
                 .build()
                 .toUri();
-    }
-
-    public URI allSpaceStationsURI() {
-        return collection("space_stations", PAGE_LIMIT).build().toUri();
     }
 
     public URI allAgenciesURI() {
