@@ -1,11 +1,12 @@
 package com.moonkeyeu.etl.api.service;
 
-import com.moonkeyeu.etl.api.model.ImageEntity;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.StorableImage;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 
 public interface LocalMediaService {
-    String saveMediaLocal(ImageEntity item, String localDir) throws IOException;
-    String getLocalHostUrl(ImageEntity imageEntity) throws MalformedURLException;
+    String saveMediaLocal(StorableImage item, String localDir) throws IOException;
+    String getLocalHostUrl(StorableImage image) throws MalformedURLException;
+    String getBaseUrl();
 }

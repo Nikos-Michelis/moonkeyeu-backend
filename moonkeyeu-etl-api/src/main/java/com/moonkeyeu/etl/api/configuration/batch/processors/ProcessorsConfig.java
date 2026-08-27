@@ -1,68 +1,66 @@
 package com.moonkeyeu.etl.api.configuration.batch.processors;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moonkeyeu.etl.api.configuration.files.CsvSource;
-import com.moonkeyeu.etl.api.configuration.mappers.JsonObjectMapper;
-import com.moonkeyeu.etl.api.dto.chunks.ChunkStore;
-import com.moonkeyeu.etl.api.model.CsvEntity;
-import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import com.moonkeyeu.etl.api.pipeline.ll2.Context;
+import com.moonkeyeu.etl.api.pipeline.core.RowSink;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.AgencyExtractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.CrewExtractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.Extractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.LaunchExtractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.LauncherStageExtractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.MissionExtractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.PadExtractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.ProgramExtractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.RocketExtractor;
+import com.moonkeyeu.etl.api.pipeline.ll2.extract.SpacecraftStageExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
-import org.springframework.batch.infrastructure.item.support.CompositeItemProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.util.List;
 
+/**
+ * Turns one upstream record into the rows it implies.
+ * <p>
+ * The extractors are stateless and hold no Spring dependencies, so they are composed here as plain
+ * objects rather than component-scanned. The shape of the tree is then visible in one place, which
+ * is the point — previously it was spread across twenty-five mapper methods and an eighteen-line
+ * wall of {@code chunk.add(...)} calls mapping each collection to a CSV file.
+ */
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
 public class ProcessorsConfig {
 
     @Bean
-    public CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> compositeProcessor(MediaProcessor mediaProcessor, CleaningProcessor cleaningProcessor) {
-        CompositeItemProcessor<CsvEntity<?>, CsvEntity<?>> processor = new CompositeItemProcessor<>();
-        processor.setDelegates(List.of(cleaningProcessor, mediaProcessor));
-        return processor;
+    public LaunchExtractor launchExtractor() {
+        return new LaunchExtractor(
+                new RocketExtractor(
+                        new LauncherStageExtractor(),
+                        new SpacecraftStageExtractor(new CrewExtractor())),
+                new PadExtractor(),
+                new MissionExtractor(),
+                new ProgramExtractor());
     }
 
     @Bean
-    public ItemProcessor<JsonNode, ChunkStore> launchesProcessor(ObjectMapper objectMapper) {
-        JsonObjectMapper jsonObjectMapper = new JsonObjectMapper(objectMapper);
-        return jsonNode -> {
-            ChunkStore chunk = jsonObjectMapper.jsonToLaunchesMapper(jsonNode, new ChunkStore());
-            chunk.add(chunk.getLaunches(), CsvSource.RAW_LAUNCHES_CSV);
-            chunk.add(chunk.getPadImages(), CsvSource.RAW_PAD_IMAGES_CSV);
-            chunk.add(chunk.getRocketConfImages(), CsvSource.RAW_ROCKET_CONFIGURATION_IMAGES_CSV);
-            chunk.add(chunk.getSpacecraftConfImages(), CsvSource.RAW_SPACECRAFT_IMAGES_CSV);
-            chunk.add(chunk.getAstronautImages(), CsvSource.RAW_ASTRONAUT_IMAGES_CSV);
-            chunk.add(chunk.getLauncherStage(), CsvSource.RAW_BOOSTERS_CSV);
-            chunk.add(chunk.getSpacecraftStage(), CsvSource.RAW_SPACECRAFT_STAGE_CSV);
-            chunk.add(chunk.getCrewList(), CsvSource.RAW_ASTRONAUTS_CSV);
-            chunk.add(chunk.getSocialMedia(), CsvSource.RAW_SOCIAL_MEDIA_CSV);
-            chunk.add(chunk.getNationalities(), CsvSource.ASTRONAUTS_COUNTRIES_CSV);
-            chunk.add(chunk.getCountries(), CsvSource.RAW_ASTRONAUTS_COUNTRIES_CSV);
-            chunk.add(chunk.getVideoList(), CsvSource.RAW_VIDEO_CSV);
-            chunk.add(chunk.getUpdates(), CsvSource.RAW_UPDATES_CSV);
-            chunk.add(chunk.getPrograms(), CsvSource.RAW_PROGRAMS_CSV);
-            chunk.add(chunk.getProgramHasAgencies(), CsvSource.PROGRAMS_AGENCIES_CSV);
-            chunk.add(chunk.getPatches(), CsvSource.RAW_MISSION_PATCHES_CSV);
-            chunk.add(chunk.getInfoUrls(), CsvSource.RAW_INFO_URLS_CSV);
-            chunk.add(chunk.getAgencies(), CsvSource.RAW_MISSIONS_AGENCIES_CSV);
-            return chunk;
-        };
+    public AgencyExtractor agencyFeedExtractor() {
+        return new AgencyExtractor();
     }
 
     @Bean
-    public ItemProcessor<JsonNode, ChunkStore> agenciesProcessor(ObjectMapper objectMapper) {
-        JsonObjectMapper jsonObjectMapper = new JsonObjectMapper(objectMapper);
-        return jsonNode -> {
-            ChunkStore chunk = jsonObjectMapper.JsonToAgenciesMapper(jsonNode, new ChunkStore());
-            chunk.add(chunk.getAgencies(), CsvSource.RAW_AGENCIES_CSV);
-            chunk.add(chunk.getAgenciesImages(), CsvSource.RAW_AGENCIES_IMAGES_CSV);
-            chunk.add(chunk.getCountries(), CsvSource.RAW_AGENCY_COUNTRIES_CSV);
-            chunk.add(chunk.getAgencyHasCountries(), CsvSource.LAUNCH_PROVIDERS_COUNTRIES_CSV);
-            return chunk;
+    public ItemProcessor<JsonNode, RowSink> launchesProcessor(LaunchExtractor launchExtractor) {
+        return toRowSink(launchExtractor);
+    }
+
+    @Bean
+    public ItemProcessor<JsonNode, RowSink> agenciesProcessor(AgencyExtractor agencyExtractor) {
+        return toRowSink(agencyExtractor);
+    }
+
+    private ItemProcessor<JsonNode, RowSink> toRowSink(Extractor root) {
+        return node -> {
+            RowSink sink = new RowSink();
+            root.extract(node, Context.empty(), sink);
+            return sink.isEmpty() ? null : sink;
         };
     }
 }

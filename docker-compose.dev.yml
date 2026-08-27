@@ -15,7 +15,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql-db-data:/var/lib/mysql:rw
-      - ./db/prod:/docker-entrypoint-initdb.d:ro
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     restart: always
     networks:
       - private-internal-network
@@ -32,7 +32,7 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: "600m"
+          memory: "500m"
     container_name: moonkeyeu-etl-api-container
     restart: on-failure
     environment:
@@ -54,7 +54,6 @@ services:
       JSON_DATASET: /app/data/json-dataset
       DB_IMAGES_DIR: /app/data/images
     volumes:
-      - ./data/csv-dataset:/app/data/csv-dataset:rw
       - ./data/json-dataset:/app/data/json-dataset:rw
       - /home/moonkeyeu/.aws:/root/.aws:ro
       #- ~/.aws:/root/.aws

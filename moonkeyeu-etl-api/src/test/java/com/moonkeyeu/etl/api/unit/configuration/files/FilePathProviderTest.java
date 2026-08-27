@@ -2,7 +2,6 @@ package com.moonkeyeu.etl.api.unit.configuration.files;
 
 import com.moonkeyeu.etl.api.configuration.files.FilePathProvider;
 import com.moonkeyeu.etl.api.configuration.files.RootConfig;
-import com.moonkeyeu.etl.api.dto.storage.EntityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Paths;
-import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -72,36 +70,7 @@ class FilePathProviderTest {
         assertEquals(expected, result);
     }
 
-    @Test
-    @DisplayName("Should build correct CSV source path")
-    void shouldBuildCsvSourcePath_whenFilenameProvided() {
-        // Arrange
-        String rootFolder = "/data/csv";
-        String filename = "products.csv";
 
-        when(rootConfig.getCsvRootFolder()).thenReturn(rootFolder);
-
-        // Act
-        String result = filePathProvider.getCsvSource(filename);
-
-        // Assert
-        String expected = Paths.get(rootFolder, filename).toString();
-        assertEquals(expected, result);
-    }
-
-    @Test
-    @DisplayName("Should handle CSV filename with path separators")
-    void shouldBuildCsvSourcePath_whenFilenameContainsSubdirectory() {
-        String rootFolder = "/data/csv";
-        String filename = "exports/data.csv";
-
-        when(rootConfig.getCsvRootFolder()).thenReturn(rootFolder);
-
-        String result = filePathProvider.getCsvSource(filename);
-        String expected = Paths.get(rootFolder, filename).toString();
-
-        assertEquals(expected, result);
-    }
 
     @Test
     @DisplayName("Should build correct JSON directory path")
@@ -163,72 +132,23 @@ class FilePathProviderTest {
         assertEquals(expected, result);
     }
 
-    @Test
-    @DisplayName("Should return CSV groups sorted by order")
-    void shouldReturnCsvGroupsSortedByOrder_whenCsvGroupsAreRequested() {
-        // Arrange
-        String csvFolder = "/data/csv";
-        when(rootConfig.getCsvRootFolder()).thenReturn(csvFolder);
 
-        // Act
-        LinkedList<EntityConfig> result = filePathProvider.getCsvGroups();
 
-        // Assert
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-
-        // Verify sorting by order
-        for (int i = 0; i < result.size() - 1; i++) {
-            assertTrue(result.get(i).getOrder() <= result.get(i + 1).getOrder(),
-                    "CSV groups should be sorted by order");
-        }
-    }
-
-    @Test
-    @DisplayName("Should return LinkedList type for CSV groups")
-    void shouldReturnLinkedListType_whenGettingCsvGroups() {
-        when(rootConfig.getCsvRootFolder()).thenReturn("/data/csv");
-
-        LinkedList<EntityConfig> result = filePathProvider.getCsvGroups();
-
-        assertInstanceOf(LinkedList.class, result);
-    }
-
-    @Test
-    @DisplayName("Should have EntityConfig with correct data")
-    void shouldPopulateEntityConfigWithCorrectData_whenCsvGroupsAreRetrieved() {
-        when(rootConfig.getCsvRootFolder()).thenReturn("/data/csv");
-
-        LinkedList<EntityConfig> result = filePathProvider.getCsvGroups();
-
-        // Verify each EntityConfig has required fields
-        result.forEach(config -> {
-            assertNotNull(config.getFileName());
-            assertNotNull(config.getEntityClass());
-        });
-    }
 
     @Test
     @DisplayName("Should work with realistic path configuration")
     void testWithRealisticConfiguration() {
         // Arrange
         String jsonRoot = "/app/data/json";
-        String csvRoot = "/app/data/csv";
         String imagesRoot = "/app/media/images";
 
         when(rootConfig.getJsonRootFolder()).thenReturn(jsonRoot);
-        when(rootConfig.getCsvRootFolder()).thenReturn(csvRoot);
         when(rootConfig.getImagesRootFolder()).thenReturn(imagesRoot);
 
         // Act & Assert
         assertEquals(
                 Paths.get(jsonRoot, "users", "users.json").toString(),
                 filePathProvider.getJsonSource("users", "users.json")
-        );
-
-        assertEquals(
-                Paths.get(csvRoot, "products.csv").toString(),
-                filePathProvider.getCsvSource("products.csv")
         );
 
         assertEquals(

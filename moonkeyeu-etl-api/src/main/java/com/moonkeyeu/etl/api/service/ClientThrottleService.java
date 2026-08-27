@@ -1,8 +1,8 @@
 package com.moonkeyeu.etl.api.service;
 
-import com.moonkeyeu.etl.api.dto.ThrottleResponse;
+import com.moonkeyeu.etl.api.dto.LL2Throttle;
 import reactor.core.publisher.Mono;
 
 public interface ClientThrottleService {
-    Mono<ThrottleResponse> fetchThrottle();
+    Mono<LL2Throttle> fetchThrottle();
 }

@@ -1,22 +1,21 @@
 package com.moonkeyeu.etl.api.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.model.ImageEntity;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.StorableImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+/** Stand-in {@link StorableImage} for the storage and media tests. */
 @Getter
 @Builder
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class TestEntity implements CsvEntity<Object>, ImageEntity {
+public class TestEntity implements StorableImage {
 
     private String id;
     private String value;
     private Boolean active;
-    private String ImageUrl;
+    private String imageUrl;
+    private String folder;
 
     private TestEntity() {
     }
@@ -33,17 +32,17 @@ public class TestEntity implements CsvEntity<Object>, ImageEntity {
     }
 
     @Override
-    public Object getPrimaryKey() {
-        return id;
-    }
-
-    @Override
     public String getImageUrl() {
-        return ImageUrl;
+        return imageUrl;
     }
 
     @Override
     public void setImageUrl(String imageUrl) {
-        this.ImageUrl = imageUrl;
+        this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public String getFolder() {
+        return folder;
     }
 }

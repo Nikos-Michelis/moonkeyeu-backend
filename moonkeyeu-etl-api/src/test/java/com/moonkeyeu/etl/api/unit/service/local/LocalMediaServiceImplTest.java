@@ -1,13 +1,16 @@
 package com.moonkeyeu.etl.api.unit.service.local;
 
-import com.moonkeyeu.etl.api.model.images.RocketImageEntity;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.MediaTarget;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.PendingImage;
 import com.moonkeyeu.etl.api.service.LocalStorageService;
 import com.moonkeyeu.etl.api.service.MediaDownloadService;
 import com.moonkeyeu.etl.api.service.impl.local.LocalMediaServiceImpl;
+import com.moonkeyeu.etl.api.settings.exceptions.LocalStorageException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -29,17 +32,17 @@ class LocalMediaServiceImplTest {
 
     @Mock
     private LocalStorageService localStorageService;
-
     @Mock
     private MediaDownloadService mediaDownloadService;
-
     @InjectMocks
     private LocalMediaServiceImpl localMediaService;
-    private RocketImageEntity imageEntity;
+    private PendingImage imageEntity;
+    @TempDir
+    Path tempDir;
 
     @BeforeEach
     void setUp() {
-        imageEntity = new RocketImageEntity();
+        imageEntity = new PendingImage(MediaTarget.ROCKET_CONF_IMAGES, 1L, null);
         ReflectionTestUtils.setField(localMediaService, "localHostUrl", "http://localhost:8080/images");
     }
 
@@ -49,9 +52,8 @@ class LocalMediaServiceImplTest {
 
         imageEntity.setImageUrl("https://images.test.com/falcon9.png");
 
-        String localDir = "storage/rockets";
-
-        Path expectedPath = Paths.get(localDir, "falcon9.png");
+        String localDir = tempDir.toString();
+        Path expectedPath = tempDir.resolve("rockets").resolve("falcon9.png");
 
         when(localStorageService.existsByKey(expectedPath))
                 .thenReturn(true);
@@ -70,30 +72,28 @@ class LocalMediaServiceImplTest {
     @Test
     @DisplayName("Should download and save media locally when file does not exist")
     void saveMediaLocal_shouldDownloadAndSave_whenFileDoesNotExist() throws Exception {
+        String sourceUrl = "https://images.test.com/starship.jpg";
+        String localUrl = "http://localhost:8080/images/rockets/starship.jpg";
 
-        imageEntity.setImageUrl("https://images.test.com/starship.jpg");
-        String localDir = "storage/rockets";
-        Path expectedPath = Paths.get(localDir, "starship.jpg");
+        imageEntity.setImageUrl(sourceUrl);
+
+        Path expectedPath = tempDir.resolve("rockets").resolve("starship.jpg");
+        String localDir = tempDir.toString();
+
         byte[] data = "image-content".getBytes();
 
         when(localStorageService.existsByKey(expectedPath))
                 .thenReturn(false);
-        when(mediaDownloadService.download(imageEntity.getImageUrl()))
+        when(mediaDownloadService.download(sourceUrl))
                 .thenReturn(data);
 
-        try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
+        String result = localMediaService.saveMediaLocal(imageEntity, localDir);
 
-            String result = localMediaService.saveMediaLocal(imageEntity, localDir);
-            assertThat(result)
-                    .isEqualTo("http://localhost:8080/images/rockets/starship.jpg");
-            filesMock.verify(() ->
-                    Files.createDirectories(Paths.get(localDir)));
+        assertThat(result).isEqualTo(localUrl);
+        assertThat(expectedPath.getParent()).isDirectory();
 
-            verify(mediaDownloadService)
-                    .download(imageEntity.getImageUrl());
-            verify(localStorageService)
-                    .save(data, expectedPath);
-        }
+        verify(mediaDownloadService).download(sourceUrl);
+        verify(localStorageService).save(data, expectedPath);
     }
 
     @Test
@@ -134,28 +134,25 @@ class LocalMediaServiceImplTest {
     void saveMediaLocal_shouldThrowException_whenDownloadFails() throws Exception {
 
         imageEntity.setImageUrl("https://images.test.com/image.png");
-        String localDir = "storage/rockets";
-        Path expectedPath = Paths.get(localDir, "image.png");
+        String localDir = tempDir.toString();
 
-        when(localStorageService.existsByKey(expectedPath))
-                .thenReturn(false);
-        when(mediaDownloadService.download(imageEntity.getImageUrl()))
+        when(mediaDownloadService.download("https://images.test.com/image.png"))
                 .thenThrow(new IOException("Download failed"));
 
-        assertThatThrownBy(() ->
-                localMediaService.saveMediaLocal(imageEntity, localDir))
+        assertThatThrownBy(() -> localMediaService.saveMediaLocal(imageEntity, localDir))
                 .isInstanceOf(IOException.class)
                 .hasMessage("Download failed");
+
+        verify(localStorageService, never()).save(any(), any());
 
     }
 
     @Test
     @DisplayName("Should propagate exception when download fails")
     void test() {
-
         assertThatThrownBy(() ->
                 localMediaService.saveMediaLocal(null, null))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(LocalStorageException.class)
                 .hasMessage("Media entity should not be null or empty");
 
     }

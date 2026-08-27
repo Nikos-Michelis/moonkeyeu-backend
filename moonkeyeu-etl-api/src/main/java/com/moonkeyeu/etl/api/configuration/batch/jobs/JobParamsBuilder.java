@@ -1,8 +1,5 @@
 package com.moonkeyeu.etl.api.configuration.batch.jobs;
 
-import com.moonkeyeu.etl.api.dto.storage.CleanupType;
-import com.moonkeyeu.etl.api.dto.storage.StorageType;
-import com.moonkeyeu.etl.api.dto.storage.StoreOperation;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.batch.core.job.parameters.JobParameters;

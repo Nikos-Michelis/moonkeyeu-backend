@@ -1,26 +1,22 @@
 package com.moonkeyeu.etl.api.service.impl.local;
 
-import com.moonkeyeu.etl.api.model.CsvEntity;
-import com.moonkeyeu.etl.api.model.ImageEntity;
-import com.moonkeyeu.etl.api.model.images.*;
-import com.moonkeyeu.etl.api.model.images.SpacecraftImagesEntity;
-import com.moonkeyeu.etl.api.model.media.MissionPatchesEntity;
-import com.moonkeyeu.etl.api.model.pad.LaunchPadEntity;
+import com.moonkeyeu.etl.api.pipeline.ll2.media.StorableImage;
 import com.moonkeyeu.etl.api.service.LocalMediaService;
 import com.moonkeyeu.etl.api.service.LocalStorageService;
 import com.moonkeyeu.etl.api.service.MediaDownloadService;
+import com.moonkeyeu.etl.api.settings.exceptions.LocalStorageException;
 import com.moonkeyeu.etl.api.utils.ClientUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -29,51 +25,47 @@ public class LocalMediaServiceImpl implements LocalMediaService {
 
     private final LocalStorageService localStorageService;
     private final MediaDownloadService mediaDownloadService;
+
     @Value("${application.backend.url}")
     private String localHostUrl;
 
-    private final Map<Class<? extends CsvEntity<?>>, String> entityToLocalKeyMap = Map.of(
-            RocketImageEntity.class, "rockets",
-	        PadImagesEntity.class, "pads",
-            LaunchPadEntity.class, "pads-locations",
-            LauncherImagesEntity.class, "launchers",
-            SpacecraftImagesEntity.class, "spacecraft",
-            AstronautImagesEntity.class, "astronauts",
-            AgenciesImagesEntity.class, "agencies",
-            MissionPatchesEntity.class, "missions-patches",
-            ProgramsImagesEntity.class, "programs"
-    );
+    @Override
+    public String saveMediaLocal(StorableImage media, String localDir) throws IOException {
 
-    public String saveMediaLocal(ImageEntity media, String localDir) throws IOException {
+        if (media == null) {
+            throw new LocalStorageException("Media entity should not be null or empty");
+        }
+
         String fileName = getFileName(media);
-        Path filePath = Paths.get(localDir, fileName);
+        Path directory = Paths.get(localDir, media.getFolder());
+        Path filePath = directory.resolve(fileName);
         String localStorageUrl = getLocalHostUrl(media);
 
         if (localStorageService.existsByKey(filePath)) {
             return localStorageUrl;
         }
 
-        Files.createDirectories(Paths.get(localDir));
+        Files.createDirectories(directory);
         byte[] data = mediaDownloadService.download(media.getImageUrl());
         localStorageService.save(data, filePath);
         return localStorageUrl;
     }
 
-    public String getLocalHostUrl(ImageEntity media) throws MalformedURLException {
-        String basePath = getRootPath(media);
-        String fileName = getFileName(media);
+    @Override
+    public String getLocalHostUrl(StorableImage media) throws MalformedURLException {
         return UriComponentsBuilder
                 .fromUriString(this.localHostUrl)
-                .pathSegment(basePath)
-                .pathSegment(fileName)
+                .pathSegment(media.getFolder())
+                .pathSegment(getFileName(media))
                 .toUriString();
     }
 
-    private String getFileName(ImageEntity media) throws MalformedURLException {
-        return ClientUtils.extractImageNameFromURL(media.getImageUrl());
+    @Override
+    public String getBaseUrl() {
+        return localHostUrl;
     }
 
-    private String getRootPath(ImageEntity item) {
-        return entityToLocalKeyMap.get(item.getClass());
+    private String getFileName(StorableImage media) throws MalformedURLException {
+        return ClientUtils.extractImageNameFromURL(media.getImageUrl());
     }
 }

@@ -46,7 +46,6 @@ application:
     root:
       data:
         folder:
-          csv: ${user.home}/${DATA_PATH}/backend/data/csv-dataset
           json: ${user.home}/${DATA_PATH}/backend/data/json-dataset
           images: ${user.home}/${DATA_PATH}/backend/data/images
   api:
