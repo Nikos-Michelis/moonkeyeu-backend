@@ -1,10 +1,9 @@
 .env
 .my.cnf
 .idea
+.gitleaks-report.json
 /db
-/db-prod
 /data
-/backup-data
 moonkeyeu-etl-api/target
 moonkeyeu-core-api/target
 moonkeyeu-core-api/src/main/resources/db

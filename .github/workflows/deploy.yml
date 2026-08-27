@@ -10,8 +10,6 @@ on:
         required: true
       VPS_PORT:
         required: true
-      VPS_USER:
-        required: true
       S3_REGION:
         required: true
 env:
@@ -31,19 +29,21 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             # Navigate to app directory
-            su ${{ secrets.VPS_USER }}
             cd /opt/${{ env.APP_NAME }} || mkdir -p /opt/${{ env.APP_NAME }} && cd /opt/${{ env.APP_NAME }}
             
-            aws s3 cp s3://fs-moonkebucket-test/database/mysql/prod/ ./ --recursive --region ${{ secrets.S3_REGION }}
+            aws s3 cp s3://fs-moonkebucket-test/database/mysql/migrations/ ./moonkeyeu-core-api/src/main/resources/db/migration/ --recursive --region ${{ secrets.S3_REGION }}
+            
+            mkdir -p ./db
+            cp -r ./moonkeyeu-core-api/src/main/resources/db/migration/init/. ./db/
             
             # Pull latest image
-            docker compose -f docker-compose.yml --env-file .env pull
+            sudo docker compose -f docker-compose.prod.yml --env-file .env pull
             
             #Stop and remove old containers
-            docker compose -f docker-compose.yml --env-file .env down
+            sudo docker compose -f docker-compose.prod.yml --env-file .env down
             
             # start new containers
-            docker compose -f docker-compose.yml --env-file .env up    -d
+            sudo docker compose -f docker-compose.prod.yml --env-file .env up -d
             
             # Clean up old images
-            docker image prune -f
+            sudo docker image prune -f

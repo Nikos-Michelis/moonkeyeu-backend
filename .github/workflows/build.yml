@@ -9,7 +9,7 @@ jobs:
   build-and-push:
     name: Build & Push Docker image to AWS ECR
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/refactor-etl-api'
+    if: github.ref == 'refs/heads/chore/configure-ci-cd'
     steps:
       - name: Checkout
         uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 #v6.0.2

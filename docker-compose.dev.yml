@@ -26,6 +26,49 @@ services:
       retries: 3
       start_period: 40s
 
+  moonkeyeu-core-api:
+    build: ./moonkeyeu-core-api
+    deploy:
+      resources:
+        limits:
+          cpus: "1.3"
+          memory: "900m"
+    container_name: moonkeyeu-core-api-container
+    restart: on-failure
+    environment:
+      MYSQL_HOST: mysqldb
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_SENDER: ${MAIL_SENDER}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      NASA_APOD_KEY: ${NASA_APOD_KEY}
+      API_CORE_PORT: ${API_CORE_PORT}
+      API_PROFILE: ${API_PROFILE}
+      APP_NAME: ${APP_NAME}
+      DOMAIN_URL: ${DOMAIN_URL}
+      BACKEND_URL: ${BACKEND_URL}
+      CLOUDFRONT_URL: ${CLOUDFRONT_URL}
+    volumes:
+      - ./jwt-keys:/app/jwt-keys:ro
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    networks:
+      - private-internal-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:8080/api/v1/actuator/health | jq -e '.status == \"UP\"' || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   moonkeyeu-etl-api:
     build: ./moonkeyeu-etl-api
     deploy:
@@ -60,57 +103,14 @@ services:
     depends_on:
       mysqldb:
         condition: service_healthy
+      moonkeyeu-core-api:
+        condition: service_healthy
     ports:
       - "8081:8081"
     networks:
       - private-internal-network
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8081/api/v1/actuator/health | jq -e '.status == \"UP\"' || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  moonkeyeu-core-api:
-    build: ./moonkeyeu-core-api
-    deploy:
-      resources:
-        limits:
-          cpus: "1.3"
-          memory: "900m"
-    container_name: moonkeyeu-core-api-container
-    restart: on-failure
-    environment:
-        MYSQL_HOST: mysqldb
-        MYSQL_DATABASE: ${MYSQL_DATABASE}
-        MYSQL_PORT: ${MYSQL_PORT}
-        MYSQL_USER: ${MYSQL_USER}
-        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-        MAIL_HOST: ${MAIL_HOST}
-        MAIL_PORT: ${MAIL_PORT}
-        MAIL_USERNAME: ${MAIL_USERNAME}
-        MAIL_PASSWORD: ${MAIL_PASSWORD}
-        MAIL_SENDER: ${MAIL_SENDER}
-        GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-        GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-        NASA_APOD_KEY: ${NASA_APOD_KEY}
-        API_CORE_PORT: ${API_CORE_PORT}
-        API_PROFILE: ${API_PROFILE}
-        APP_NAME: ${APP_NAME}
-        DOMAIN_URL: ${DOMAIN_URL}
-        BACKEND_URL: ${BACKEND_URL}
-        CLOUDFRONT_URL: ${CLOUDFRONT_URL}
-    volumes:
-      - ./jwt-keys:/app/jwt-keys:ro
-    depends_on:
-      moonkeyeu-etl-api:
-        condition: service_healthy
-      mysqldb:
-        condition: service_healthy
-    networks:
-      - private-internal-network
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -s http://localhost:8080/api/v1/actuator/health | jq -e '.status == \"UP\"' || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -6,7 +6,10 @@ on:
       - 'backend/**'
       - 'moonkeyeu-core-api/**'
       - 'moonkeyeu-etl-api/**'
-    branches: [refactor-etl-api]
+    branches: [dev, main, chore/configure-ci-cd, feature/**]
+  pull_request:
+    branches: [dev, main, chore/configure-ci-cd, feature/**]
+
 env:
   API_PROFILE: ${{ vars.API_PROFILE }}
   APP_NAME: ${{ vars.APP_NAME }}
@@ -19,9 +22,16 @@ permissions:
   checks: write
 
 jobs:
+  scan:
+    name: Security checks
+    uses: ./.github/workflows/security.yml
+    secrets:
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
   setup:
     runs-on: ubuntu-latest
     name: Download Test Database From S3
+    needs: scan
     steps:
       - name: Checkout
         uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 #v6.0.2
@@ -76,5 +86,4 @@ jobs:
       VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
       VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
       VPS_PORT: ${{ secrets.VPS_PORT }}
-      VPS_USER: ${{ secrets.VPS_USER }}
       S3_REGION: ${{ secrets.S3_REGION }}

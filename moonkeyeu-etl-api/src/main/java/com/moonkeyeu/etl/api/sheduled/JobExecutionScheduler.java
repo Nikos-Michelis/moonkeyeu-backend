@@ -11,19 +11,18 @@ import org.springframework.stereotype.Component;
 public class JobExecutionScheduler {
     private final JobExecutionDecider jobExecutionDecider;
 
-    //@Profile("prod")
+    @Profile("prod")
     @Scheduled(cron = "0 0 2-22/2 * * *")
     public void scheduledDailyJob() {
         jobExecutionDecider.dailyJobExecution();
     }
 
-   // @Profile("prod")
+    @Profile("prod")
     @Scheduled(cron = "0 0 0 * * *")
     public void scheduledMidnightJob() {
         jobExecutionDecider.midnightJobExecution();
     }
 
-    //@Profile("prod")
     //@Scheduled(fixedRate = 10000)
     public void scheduledBulkInsertJob() {
         jobExecutionDecider.bulkInsertJobExecution();

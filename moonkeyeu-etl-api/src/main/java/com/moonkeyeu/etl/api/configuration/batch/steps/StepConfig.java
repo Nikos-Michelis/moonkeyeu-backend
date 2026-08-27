@@ -57,7 +57,7 @@ public class StepConfig {
     @Bean
     public Step fetchYearlyLaunchesStep() {
         LocalDate windowStart = LocalDate.now().minusMonths(1);
-        LocalDate windowEnd =  LocalDate.now().plusMonths(12);
+        LocalDate windowEnd = LocalDate.now().plusMonths(13);
         URI uri = LL2URIBuilder.launchesBetweenURI(windowStart, windowEnd);
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
 
@@ -72,7 +72,7 @@ public class StepConfig {
 
     @Bean
     public Step fetchAllLaunchesStep() {
-        LocalDate windowStart = LocalDate.now().minusYears(5);
+        LocalDate windowStart = LocalDate.now().minusYears(1);
         URI uri = LL2URIBuilder.launchesFromURI(windowStart);
         String launchesJsonFile = filePathProvider.getJsonSource(JSON_LAUNCHES.getFolder(), JSON_LAUNCHES.getFile());
 
