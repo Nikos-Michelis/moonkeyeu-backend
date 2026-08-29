@@ -4,8 +4,8 @@ on:
   push:
     paths:
       - 'backend/**'
-      - 'moonkeyeu-core-api/**'
-      - 'moonkeyeu-etl-api/**'
+      - '../../../moonkeyeu-core-api'
+      - '../../../moonkeyeu-etl-api'
     branches: [dev, main, chore/configure-ci-cd, feature/**]
   pull_request:
     branches: [dev, main, chore/configure-ci-cd, feature/**]

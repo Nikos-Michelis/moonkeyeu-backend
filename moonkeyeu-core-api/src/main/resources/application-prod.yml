@@ -19,16 +19,16 @@ spring:
     encoding: UTF-8
 
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:${LOCAL_MYSQL_PORT}}/${MYSQL_DATABASE:${LOCAL_MYSQL_DATABASE}}
-    username: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
-    password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    username: ${MYSQL_APP_USER}
+    password: ${MYSQL_APP_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   flyway:
     clean-disabled: false
     enabled: true
-    user: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
-    password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
+    user: ${MYSQL_MIGRATION_USER}
+    password: ${MYSQL_MIGRATION_PASSWORD}
     locations:
       - classpath:db/migration/schema
       - classpath:db/migration/seed

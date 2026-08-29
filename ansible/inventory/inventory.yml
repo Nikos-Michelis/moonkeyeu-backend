@@ -1,0 +1,6 @@
+all:
+  hosts:
+    lightsail:
+      ansible_host: "{{ lookup('env', 'VPS_HOST') }}"
+      ansible_user: "{{ lookup('env', 'VPS_USER') }}"
+      ansible_port: "{{ lookup('env', 'VPS_PORT') }}"

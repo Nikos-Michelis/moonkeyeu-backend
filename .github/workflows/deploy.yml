@@ -1,4 +1,5 @@
 name: Deploy backend to LightSail VPS
+
 on:
   workflow_call:
     secrets:
@@ -12,6 +13,7 @@ on:
         required: true
       S3_REGION:
         required: true
+
 env:
   APP_NAME: ${{ vars.APP_NAME }}
 
@@ -19,31 +21,33 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: prod
+
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USERNAME }}
+      VPS_PORT: ${{ secrets.VPS_PORT }}
+      AWS_DEFAULT_REGION: ${{ secrets.S3_REGION }}
+      APP_NAME: ${{ vars.APP_NAME }}
+
     steps:
-      - name: SSH and Update
-        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 #v1.2.5
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            # Navigate to app directory
-            cd /opt/${{ env.APP_NAME }} || mkdir -p /opt/${{ env.APP_NAME }} && cd /opt/${{ env.APP_NAME }}
-            
-            aws s3 cp s3://fs-moonkebucket-test/database/mysql/migrations/ ./moonkeyeu-core-api/src/main/resources/db/migration/ --recursive --region ${{ secrets.S3_REGION }}
-            
-            mkdir -p ./db
-            cp -r ./moonkeyeu-core-api/src/main/resources/db/migration/init/. ./db/
-            
-            # Pull latest image
-            sudo docker compose -f docker-compose.prod.yml --env-file .env pull
-            
-            #Stop and remove old containers
-            sudo docker compose -f docker-compose.prod.yml --env-file .env down
-            
-            # start new containers
-            sudo docker compose -f docker-compose.prod.yml --env-file .env up -d
-            
-            # Clean up old images
-            sudo docker image prune -f
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
+
+      - name: Run Ansible
+        run: |
+          ansible-playbook \
+            -i ansible/inventory.ini \
+            ansible/playbook/deploy.yml \
+            --private-key ~/.ssh/vps_key

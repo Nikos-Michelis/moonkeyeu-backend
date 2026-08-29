@@ -20,8 +20,8 @@ spring:
   flyway:
     clean-disabled: false
     enabled: true
-    user: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
-    password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
+    user: ${MYSQL_MIGRATION_USER}
+    password: ${MYSQL_MIGRATION_PASSWORD}
     locations:
       - classpath:db/migration/schema
       - classpath:db/migration/seed

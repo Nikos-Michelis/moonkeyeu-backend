@@ -1,0 +1,69 @@
+- name: Deploy application
+
+  vars:
+    app_name: "{{ lookup('env', 'APP_NAME') }}"
+    app_dir: "/opt/{{ app_name }}"
+    s3_region: "{{ lookup('env', 'S3_REGION') }}"
+    s3_migrations: "s3://fs-moonkebucket-test/database/mysql/migrations/"
+    migration_dir: "{{ app_dir }}/moonkeyeu-core-api/src/main/resources/db/migration"
+    db_dir: "{{ app_dir }}/db"
+
+  tasks:
+    - name: Navigate to app directory
+      ansible.builtin.file:
+        ansible.builtin.file:
+          path: "{{ app_dir }}"
+          state: directory
+          mode: "0755"
+
+    - name: Download database migrations from S3
+      amazon.aws.aws_s3:
+        bucket: "fs-moonkebucket-test"
+        object: "database/mysql/migrations/"
+        dest: "{{ migration_dir }}/"
+        mode: get
+        region: "{{ s3_region }}"
+
+    - name: Create db directory
+      ansible.builtin.file:
+        path: "{{ db_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy migration init files
+      ansible.builtin.copy:
+        src: "{{ migration_dir }}/init/"
+        dest: "{{ db_dir }}/"
+        remote_src: true
+
+    - name: Pull latest Docker images
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - docker-compose.prod.yml
+        env_files:
+          - "{{ app_dir }}/.env"
+        pull: always
+        state: present
+
+    - name: Stop existing containers
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - docker-compose.prod.yml
+        env_files:
+          - "{{ app_dir }}/.env"
+        state: absent
+
+    - name: Start new containers
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - docker-compose.prod.yml
+        env_files:
+          - "{{ app_dir }}/.env"
+        state: present
+
+    - name: Remove unused Docker images
+      community.docker.docker_prune:
+        images: true

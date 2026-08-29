@@ -11,7 +11,7 @@ RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Run the application
 FROM eclipse-temurin:21-jdk-jammy
-ARG APP_VERSION=2.0.0-SNAPSHOT
+ARG APP_VERSION=2.0.0-RELEASE
 # Install curl and jq for health checks
 RUN apt-get update && apt-get install -y jq curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
