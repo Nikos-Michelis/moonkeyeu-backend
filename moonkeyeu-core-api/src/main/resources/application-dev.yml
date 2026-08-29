@@ -42,7 +42,7 @@ spring:
 
   flyway:
     clean-disabled: false
-    enabled: true
+    enabled: false
     user: ${MYSQL_MIGRATION_USER}
     password: ${MYSQL_MIGRATION_PASSWORD}
     locations:
