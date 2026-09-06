@@ -9,6 +9,7 @@ moonkeyeu-etl-api/target
 moonkeyeu-core-api/target
 moonkeyeu-core-api/src/main/resources/db
 moonkeyeu-etl-api/src/main/resources/db
+migration
 appmap.yml
 jwt-keys/access-token/*
 jwt-keys/refresh-token/*

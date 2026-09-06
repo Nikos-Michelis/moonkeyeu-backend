@@ -19,8 +19,8 @@ spring:
     user: ${MYSQL_MIGRATION_USER}
     password: ${MYSQL_MIGRATION_PASSWORD}
     locations:
-      - classpath:db/migration/schema
-      - classpath:db/migration/seed
+      - filesystem:db/migration/schema
+      - filesystem:db/migration/seed
     baseline-version: 1
 
   main:

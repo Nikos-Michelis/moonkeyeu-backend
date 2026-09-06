@@ -8,7 +8,7 @@ on:
 
 jobs:
   semgrep:
-    name: Running security scanning
+    name: Scanning Code
     runs-on: ubuntu-latest
     if: github.actor != 'dependabot[bot]'
     container:

@@ -15,7 +15,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql-db-data:/var/lib/mysql:rw
-      - - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     restart: always
     networks:
       - private-internal-network
@@ -26,8 +26,26 @@ services:
       retries: 3
       start_period: 40s
 
+  flyway:
+    image: flyway/flyway:latest
+    container_name: flyway-container
+    command:
+      - migrate
+    environment:
+      FLYWAY_URL: jdbc:mysql://mysqldb:${MYSQL_PORT}/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false
+      FLYWAY_USER: ${MYSQL_MIGRATION_USER}
+      FLYWAY_PASSWORD: ${MYSQL_MIGRATION_PASSWORD}
+      FLYWAY_LOCATIONS: "filesystem:/flyway/sql"
+    volumes:
+      - ./db/migration:/flyway/sql:ro
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    networks:
+      - private-internal-network
+
   moonkeyeu-core-api:
-    build: ./moonkeyeu-core-api
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}-core-api:latest
     deploy:
       resources:
         limits:
@@ -36,6 +54,8 @@ services:
     container_name: moonkeyeu-core-api-container
     restart: on-failure
     environment:
+      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
+      AWS_REGION: ${AWS_REGION}
       MYSQL_HOST: mysqldb
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_PORT: ${MYSQL_PORT}
@@ -79,21 +99,21 @@ services:
     container_name: moonkeyeu-etl-api-container
     restart: on-failure
     environment:
+      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
+      AWS_REGION: ${AWS_REGION}
+      S3_REGION: ${AWS_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_BUCKET_ROOT: ${S3_BUCKET_ROOT}
+      CLOUDFRONT_URL: ${CLOUDFRONT_URL}
       MYSQL_HOST: mysqldb
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_PORT: ${MYSQL_PORT}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
-      S3_REGION: ${S3_REGION}
-      S3_BUCKET: ${S3_BUCKET}
-      S3_BUCKET_ROOT: ${S3_BUCKET_ROOT}
-      CLOUDFRONT_URL: ${CLOUDFRONT_URL}
       THE_SPACE_DEVS_VERSION: ${THE_SPACE_DEVS_VERSION}
       API_ETL_PORT: ${API_ETL_PORT}
-      API_PROFILE: ${API_PROFILE:prod}
+      API_PROFILE: ${API_PROFILE}
       APP_NAME: ${APP_NAME}
-      CSV_DATASET: /app/data/csv-dataset
       JSON_DATASET: /app/data/json-dataset
       DB_IMAGES_DIR: /app/data/images
     volumes:
@@ -122,8 +142,6 @@ services:
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
-      mysql-exporter:
-        condition: service_healthy
       moonkeyeu-etl-api:
         condition: service_healthy
       moonkeyeu-core-api:
@@ -249,7 +267,7 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: "256m"
+          memory: "800m"
     restart: unless-stopped
     networks:
       - private-internal-network

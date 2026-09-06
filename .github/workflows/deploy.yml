@@ -1,4 +1,4 @@
-name: Deploy backend to LightSail VPS
+name: Deploy to LightSail VPS
 
 on:
   workflow_call:
@@ -13,9 +13,8 @@ on:
         required: true
       S3_REGION:
         required: true
-
-env:
-  APP_NAME: ${{ vars.APP_NAME }}
+      S3_BUCKET:
+        required: true
 
 jobs:
   deploy:
@@ -23,18 +22,19 @@ jobs:
     environment: prod
 
     env:
-      VPS_HOST: ${{ secrets.VPS_HOST }}
-      VPS_USER: ${{ secrets.VPS_USERNAME }}
-      VPS_PORT: ${{ secrets.VPS_PORT }}
-      AWS_DEFAULT_REGION: ${{ secrets.S3_REGION }}
       APP_NAME: ${{ vars.APP_NAME }}
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+      VPS_PORT: ${{ secrets.VPS_PORT }}
+      S3_REGION: ${{ secrets.S3_REGION }}
+      S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
     steps:
-
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
 
       - name: Install Ansible
+        shell: bash
         run: |
           sudo apt update
           sudo apt install -y ansible
@@ -44,10 +44,12 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/vps_key
           chmod 600 ~/.ssh/vps_key
+          ssh-keyscan -p "${{ secrets.VPS_PORT }}" "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Run Ansible
         run: |
           ansible-playbook \
-            -i ansible/inventory.ini \
+            -i ansible/inventory/inventory.yml \
             ansible/playbook/deploy.yml \
             --private-key ~/.ssh/vps_key
