@@ -2,5 +2,6 @@ all:
   hosts:
     lightsail:
       ansible_host: "{{ lookup('env', 'VPS_HOST') }}"
-      ansible_user: "{{ lookup('env', 'VPS_USER') }}"
+      ansible_user: "{{ lookup('env', 'VPS_USERNAME') }}"
       ansible_port: "{{ lookup('env', 'VPS_PORT') }}"
+      ansible_python_interpreter: /usr/bin/python3

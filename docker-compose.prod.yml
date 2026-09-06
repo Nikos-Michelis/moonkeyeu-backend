@@ -11,23 +11,41 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_APP_USER: ${MYSQL_APP_USER}
+      MYSQL_APP_PASSWORD: ${MYSQL_APP_PASSWORD}
     volumes:
       - mysql-db-data:/var/lib/mysql:rw
-      - - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     restart: always
     networks:
       - private-internal-network
     healthcheck:
-      test: mysql --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute="SHOW DATABASES;"
+      test: mysql --user=${MYSQL_APP_USER} --password=${MYSQL_APP_PASSWORD} --execute="SHOW DATABASES;"
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
+  flyway:
+    image: flyway/flyway:latest
+    container_name: flyway-container
+    command:
+      - migrate
+    environment:
+      FLYWAY_URL: jdbc:mysql://mysqldb:${MYSQL_PORT}/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false
+      FLYWAY_USER: ${MYSQL_MIGRATION_USER}
+      FLYWAY_PASSWORD: ${MYSQL_MIGRATION_PASSWORD}
+      FLYWAY_LOCATIONS: "filesystem:/flyway/sql"
+    volumes:
+      - ./db/migration:/flyway/sql:ro
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    networks:
+      - private-internal-network
+
   moonkeyeu-core-api:
-    build: ./moonkeyeu-core-api
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}-core-api:v2.0.0-RELEASE
     deploy:
       resources:
         limits:
@@ -36,11 +54,13 @@ services:
     container_name: moonkeyeu-core-api-container
     restart: on-failure
     environment:
+      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
+      AWS_REGION: ${AWS_REGION}
       MYSQL_HOST: mysqldb
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_PORT: ${MYSQL_PORT}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_APP_USER: ${MYSQL_APP_USER}
+      MYSQL_APP_PASSWORD: ${MYSQL_APP_PASSWORD}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USERNAME: ${MAIL_USERNAME}
@@ -70,7 +90,7 @@ services:
       start_period: 40s
 
   moonkeyeu-etl-api:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}-etl-api:latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}-etl-api:v2.0.0-RELEASE
     deploy:
       resources:
         limits:
@@ -79,21 +99,21 @@ services:
     container_name: moonkeyeu-etl-api-container
     restart: on-failure
     environment:
-      MYSQL_HOST: mysqldb
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_PORT: ${MYSQL_PORT}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
-      S3_REGION: ${S3_REGION}
+      AWS_REGION: ${AWS_REGION}
+      S3_REGION: ${AWS_REGION}
       S3_BUCKET: ${S3_BUCKET}
       S3_BUCKET_ROOT: ${S3_BUCKET_ROOT}
       CLOUDFRONT_URL: ${CLOUDFRONT_URL}
+      MYSQL_HOST: mysqldb
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_APP_USER: ${MYSQL_APP_USER}
+      MYSQL_APP_PASSWORD: ${MYSQL_APP_PASSWORD}
       THE_SPACE_DEVS_VERSION: ${THE_SPACE_DEVS_VERSION}
       API_ETL_PORT: ${API_ETL_PORT}
-      API_PROFILE: ${API_PROFILE:prod}
+      API_PROFILE: ${API_PROFILE}
       APP_NAME: ${APP_NAME}
-      CSV_DATASET: /app/data/csv-dataset
       JSON_DATASET: /app/data/json-dataset
       DB_IMAGES_DIR: /app/data/images
     volumes:
@@ -122,8 +142,6 @@ services:
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
-      mysql-exporter:
-        condition: service_healthy
       moonkeyeu-etl-api:
         condition: service_healthy
       moonkeyeu-core-api:
@@ -147,8 +165,8 @@ services:
     image: docker.io/grafana/alloy:v1.14.0
     container_name: alloy-container
     environment:
-      MYSQL_ALLOY: ${MYSQL_ALLOY}
-      MYSQL_ALLOY_PASSWORD: ${MYSQL_ALLOY_PASSWORD}
+      MYSQL_ALLOY: ${MYSQL_MONITORING_USER}
+      MYSQL_ALLOY_PASSWORD: ${MYSQL_MONITORING_PASSWORD}
     deploy:
       resources:
         limits:
@@ -200,7 +218,7 @@ services:
     container_name: grafana-container
     environment:
       - GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL}
-      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
     depends_on:
       prometheus:
@@ -249,7 +267,7 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: "256m"
+          memory: "800m"
     restart: unless-stopped
     networks:
       - private-internal-network

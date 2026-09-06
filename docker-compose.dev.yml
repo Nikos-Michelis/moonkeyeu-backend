@@ -15,7 +15,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
     volumes:
       - mysql-db-data:/var/lib/mysql:rw
-      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./db/migration/init:/docker-entrypoint-initdb.d:ro
     restart: always
     networks:
       - private-internal-network
@@ -25,6 +25,24 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  flyway:
+    image: flyway/flyway:latest
+    container_name: flyway-container
+    command:
+      - migrate
+    environment:
+      FLYWAY_URL: jdbc:mysql://mysqldb:${MYSQL_PORT}/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false
+      FLYWAY_USER: ${MYSQL_MIGRATION_USER}
+      FLYWAY_PASSWORD: ${MYSQL_MIGRATION_PASSWORD}
+      FLYWAY_LOCATIONS: "filesystem:/flyway/sql"
+    volumes:
+      - ./db/migration:/flyway/sql:ro
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    networks:
+      - private-internal-network
 
   moonkeyeu-core-api:
     build: ./moonkeyeu-core-api
@@ -41,8 +59,6 @@ services:
       MYSQL_PORT: ${MYSQL_PORT}
       MYSQL_APP_USER: ${MYSQL_APP_USER}
       MYSQL_APP_PASSWORD: ${MYSQL_APP_PASSWORD}
-      MYSQL_MIGRATION_USER: ${MYSQL_MIGRATION_USER}
-      MYSQL_MIGRATION_PASSWORD: ${MYSQL_MIGRATION_PASSWORD}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USERNAME: ${MAIL_USERNAME}
@@ -62,6 +78,8 @@ services:
     depends_on:
       mysqldb:
         condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
     networks:
       - private-internal-network
     healthcheck:
@@ -95,7 +113,6 @@ services:
       API_ETL_PORT: ${API_ETL_PORT}
       API_PROFILE: prod
       APP_NAME: ${APP_NAME}
-      CSV_DATASET: /app/data/csv-dataset
       JSON_DATASET: /app/data/json-dataset
       DB_IMAGES_DIR: /app/data/images
     volumes:

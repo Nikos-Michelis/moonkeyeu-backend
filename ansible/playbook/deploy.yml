@@ -1,68 +1,91 @@
-- name: Deploy application
+- name: Playbook Deploy Application
+  hosts: lightsail
+  become: false
 
   vars:
     app_name: "{{ lookup('env', 'APP_NAME') }}"
-    app_dir: "/opt/{{ app_name }}"
+    src: "project/{{ app_name }}"
+    data: "{{ src }}/data"
+    keys: "{{ src }}/jwt-keys"
+    migration: "{{ src }}/db/migration"
+    compose_file: docker-compose.prod.yml
+    s3_bucket: "{{ lookup('env', 'S3_BUCKET') }}"
     s3_region: "{{ lookup('env', 'S3_REGION') }}"
-    s3_migrations: "s3://fs-moonkebucket-test/database/mysql/migrations/"
-    migration_dir: "{{ app_dir }}/moonkeyeu-core-api/src/main/resources/db/migration"
-    db_dir: "{{ app_dir }}/db"
+    s3_prefix: "database/mysql/migrations/"
 
   tasks:
-    - name: Navigate to app directory
+    - name: Ensure app directories exist
       ansible.builtin.file:
-        ansible.builtin.file:
-          path: "{{ app_dir }}"
-          state: directory
-          mode: "0755"
-
-    - name: Download database migrations from S3
-      amazon.aws.aws_s3:
-        bucket: "fs-moonkebucket-test"
-        object: "database/mysql/migrations/"
-        dest: "{{ migration_dir }}/"
-        mode: get
-        region: "{{ s3_region }}"
-
-    - name: Create db directory
-      ansible.builtin.file:
-        path: "{{ db_dir }}"
+        path: "{{ item }}"
         state: directory
-        mode: "0755"
+        mode: "0750"
+      loop:
+        - "{{ src }}"
+        - "{{ migration }}"
+        - "{{ data }}/missions"
+        - "{{ data }}/agencies"
+        - "{{ keys }}/access-token"
+        - "{{ keys }}/refresh-token"
 
-    - name: Copy migration init files
+    - name: List migration objects in S3
+      amazon.aws.s3_object_info:
+        bucket_name: "{{ s3_bucket }}"
+        region: "{{ s3_region }}"
+        prefix: "{{ s3_prefix }}"
+      register: migration_keys
+
+    - name: Download migrations from S3
+      ansible.builtin.command:
+        argv:
+          - aws
+          - s3
+          - sync
+          - "s3://{{ s3_bucket }}/{{ s3_prefix }}"
+          - "{{ migration }}/"
+          - "--region={{ s3_region }}"
+          - --delete
+      register: s3_sync
+      changed_when: "'download:' in s3_sync.stdout"
+
+    - name: Copy deployment files to server
       ansible.builtin.copy:
-        src: "{{ migration_dir }}/init/"
-        dest: "{{ db_dir }}/"
-        remote_src: true
+        src: "{{ playbook_dir }}/../../{{ item }}"
+        dest: "{{ src }}/"
+        mode: "0640"
+        directory_mode: "0750"
+      loop:
+        - "{{ compose_file }}"
+        - nginx
+        - monitoring
 
     - name: Pull latest Docker images
       community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
+        project_src: "{{ src }}"
         files:
-          - docker-compose.prod.yml
+          - "{{ compose_file }}"
         env_files:
-          - "{{ app_dir }}/.env"
+          - ".env"
         pull: always
         state: present
 
     - name: Stop existing containers
       community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
+        project_src: "{{ src }}"
         files:
-          - docker-compose.prod.yml
+          - "{{ compose_file }}"
         env_files:
-          - "{{ app_dir }}/.env"
+          - ".env"
         state: absent
 
-    - name: Start new containers
+    - name: Start containers
       community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
+        project_src: "{{ src }}"
         files:
-          - docker-compose.prod.yml
+          - "{{ compose_file }}"
         env_files:
-          - "{{ app_dir }}/.env"
+          - ".env"
         state: present
+        pull: never
 
     - name: Remove unused Docker images
       community.docker.docker_prune:

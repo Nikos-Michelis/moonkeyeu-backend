@@ -1,0 +1,47 @@
+name: Test Ansible
+
+on:
+  push:
+    branches:
+      - chore/configure-ci-cd
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    env:
+      APP_NAME: ${{ vars.APP_NAME }}
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+      VPS_PORT: ${{ secrets.VPS_PORT }}
+      S3_REGION: ${{ secrets.S3_REGION }}
+      S3_BUCKET: ${{ secrets.S3_BUCKET }}
+      MYSQL_MIGRATION_USER: ${{ secrets.MYSQL_MIGRATION_USER }}
+      MYSQL_MIGRATION_PASSWORD: ${{ secrets.MYSQL_MIGRATION_PASSWORD }}
+      MYSQL_PORT: ${{ vars.MYSQL_PORT }}
+      MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
+          ssh-keyscan -p "${{ secrets.VPS_PORT }}" "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Rollout
+        run: |
+          ansible-playbook \
+            -i ansible/inventory/inventory.yml \
+            ansible/playbook/deploy.yml \
+            --private-key ~/.ssh/vps_key

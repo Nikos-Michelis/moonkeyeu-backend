@@ -33,7 +33,7 @@ spring:
 
   mail:
     host: localhost
-    port: 3025
+    port: 3026
     username: test@test.com
     password: test
     sender: test@test.com

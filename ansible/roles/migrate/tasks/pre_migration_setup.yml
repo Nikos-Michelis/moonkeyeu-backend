@@ -1,0 +1,178 @@
+- name: Run pre-migration checks and backup
+  hosts: prod
+  become: true
+
+  vars:
+    app_name: "{{ lookup('env', 'APP_NAME') }}"
+    app_dir: "/opt/{{ app_name }}"
+    db_service: mysql-container
+    db_name: moonkey_db
+    db_data_dir: /var/lib/docker
+    db_is_local: true
+    backup_dir: "/var/backups/{{ app_name }}"
+    backup_retention_days: 7
+    disk_threshold: 80
+
+  tasks:
+
+    - name: Check database container is running
+      ansible.builtin.command:
+        cmd: "docker compose ps --status running --quiet {{ db_service }}"
+        chdir: "{{ app_dir }}"
+      register: db_container
+      changed_when: false
+      failed_when: false
+
+    - name: Fail if database container is not running
+      ansible.builtin.fail:
+        msg: >-
+          Database service '{{ db_service }}' is not running in {{ app_dir }}.
+          Start it with: docker compose up -d {{ db_service }}
+      when: db_container.stdout | trim | length == 0
+
+    - name: Set backup filename
+      ansible.builtin.set_fact:
+        backup_name: "pre_migration_{{ ansible_date_time.iso8601_basic_short }}.sql"
+
+    - name: Wait for database to accept connections
+      ansible.builtin.shell:
+        cmd: >
+          docker compose exec -T {{ db_service }}
+          sh -c 'exec mysqladmin ping -u root -p"$MYSQL_ROOT_PASSWORD" --silent'
+        chdir: "{{ app_dir }}"
+      register: db_ping
+      until: db_ping.rc == 0
+      retries: 15
+      delay: 2
+      changed_when: false
+
+    - name: Get database version
+      ansible.builtin.shell:
+        cmd: >
+          docker compose exec -T {{ db_service }}
+          sh -c 'exec mysql -u root -p"$MYSQL_ROOT_PASSWORD" -N -B -e "SELECT VERSION()"'
+        chdir: "{{ app_dir }}"
+      register: db_version
+      changed_when: false
+
+    - name: Report database version
+      ansible.builtin.debug:
+        msg: "Connected to MySQL {{ db_version.stdout | trim }}"
+
+    # ---------- first deploy detection ----------
+
+    - name: Count existing tables
+      ansible.builtin.shell:
+        cmd: >
+          docker compose exec -T {{ db_service }}
+          sh -c 'exec mysql -u root -p"$MYSQL_ROOT_PASSWORD" -N -B -e
+          "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = \"{{ db_name }}\""'
+        chdir: "{{ app_dir }}"
+      register: schema_check
+      changed_when: false
+
+    - name: Determine whether this is a first deploy
+      ansible.builtin.set_fact:
+        is_first_deploy: "{{ schema_check.stdout | trim | int == 0 }}"
+
+    - name: Report deployment type
+      ansible.builtin.debug:
+        msg: >-
+          {{ 'FIRST DEPLOY - empty schema, skipping backup and transaction checks'
+             if is_first_deploy
+             else 'EXISTING DATABASE - running full pre-checks' }}
+
+    # ---------- checks that only apply to an existing database ----------
+
+    - name: Check for long-running transactions
+      ansible.builtin.shell:
+        cmd: >
+          docker compose exec -T {{ db_service }}
+          sh -c 'exec mysql -u root -p"$MYSQL_ROOT_PASSWORD" -N -B -e
+          "SELECT COUNT(*) FROM information_schema.innodb_trx
+           WHERE TIMESTAMPDIFF(SECOND, trx_started, NOW()) > 60"'
+        chdir: "{{ app_dir }}"
+      register: txn_check
+      changed_when: false
+      when: not is_first_deploy
+
+    - name: Warn about long-running transactions
+      ansible.builtin.debug:
+        msg: >-
+          WARNING: {{ txn_check.stdout | trim }} transaction(s) running over 60s.
+          DDL may queue behind them. Flyway lock_timeout will abort if it blocks.
+      when:
+        - not is_first_deploy
+        - txn_check.stdout | trim | int > 0
+
+    - name: Check disk space
+      ansible.builtin.shell:
+        cmd: "df --output=pcent {{ db_data_dir }} | tail -1 | tr -dc '0-9'"
+      register: disk_usage
+      changed_when: false
+      when: db_is_local | bool
+
+    - name: Fail if disk space is low
+      ansible.builtin.fail:
+        msg: >-
+          Disk usage at {{ disk_usage.stdout }}% on {{ db_data_dir }}.
+          Must be under {{ disk_threshold }}% to migrate safely.
+      when:
+        - db_is_local | bool
+        - disk_usage.stdout | int > disk_threshold
+
+    # ---------- backup ----------
+
+    - name: Ensure backup directory exists
+      ansible.builtin.file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: "0750"
+      when: not is_first_deploy
+
+    - name: Create full backup before migration
+      ansible.builtin.shell:
+        cmd: >
+          docker compose exec -T {{ db_service }}
+          sh -c 'exec mysqldump -u root -p"$MYSQL_ROOT_PASSWORD"
+          --single-transaction --routines --triggers --events
+          {{ db_name }}'
+          > {{ backup_dir }}/{{ backup_name }}
+        chdir: "{{ app_dir }}"
+      register: backup_result
+      changed_when: backup_result.rc == 0
+      when: not is_first_deploy
+
+    - name: Verify backup completed cleanly
+      ansible.builtin.shell:
+        cmd: "tail -1 {{ backup_dir }}/{{ backup_name }} | grep -q 'Dump completed'"
+      changed_when: false
+      when: not is_first_deploy
+
+    - name: Stat the backup file
+      ansible.builtin.stat:
+        path: "{{ backup_dir }}/{{ backup_name }}"
+      register: backup_file
+      when: not is_first_deploy
+
+    - name: Report backup location
+      ansible.builtin.debug:
+        msg: "Backup written: {{ backup_dir }}/{{ backup_name }} ({{ backup_file.stat.size | human_readable }})"
+      when: not is_first_deploy
+
+    - name: Find backups older than retention period
+      ansible.builtin.find:
+        paths: "{{ backup_dir }}"
+        patterns: "pre_migration_*.sql"
+        age: "{{ backup_retention_days }}d"
+      register: old_backups
+      when: not is_first_deploy
+
+    - name: Delete old backups
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_backups.files | default([]) }}"
+      loop_control:
+        label: "{{ item.path }}"
+      when: not is_first_deploy
