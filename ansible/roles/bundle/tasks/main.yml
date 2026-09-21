@@ -1,0 +1,16 @@
+---
+- name: Create application source
+  ansible.builtin.import_tasks: source.yml
+  tags: [source]
+
+- name: Sync database migrations from S3
+  ansible.builtin.import_tasks: migrations.yml
+  tags: [migrations]
+
+- name: Provision credentials
+  ansible.builtin.import_tasks: credentials.yml
+  tags: [credentials, secrets]
+
+- name: Sync application directories
+  ansible.builtin.import_tasks: sync.yml
+  tags: [sync]

@@ -11,22 +11,20 @@ jobs:
     environment: prod
 
     env:
-      APP_NAME: ${{ vars.APP_NAME }}
       VPS_HOST: ${{ secrets.VPS_HOST }}
-      VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
       VPS_PORT: ${{ secrets.VPS_PORT }}
-      S3_REGION: ${{ secrets.S3_REGION }}
-      S3_BUCKET: ${{ secrets.S3_BUCKET }}
-      MYSQL_MIGRATION_USER: ${{ secrets.MYSQL_MIGRATION_USER }}
-      MYSQL_MIGRATION_PASSWORD: ${{ secrets.MYSQL_MIGRATION_PASSWORD }}
-      MYSQL_PORT: ${{ vars.MYSQL_PORT }}
-      MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
 
+      - name: Create vault password file
+        run: |
+          printf '%s' "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" | tr -d '\r' > /tmp/vault_pass.txt
+          echo "vault password file: $(wc -c < /tmp/vault_pass.txt) bytes (expected 2774)"
+
       - name: Install Ansible
+        shell: bash
         run: |
           sudo apt update
           sudo apt install -y ansible
@@ -40,8 +38,14 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
 
       - name: Rollout
+        working-directory: ansible
         run: |
           ansible-playbook \
-            -i ansible/inventory/inventory.yml \
-            ansible/playbook/deploy.yml \
+            -i inventories/production/hosts.yml \
+            --vault-password-file /tmp/vault_pass.txt \
+            playbooks/deploy.yml \
             --private-key ~/.ssh/vps_key
+
+      - name: Clean up secrets
+        if: always()
+        run: rm -f /tmp/vault_pass.txt ~/.ssh/vps_key

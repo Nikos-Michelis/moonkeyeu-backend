@@ -1,0 +1,39 @@
+---
+- name: Ensure ACL tools are present
+  ansible.builtin.package:
+    name: acl
+    state: present
+
+- name: Ensure the deploy user exists
+  ansible.builtin.user:
+    name: "{{ env_user }}"
+    shell: /bin/bash
+    groups: sudo
+    append: true
+    create_home: true
+
+- name: Configure passwordless sudo
+  ansible.builtin.copy:
+    content: "{{ env_user }} ALL=(ALL) NOPASSWD: ALL\n"
+    dest: "/etc/sudoers.d/{{ env_user }}"
+    mode: '0440'
+    owner: root
+    group: root
+    validate: "visudo -cf %s"
+
+- name: Verify passwordless sudo
+  ansible.builtin.command: sudo -n whoami
+  become: true
+  become_user: "{{ env_user }}"
+  register: common_sudo_test
+  changed_when: false
+  failed_when: false
+
+- name: Fail if passwordless sudo is not working
+  ansible.builtin.fail:
+    msg: "Passwordless sudo failed for {{ env_user_id }}: {{ common_sudo_test.stderr }}"
+  when: common_sudo_test.rc != 0 or (common_sudo_test.stdout != 'root' and common_sudo_test.stdout != 'ubuntu')
+
+- name: Report result
+  ansible.builtin.debug:
+    msg: "{{ env_user }} can sudo as: {{ common_sudo_test.stdout }}"

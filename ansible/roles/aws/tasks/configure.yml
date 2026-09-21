@@ -1,0 +1,43 @@
+---
+- name: Check required AWS credentials
+  ansible.builtin.assert:
+    that:
+      - vault_aws_access_key_id is defined
+      - vault_aws_secret_access_key is defined
+    fail_msg: "Set aws_access_key_id and aws_secret_access_key in inventory or vault."
+
+- name: Ensure .aws directory exists
+  ansible.builtin.file:
+    path: "/home/{{ env_user }}/.aws"
+    state: directory
+    owner: "{{ env_user }}"
+    group: "{{ env_user }}"
+    mode: "0700"
+
+- name: Remove existing AWS credentials
+  ansible.builtin.file:
+    path: "/home/{{ env_user }}/.aws/credentials"
+    state: absent
+
+- name: Write AWS credentials
+  ansible.builtin.copy:
+    dest: "/home/{{ env_user }}/.aws/credentials"
+    owner: "{{ env_user }}"
+    group: "{{ env_user }}"
+    mode: "0600"
+    content: |
+      [default]
+      aws_access_key_id = {{ vault_aws_access_key_id }}
+      aws_secret_access_key = {{ vault_aws_secret_access_key }}
+  no_log: true
+
+- name: Verify AWS identity
+  ansible.builtin.command: aws sts get-caller-identity --region {{ vault_aws_region }}
+  become: true
+  become_user: "{{ env_user }}"
+  changed_when: false
+  register: aws_identity
+
+- name: Show identity
+  ansible.builtin.debug:
+    var: aws_identity.stdout

@@ -1,0 +1,8 @@
+---
+- name: Install AWS CLI
+  ansible.builtin.import_tasks: install.yml
+  tags: [aws, aws-cli]
+
+- name: Configure AWS credentials
+  ansible.builtin.import_tasks: configure.yml
+  tags: [aws, aws-conf]

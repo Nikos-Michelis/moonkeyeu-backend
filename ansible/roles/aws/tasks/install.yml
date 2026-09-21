@@ -1,0 +1,34 @@
+---
+- name: Ensure dependencies are installed
+  ansible.builtin.package:
+    name:
+      - curl
+      - unzip
+    state: present
+
+- name: Download AWS CLI installer
+  ansible.builtin.get_url:
+    url: "{{ aws_cli_base_url }}/awscli-exe-linux-{{ kernel_arch }}.zip"
+    dest: /tmp/awscliv2.zip
+    mode: "0644"
+
+- name: Unzip AWS CLI installer
+  ansible.builtin.unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp
+    remote_src: true
+    creates: /tmp/aws/install
+
+- name: Run AWS CLI installer
+  ansible.builtin.command: /tmp/aws/install --update
+  args:
+    creates: /usr/local/bin/aws
+
+- name: Verify AWS CLI installation
+  ansible.builtin.command: /usr/local/bin/aws --version
+  changed_when: false
+  register: aws_cli_version
+
+- name: Display AWS CLI version
+  ansible.builtin.debug:
+    msg: "{{ aws_cli_version.stdout }}"

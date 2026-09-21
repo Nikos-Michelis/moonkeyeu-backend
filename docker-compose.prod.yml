@@ -11,11 +11,11 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_APP_USER: ${MYSQL_APP_USER}
-      MYSQL_APP_PASSWORD: ${MYSQL_APP_PASSWORD}
+      MYSQL_USER: ${MYSQL_APP_USER}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
     volumes:
       - mysql-db-data:/var/lib/mysql:rw
-      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./db/migration/init:/docker-entrypoint-initdb.d:ro
     restart: always
     networks:
       - private-internal-network
@@ -118,7 +118,6 @@ services:
       DB_IMAGES_DIR: /app/data/images
     volumes:
       - ./data/json-dataset:/app/data/json-dataset
-      - /home/moonkeyeu/.aws:/root/.aws
     depends_on:
       mysqldb:
         condition: service_healthy
@@ -298,7 +297,6 @@ networks:
 volumes:
   mysql-db-data:
     name: mysql-db-data
-    external: true
   data_loki:
     name: data_loki
     driver: local

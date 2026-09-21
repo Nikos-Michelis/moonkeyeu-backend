@@ -1,0 +1,8 @@
+---
+- name: Provision application host
+  hosts: provision
+  become: true
+  roles:
+    - common
+    - docker
+    - aws

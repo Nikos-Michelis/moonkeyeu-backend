@@ -3,6 +3,7 @@
 .my.cnf
 .idea
 .gitleaks-report.json
+ansible/inventories/**/.vault_pass/*
 /db
 /data
 moonkeyeu-etl-api/target

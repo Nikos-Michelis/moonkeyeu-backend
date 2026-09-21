@@ -1,0 +1,33 @@
+---
+- name: Pull latest Docker images
+  community.docker.docker_compose_v2:
+    project_src: "{{ src }}"
+    files:
+      - "{{ compose_file }}"
+    env_files:
+      - ".env"
+    pull: always
+    state: present
+
+- name: Stop existing containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ src }}"
+    files:
+      - "{{ compose_file }}"
+    env_files:
+      - ".env"
+    state: absent
+
+- name: Start containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ src }}"
+    files:
+      - "{{ compose_file }}"
+    env_files:
+      - ".env"
+    state: present
+    pull: never
+
+- name: Remove unused Docker images
+  community.docker.docker_prune:
+    images: true

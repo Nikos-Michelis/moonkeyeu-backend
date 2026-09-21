@@ -1,0 +1,10 @@
+---
+- name: Ensure base directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ env_user }}"
+    mode: "0750"
+  loop:
+    - "{{ src }}"
+    - "{{ migration }}"
