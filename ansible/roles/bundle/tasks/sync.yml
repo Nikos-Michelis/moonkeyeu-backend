@@ -4,8 +4,8 @@
     src: "{{ project_root }}/{{ item }}/"
     dest: "{{ src }}/{{ item }}/"
     owner: "{{ env_user }}"
-    mode: "0640"
-    directory_mode: "0750"
+    mode: "0644"
+    directory_mode: "0755"
   loop: "{{ app_dirs }}"
   register: bundle_app_dirs_result
 

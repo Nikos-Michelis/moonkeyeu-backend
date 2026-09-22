@@ -55,7 +55,7 @@ compose_env:
 
   NGINX_PORT: "{{ vault_nginx_port }}"
   NGINX_HTTPS_PORT: "{{ vault_nginx_https_port }}"
-  NGINX_SERVER_NAME: "{{ vault_nginx_server_name }}"
+  NGINX_SERVER_NAME: "{{ vault_certbot_domain_backend }}"
 
   VPS_HOST: "{{ vault_vps_host }}"
   VPS_PORT: "{{ vault_vps_port }}"

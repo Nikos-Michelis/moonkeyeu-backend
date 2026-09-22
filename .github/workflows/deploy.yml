@@ -1,18 +1,21 @@
-name: Test Ansible
+name: Deploy to LightSail VPS
 
 on:
-  push:
-    branches:
-      - chore/configure-ci-cd
+  workflow_call:
+    secrets:
+      VPS_HOST:
+        required: true
+      VPS_SSH_KEY:
+        required: true
+      VPS_PORT:
+        required: true
+      ANSIBLE_VAULT_PASSWORD:
+        required: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: prod
-
-    env:
-      VPS_HOST: ${{ secrets.VPS_HOST }}
-      VPS_PORT: ${{ secrets.VPS_PORT }}
 
     steps:
       - name: Checkout repository

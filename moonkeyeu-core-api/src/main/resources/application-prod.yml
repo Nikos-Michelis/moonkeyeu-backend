@@ -26,13 +26,7 @@ spring:
 
   flyway:
     clean-disabled: false
-    enabled: true
-    user: ${MYSQL_MIGRATION_USER}
-    password: ${MYSQL_MIGRATION_PASSWORD}
-    locations:
-      - classpath:db/migration/schema
-      - classpath:db/migration/seed
-    baseline-version: 1
+    enabled: false
 
   jpa:
     hibernate:
@@ -76,7 +70,7 @@ spring:
 application:
   seo:
     name: MoonkeyEU
-    logo: ${CLOUDFRONT_URL}/media/assets/moonkeyeu-logo.jpg
+    logo: ${CLOUDFRONT_URL}/media/assets/logo/moonkeyeu-logo.jpg
     description: Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.
   frontend:
     url: ${DOMAIN_URL:http://localhost:3001}

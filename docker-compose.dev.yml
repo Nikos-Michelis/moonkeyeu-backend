@@ -260,7 +260,7 @@ services:
       grafana:
         condition: service_healthy
     volumes:
-      - ./nginx/conf/nginx.conf:/etc/nginx/templates/nginx.conf.template
+      - ./nginx/conf/dev/nginx.conf:/etc/nginx/templates/nginx.conf.template
       - ./nginx/logs:/var/log/myapp:rw
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot

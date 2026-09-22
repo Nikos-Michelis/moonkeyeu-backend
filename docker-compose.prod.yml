@@ -186,6 +186,12 @@ services:
     networks:
       - private-internal-network
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://alloy-container:9090/-/healthy" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   loki:
     image: docker.io/grafana/loki:3.6.7
@@ -256,22 +262,23 @@ services:
       grafana:
         condition: service_healthy
     volumes:
-      - ./nginx/conf/nginx.conf:/etc/nginx/templates/nginx.conf.template
+      - ./nginx/conf/prod/nginx.conf:/etc/nginx/templates/nginx.conf.template:ro
       - ./nginx/logs:/var/log/myapp:rw
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
+      - ./nginx/certbot/conf:/etc/letsencrypt:rw
+      - ./nginx/certbot/www:/var/www/certbot:rw
     ports:
       - "80:80"
+      - "443:443"
     deploy:
       resources:
         limits:
           cpus: "1"
-          memory: "800m"
+          memory: "500m"
     restart: unless-stopped
     networks:
       - private-internal-network
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:80/health | jq -e '.status == \"UP\"' || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://127.0.0.1:80/health | jq -e '.status == \"UP\"' || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -284,12 +291,9 @@ services:
       nginx:
         condition: service_healthy
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/www/certbot:/var/www/certbot
-    #command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN_BACKEND} --agree-tos
-    #command: renew --dry-run
-    #command: renew --force-renewal
-    command: renew
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN_BACKEND} --agree-tos
 
 networks:
   private-internal-network:
