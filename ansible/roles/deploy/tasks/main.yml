@@ -1,0 +1,20 @@
+---
+- name: Deploy | Setup application source
+  ansible.builtin.import_tasks: setup.yml
+  tags: [source]
+
+- name: Deploy | Sync database migrations from S3
+  ansible.builtin.import_tasks: migrations.yml
+  tags: [migrations]
+
+- name: Deploy | Provision credentials
+  ansible.builtin.import_tasks: credentials.yml
+  tags: [credentials, secrets]
+
+- name: Deploy | Bundle application directories
+  ansible.builtin.import_tasks: bundle.yml
+  tags: [sync]
+
+- name: Deploy | Update docker images
+  ansible.builtin.import_tasks: deploy.yml
+  tags: [deploy]

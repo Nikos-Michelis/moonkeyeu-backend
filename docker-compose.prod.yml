@@ -99,6 +99,7 @@ services:
     container_name: moonkeyeu-etl-api-container
     restart: on-failure
     environment:
+      VPS_ENVIRONMENT_USER: ${VPS_ENVIRONMENT_USER}
       AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
       AWS_REGION: ${AWS_REGION}
       S3_REGION: ${AWS_REGION}
@@ -118,6 +119,7 @@ services:
       DB_IMAGES_DIR: /app/data/images
     volumes:
       - ./data/json-dataset:/app/data/json-dataset
+      - /home/${VPS_ENVIRONMENT_USER}/.aws:/root/.aws:ro
     depends_on:
       mysqldb:
         condition: service_healthy
@@ -183,11 +185,12 @@ services:
       - alloy_data:/var/lib/alloy/data:rw
       - ./monitoring/alloy:/etc/alloy:ro
       - ./nginx/logs:/var/log/myapp:ro
+      - ./bin/curl:/usr/local/bin/curl:ro
     networks:
       - private-internal-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://alloy-container:9090/-/healthy" ]
+      test: [ "CMD", "/usr/local/bin/curl", "-fsS", "http://127.0.0.1:12345/-/healthy" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -202,7 +205,7 @@ services:
       - ./monitoring/loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
     depends_on:
       alloy:
-        condition: service_started
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -231,7 +234,7 @@ services:
       loki:
         condition: service_healthy
       alloy:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro

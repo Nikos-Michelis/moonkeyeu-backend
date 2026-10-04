@@ -1,12 +1,12 @@
 ---
-- name: Download migrations from S3
+- name: Migrations | Download migrations from S3
   ansible.builtin.command:
     argv:
       - aws
       - s3
       - sync
-      - "s3://{{ vault_s3_bucket }}/{{ s3_prefix }}"
-      - "{{ migration }}/"
+      - "s3://{{ vault_s3_bucket }}/{{ s3_migrations_prefix }}"
+      - "{{ src }}/db/migration/"
       - "--region={{ vault_s3_region }}"
       - --delete
   register: bundle_s3_sync

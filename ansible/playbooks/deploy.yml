@@ -1,7 +1,6 @@
 ---
-- name: Playbook Deploy Application
+- name: Deploy | Deploy application
   hosts: deploy
   become: false
   roles:
-    - bundle
-    - compose
+    - deploy

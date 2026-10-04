@@ -1,5 +1,5 @@
 # Makefile
-.PHONY: ping deploy-prod deploy-staging lint check-prod
+.PHONY: ping deploy-prod deploy-staging lint check-prod maintain-prod maintain-prod-reboot
 
 ping:
     ansible all -m ping -i inventories/production/hosts.yml
@@ -9,6 +9,12 @@ deploy-prod:
 
 deploy-staging:
     ansible-playbook playbooks/site.yml -i inventories/staging/hosts.yml
+
+maintain-prod:
+	ansible-playbook playbooks/maintenance.yml -i inventories/production/hosts.yml
+
+maintain-prod-reboot:
+	ansible-playbook playbooks/maintenance.yml -i inventories/production/hosts.yml -e maintenance_allow_reboot=true
 
 lint:
     ansible-lint playbooks/ roles/

@@ -1,7 +1,11 @@
 ---
-- name: Update apt cache
+- name: Common | Update apt cache
   ansible.builtin.import_tasks: update-apt.yml
 
-- name: Setup Passwordless Sudo
+- name: Common | Setup Passwordless Sudo
   ansible.builtin.import_tasks: setup-sudo.yml
   tags: [sudo]
+
+- name: Common | Setup SSL renewal cronjob
+  ansible.builtin.import_tasks: cron.yml
+  tags: [cron]

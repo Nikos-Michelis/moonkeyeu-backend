@@ -1,5 +1,5 @@
 ---
-- name: Update apt package index
+- name: Apt update | Update apt package index
   ansible.builtin.apt:
     name: "{{ common_packages }}"
     state: present

@@ -183,11 +183,18 @@ services:
       - alloy_data:/var/lib/alloy/data:rw
       - ./monitoring/alloy:/etc/alloy:ro
       - ./nginx/logs:/var/log/myapp:ro
+      - ./bin/curl:/usr/local/bin/curl:ro
     ports:
       - "12345:12345"
     networks:
       - private-internal-network
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "/usr/local/bin/curl", "-fsS", "http://127.0.0.1:12345/-/healthy" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   loki:
     image: docker.io/grafana/loki:3.6.7
@@ -200,7 +207,7 @@ services:
       - "3100:3100"
     depends_on:
       alloy:
-        condition: service_started
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -229,7 +236,7 @@ services:
       loki:
         condition: service_healthy
       alloy:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
@@ -295,10 +302,7 @@ services:
         limits:
           cpus: "0.6"
           memory: "100m"
-    #command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN_BACKEND} --agree-tos
-    #command: renew --dry-run
-    #command: renew --force-renewal
-    command: renew
+    command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN_BACKEND} --agree-tos
 
 networks:
   private-internal-network:

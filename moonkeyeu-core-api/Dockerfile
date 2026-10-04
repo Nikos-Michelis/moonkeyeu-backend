@@ -14,7 +14,7 @@ FROM eclipse-temurin:21-jdk-jammy
 ARG APP_NAME=moonkeyeu-core-api
 ARG APP_VERSION=v2.0.0-RELEASE
 # Install curl and jq for health checks
-RUN apt-get update && apt-get install -y jq curl && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl jq
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/
 EXPOSE 8080
