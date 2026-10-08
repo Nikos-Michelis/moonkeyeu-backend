@@ -1,7 +1,7 @@
 ---
 vm_kernel_arch: x86_64
 app_name: moonkeyeu
-s3_migrations_prefix: "database/mysql/migrations/"
+s3_migrations_prefix: "database/mysql/migrations/dev/"
 compose_file: docker-compose.prod.yml
 
 enable_debug: true
@@ -18,11 +18,10 @@ init_src:
 app_dirs:
   - nginx
   - monitoring
+  - scripts
 
 app_files:
   - "{{ compose_file }}"
-  - renew_cert.sh
-  - Makefile
 
 app_key_types:
   - access-token

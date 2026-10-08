@@ -44,7 +44,7 @@ jobs:
 
       - name: Download test database from S3
         run: |
-          aws s3 cp s3://fs-moonkeyeu-bucket-test/database/mysql/migrations/ ./db/migration/ --recursive
+          aws s3 cp s3://fs-moonkeyeu-bucket-test/database/mysql/migrations/test/ ./db/migration/ --recursive
 
       - name: Upload SQL as artifact
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f #v7.0.0

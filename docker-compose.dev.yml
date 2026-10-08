@@ -122,6 +122,8 @@ services:
     depends_on:
       mysqldb:
         condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
       moonkeyeu-core-api:
         condition: service_healthy
     ports:
@@ -145,6 +147,11 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      moonkeyeu-etl-api:
+        condition: service_healthy
+      moonkeyeu-core-api:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -287,22 +294,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot-container
-    depends_on:
-      nginx:
-        condition: service_healthy
-    volumes:
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-    deploy:
-      resources:
-        limits:
-          cpus: "0.6"
-          memory: "100m"
-    command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN_BACKEND} --agree-tos
 
 networks:
   private-internal-network:

@@ -29,4 +29,4 @@
     day: "15,30"
     month: "*"
     weekday: "*"
-    job: "cd {{ src }} && ./renew_cert.sh >> {{ common_renew_cert_log }} 2>&1"
+    job: "cd {{ src }} && ./scripts/renew_cert.sh >> {{ common_renew_cert_log }} 2>&1"

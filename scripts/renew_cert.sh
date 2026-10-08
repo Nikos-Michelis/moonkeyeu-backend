@@ -1,8 +1,8 @@
 #!/bin/bash
 
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.prod.yml}"
-NGINX_SERVICE="nginx"
-CERTBOT_SERVICE="certbot"
+NGINX_SERVICE="nginx-container"
+CERTBOT_SERVICE="certbot-renew-container"
 
 cd "$(dirname "$(readlink -f "$0")")" || exit 1
 

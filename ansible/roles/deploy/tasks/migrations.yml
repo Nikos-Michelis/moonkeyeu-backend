@@ -1,5 +1,5 @@
 ---
-- name: Migrations | Download migrations from S3
+- name: Migrations | Sync migrations from S3
   ansible.builtin.command:
     argv:
       - aws
@@ -9,5 +9,6 @@
       - "{{ src }}/db/migration/"
       - "--region={{ vault_s3_region }}"
       - --delete
-  register: bundle_s3_sync
-  changed_when: "'download:' in bundle_s3_sync.stdout"
+      - --exact-timestamps
+  register: migrations_s3_sync
+  changed_when: "'download:' in migrations_s3_sync.stdout or 'delete:' in migrations_s3_sync.stdout"
