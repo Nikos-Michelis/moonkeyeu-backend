@@ -1,0 +1,32 @@
+---
+- name: Bundle | Bundle application directories
+  ansible.builtin.copy:
+    src: "{{ project_root }}/{{ item }}/"
+    dest: "{{ src }}/{{ item }}/"
+    owner: "{{ env_user }}"
+    mode: "0644"
+    directory_mode: "0755"
+  loop: "{{ app_dirs }}"
+
+- name: Bundle | Check application file destinations
+  ansible.builtin.stat:
+    path: "{{ src }}/{{ item }}"
+  loop: "{{ app_files }}"
+  register: bundle_app_files_stat
+
+- name: Bundle | Remove stale directories shadowing application files
+  ansible.builtin.file:
+    path: "{{ item.stat.path }}"
+    state: absent
+  loop: "{{ bundle_app_files_stat.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.stat.exists and item.stat.isdir
+
+- name: Bundle | Bundle application files
+  ansible.builtin.copy:
+    src: "{{ project_root }}/{{ item }}"
+    dest: "{{ src }}/{{ item }}"
+    owner: "{{ env_user }}"
+    mode: "{{ '0750' if item.endswith('.sh') else '0640' }}"
+  loop: "{{ app_files }}"

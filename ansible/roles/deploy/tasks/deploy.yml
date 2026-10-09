@@ -1,0 +1,21 @@
+---
+- name: Compose | Pull latest images and update the stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ src }}"
+    files:
+      - "{{ compose_file }}"
+    env_files:
+      - ".env"
+    pull: always
+    state: present
+    remove_orphans: true
+  become: true
+  become_user: "{{ env_user }}"
+  register: app_compose
+
+- name: Compose | Remove unused Docker images
+  community.docker.docker_prune:
+    images: true
+  become: true
+  become_user: "{{ env_user }}"
+  when: app_compose is changed

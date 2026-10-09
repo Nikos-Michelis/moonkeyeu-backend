@@ -1,0 +1,9 @@
+---
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+docker_apt_key_path: /etc/apt/keyrings/docker.asc
+docker_apt_base_url: https://download.docker.com/linux/ubuntu
