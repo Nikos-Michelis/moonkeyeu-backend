@@ -32,6 +32,8 @@ FROM eclipse-temurin:21-jre-jammy
 
 ARG APP_NAME=moonkeyeu-core-api
 ARG APP_VERSION=v2.0.0-RELEASE
+ARG APP_UID=1001
+ARG APP_GID=1001
 
 LABEL org.opencontainers.image.title=${APP_NAME} \
       org.opencontainers.image.version=${APP_VERSION}
@@ -41,17 +43,18 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends curl jq \
     && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN groupadd -g ${APP_GID} service_user \
+    && useradd -u ${APP_UID} -g service_user -m service_user
 
 WORKDIR /app
 
 # Copy layers from least to most frequently changing
-COPY --from=extract --chown=appuser:appuser /app/extracted/dependencies/ ./
-COPY --from=extract --chown=appuser:appuser /app/extracted/spring-boot-loader/ ./
-COPY --from=extract --chown=appuser:appuser /app/extracted/snapshot-dependencies/ ./
-COPY --from=extract --chown=appuser:appuser /app/extracted/application/ ./
+COPY --from=extract --chown=service_user:service_user /app/extracted/dependencies/ ./
+COPY --from=extract --chown=service_user:service_user /app/extracted/spring-boot-loader/ ./
+COPY --from=extract --chown=service_user:service_user /app/extracted/snapshot-dependencies/ ./
+COPY --from=extract --chown=service_user:service_user /app/extracted/application/ ./
 
-USER appuser
+USER service_user
 
 EXPOSE 8080
 
