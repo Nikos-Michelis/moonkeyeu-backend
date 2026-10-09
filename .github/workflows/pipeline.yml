@@ -6,9 +6,9 @@ on:
       - 'backend/**'
       - 'moonkeyeu-core-api/**'
       - 'moonkeyeu-etl-api/**'
-    branches: [dev, main, chore/configure-ci-cd, feature/**]
+    branches: [dev, main, feature/**]
   pull_request:
-    branches: [dev, main, chore/configure-ci-cd, feature/**]
+    branches: [dev, main, feature/**]
 
 env:
   API_PROFILE: ${{ vars.API_PROFILE }}
