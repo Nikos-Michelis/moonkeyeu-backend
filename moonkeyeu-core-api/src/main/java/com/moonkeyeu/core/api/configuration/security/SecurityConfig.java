@@ -25,7 +25,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final FilterChainExceptionHandler filterChainExceptionHandler;
     private final LogoutHandler logoutHandler;

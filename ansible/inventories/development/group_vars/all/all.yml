@@ -1,0 +1,29 @@
+---
+vm_kernel_arch: x86_64
+app_name: moonkeyeu
+s3_migrations_prefix: "database/mysql/migrations/prod/"
+compose_file: docker-compose.prod.yml
+
+enable_debug: true
+project_root : "{{ playbook_dir }}/../.."
+
+src: "/home/{{ env_user }}/project/{{ app_name }}"
+
+init_src:
+  - "{{ src }}"
+  - "{{ src }}/jwt-keys"
+  - "{{ src }}/db/migration"
+  - "{{ src }}/bin"
+  - "{{ src }}/data/json-dataset"
+
+app_dirs:
+  - nginx
+  - monitoring
+  - scripts
+
+app_files:
+  - "{{ compose_file }}"
+
+app_key_types:
+  - access-token
+  - refresh-token

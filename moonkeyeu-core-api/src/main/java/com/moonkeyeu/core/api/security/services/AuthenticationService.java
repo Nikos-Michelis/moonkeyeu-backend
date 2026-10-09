@@ -10,7 +10,7 @@ import com.moonkeyeu.core.api.security.dto.request.RegisterRequest;
 import com.moonkeyeu.core.api.security.dto.response.TokenDetailsDTO;
 import com.moonkeyeu.core.api.security.email.EmailDetails;
 import com.moonkeyeu.core.api.security.email.EmailTemplateName;
-import com.moonkeyeu.core.api.security.model.SignUpProvider;
+import com.moonkeyeu.core.api.security.model.SignUpMethod;
 import com.moonkeyeu.core.api.security.model.otp.OtpToken;
 import com.moonkeyeu.core.api.security.model.otp.OtpType;
 import com.moonkeyeu.core.api.security.model.token.jwt.Token;
@@ -75,7 +75,7 @@ public class AuthenticationService {
         var userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("Role was not initialized."));
 
-        var signUpMethod = providerRepository.findByProvider(SignUpProvider.Password.name())
+        var signUpMethod = providerRepository.findByProvider(SignUpMethod.Password)
                 .orElseThrow(() -> new IllegalStateException("SignUp provider was not initialized."));
 
 
@@ -100,61 +100,61 @@ public class AuthenticationService {
                         .build());
         return otpToken;
     }
-   @Transactional(noRollbackFor = {BadCredentialsException.class, LockedException.class})
-   public OtpToken authenticate(AuthenticationRequest request) throws MessagingException {
+    @Transactional(noRollbackFor = {BadCredentialsException.class, LockedException.class})
+    public OtpToken authenticate(AuthenticationRequest request) throws MessagingException {
 
-        var auth = authenticationManagerImpl.authenticate(
-               new UsernamePasswordAuthenticationToken(
-                       request.getEmail(),
-                       request.getPassword()
-               )
-       );
+         var auth = authenticationManagerImpl.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
 
-       var user = ((User) auth.getPrincipal());
-       OtpToken otpToken = otpServiceProvider.issueOtpCode(user, OtpType.LOGIN);
-       otpServiceProvider
-               .buildEmail(
-                       user,
-                       otpToken,
-                       EmailDetails.builder()
-                               .subject("Account Verification")
-                               .emailTemplateName(EmailTemplateName.VERIFY_ACCOUNT)
-                               .build()
-               );
-       return otpToken;
-   }
-   @Transactional(noRollbackFor = {OtpLimitException.class, InvalidOtpException.class})
-   public TokenDetailsDTO VerifyOtp(OtpValidationRequest otpValidationRequest) {
-       OtpToken otpToken = otpRepository.findByToken(otpValidationRequest.getToken())
-               .filter(otp -> (otp.getValidatedAt() == null
-                       && !otp.isRedeemed())
-                       && (!otp.isRevoked()
-                       && !otp.isExpired()))
-               .orElseThrow(() -> new InvalidOtpException("Invalid otp token."));
+        var user = ((User) auth.getPrincipal());
+        OtpToken otpToken = otpServiceProvider.issueOtpCode(user, OtpType.LOGIN);
+        otpServiceProvider
+                .buildEmail(
+                        user,
+                        otpToken,
+                        EmailDetails.builder()
+                                .subject("Account Verification")
+                                .emailTemplateName(EmailTemplateName.VERIFY_ACCOUNT)
+                                .build()
+                );
+        return otpToken;
+    }
+    @Transactional(noRollbackFor = {OtpLimitException.class, InvalidOtpException.class})
+    public TokenDetailsDTO VerifyOtp(OtpValidationRequest otpValidationRequest) {
+        OtpToken otpToken = otpRepository.findByToken(otpValidationRequest.getToken())
+                .filter(otp -> (otp.getValidatedAt() == null
+                        && !otp.isRedeemed())
+                        && (!otp.isRevoked()
+                        && !otp.isExpired()))
+                .orElseThrow(() -> new InvalidOtpException("Invalid otp token."));
 
-       User user = userRepository.findByEmail(otpToken.getUser().getEmail())
-               .filter(User::isEnable)
-               .orElseThrow(() -> new UsernameNotFoundException("User not found."));
-       otpServiceValidatorImpl.isValidOtp(otpToken, otpValidationRequest, user);
-       if (user.getValidatedAt() == null) {
-           user.setValidatedAt(Instant.now());
-       }
-       otpToken.setValidatedAt(Instant.now());
-       revokeOtpToken(otpToken);
-       revokeAllUserTokens(user);
-       Token accessToken = jwtServiceProvider.generateAccessToken(user);
-       Token refreshToken = jwtServiceProvider.generateRefreshToken(user, otpValidationRequest.getRememberMe());
-       tokenRepository.save(refreshToken);
-       return TokenDetailsDTO.builder()
-               .accessToken(accessToken.getToken())
-               .refreshToken(refreshToken.getToken())
-               .accessTokenIssuedAt(accessToken.getIssuedAt())
-               .accessTokenExpiresAt(accessToken.getExpiresAt())
-               .refreshTokenIssuedAt(refreshToken.getIssuedAt())
-               .refreshTokenExpiresAt(refreshToken.getExpiresAt())
-               .message("Login Successful.")
-               .build();
-   }
+        User user = userRepository.findByEmail(otpToken.getUser().getEmail())
+                .filter(User::isEnable)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        otpServiceValidatorImpl.isValidOtp(otpToken, otpValidationRequest, user);
+        if (user.getValidatedAt() == null) {
+            user.setValidatedAt(Instant.now());
+        }
+        otpToken.setValidatedAt(Instant.now());
+        revokeOtpToken(otpToken);
+        revokeAllUserTokens(user);
+        Token accessToken = jwtServiceProvider.generateAccessToken(user);
+        Token refreshToken = jwtServiceProvider.generateRefreshToken(user, otpValidationRequest.getRememberMe());
+        tokenRepository.save(refreshToken);
+        return TokenDetailsDTO.builder()
+                .accessToken(accessToken.getToken())
+                .refreshToken(refreshToken.getToken())
+                .accessTokenIssuedAt(accessToken.getIssuedAt())
+                .accessTokenExpiresAt(accessToken.getExpiresAt())
+                .refreshTokenIssuedAt(refreshToken.getIssuedAt())
+                .refreshTokenExpiresAt(refreshToken.getExpiresAt())
+                .message("Login Successful.")
+                .build();
+    }
 
     @Transactional
     public TokenDetailsDTO OAuth2GoogleRegister(OAuth2Request oAuth2Request){
@@ -167,7 +167,7 @@ public class AuthenticationService {
        var userRole = roleRepository.findByName("USER")
                .orElseThrow(() -> new IllegalStateException("Role was not initialized."));
 
-       var signUpMethod = providerRepository.findByProvider(SignUpProvider.Google.name())
+       var signUpMethod = providerRepository.findByProvider(SignUpMethod.Google)
                .orElseThrow(() -> new IllegalStateException("SignUp provider was not initialized."));
 
        User newUser = User.builder()
@@ -236,10 +236,10 @@ public class AuthenticationService {
 
     private void handleGoogleSignUp(User user){
         boolean hasSignUpMethod = user.getSignUpMethods().stream()
-                .anyMatch(method -> method.getProvider().equalsIgnoreCase(SignUpProvider.Google.name()));
+                .anyMatch(method -> method.getProvider().name().equalsIgnoreCase(SignUpMethod.Google.name()));
 
         if (!hasSignUpMethod) {
-           var signUpMethods = providerRepository.findByProvider(SignUpProvider.Google.name())
+           var signUpMethods = providerRepository.findByProvider(SignUpMethod.Google)
                     .orElseThrow(() -> new IllegalStateException("Google sign up provider was not initialized."));
            user.addSignUpProvider(signUpMethods);
         }

@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.moonkeyeu.core.api.launch.model.agency.Agencies;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
@@ -32,17 +30,20 @@ import java.util.Set;
                 )
         }
 )
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "spacecraft_configuration", schema = "moonkey_db")
 public class SpacecraftConfiguration {
     @Id
-    @Column(name = "spacecraft_conf_id")
+    @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Long spacecraftConfId;
     @Basic
-    @Column(name = "spacecraft_conf_name")
+    @Column(name = "name")
     private String spacecraftConfName;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
@@ -100,17 +101,4 @@ public class SpacecraftConfiguration {
     @OneToMany(mappedBy = "spacecraftConfiguration")
     @BatchSize(size = 10)
     private Set<SpacecraftConfImages> spacecraftConfImages;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        SpacecraftConfiguration that = (SpacecraftConfiguration) object;
-        return Objects.equals(spacecraftConfId, that.spacecraftConfId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(spacecraftConfId);
-    }
 }

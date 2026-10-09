@@ -11,7 +11,8 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -27,7 +28,7 @@ import java.util.Set;
 public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bookmark_id")
+    @Column(name = "id")
     private Long bookmarkId;
     @Column(name = "bookmark_name", unique = true)
     private String bookmarkName;
@@ -36,7 +37,7 @@ public class Bookmark {
     private User user;
     @ManyToMany(mappedBy = "bookmarks", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @BatchSize(size = 20)
-    private Set<Launch> launches = new HashSet<>();
+    private Set<Launch> launches;
     @CreatedDate
     @Column(name = "created_at", nullable = false, unique = false)
     private Instant createdAt;

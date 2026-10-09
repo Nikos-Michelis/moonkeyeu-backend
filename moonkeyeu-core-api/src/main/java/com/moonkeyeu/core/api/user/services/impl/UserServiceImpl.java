@@ -17,6 +17,7 @@ import com.moonkeyeu.core.api.settings.exceptions.InvalidResetTokenException;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Profile({"dev", "prod"})
 public class UserServiceImpl implements UserService {
     @Value("${application.frontend.url}")
     private String frontendUrl;

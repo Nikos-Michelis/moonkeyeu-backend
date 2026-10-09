@@ -34,7 +34,6 @@ public class JwtServiceProvider {
     private final RequestTokenBuilder requestTokenBuilder;
 
     private static final long ACCESS_EXPIRATION = 15 * 60 * 1000; // 15 minutes
-    //private static final long ACCESS_EXPIRATION = 30 * 1000; // 30 seconds
     private static final long REFRESH_EXPIRATION = 3 * 60 * 60 * 1000; // 3 hours
     private static final long REFRESH_EXPIRATION_REMEMBER_ME = 31L * 24 * 60 * 60 * 1000; // 31 days
 

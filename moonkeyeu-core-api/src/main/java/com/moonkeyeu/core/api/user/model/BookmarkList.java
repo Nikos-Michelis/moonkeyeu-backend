@@ -9,18 +9,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "bookmark_list")
+@Table(name = "bookmark_list", schema = "moonkey_db")
 @EqualsAndHashCode(of = "bookmarkListId")
 public class BookmarkList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bookmark_list_id")
+    @Column(name = "id")
     private Long bookmarkListId;
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "bookmark_id")

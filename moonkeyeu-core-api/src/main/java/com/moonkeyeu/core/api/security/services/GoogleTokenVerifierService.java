@@ -29,7 +29,9 @@ public class GoogleTokenVerifierService {
             GoogleIdToken idToken = verifier.verify(idTokenString);
             return idToken != null ? idToken.getPayload() : null;
         } catch (GeneralSecurityException | IllegalArgumentException | IOException e) {
-            throw new InvalidGoogleJwtToken("Invalid Google ID token");
+           throw new InvalidGoogleJwtToken("Invalid Google ID token");
+        } catch (Exception e) {
+            throw new InvalidGoogleJwtToken("Something went wrong during google id token verification", e);
         }
     }
 }

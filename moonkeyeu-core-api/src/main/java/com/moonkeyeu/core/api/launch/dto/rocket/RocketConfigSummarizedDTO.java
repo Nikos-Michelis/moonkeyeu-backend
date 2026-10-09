@@ -35,7 +35,8 @@ import java.time.LocalDate;
                 "infoUrl",
                 "wikiUrl",
                 "images",
-        })public class RocketConfigSummarizedDTO implements DTOEntity {
+        })
+public class RocketConfigSummarizedDTO implements DTOEntity {
     @JsonProperty("id")
     private Long rocketConfId;
     @JsonProperty("fullname")
@@ -76,6 +77,5 @@ import java.time.LocalDate;
     private ImageDTO rocketConfImages;
     @JsonProperty("agency")
     private AgencySummarizedDTO agencies;
-
 }
 

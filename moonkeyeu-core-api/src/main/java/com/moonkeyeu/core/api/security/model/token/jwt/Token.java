@@ -7,21 +7,23 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import java.time.Instant;
 
-@Data
-@Builder
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "token", schema = "moonkey_db")
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "token_id", unique = true)
-    private Integer id;
+    @Column(name = "id")
+    private Long id;
     @Column(name = "jti")
     private String jti;
     @Column(name = "token", unique = true)
     private String token;
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "token_type")
     private TokenType tokenType = TokenType.BEARER;

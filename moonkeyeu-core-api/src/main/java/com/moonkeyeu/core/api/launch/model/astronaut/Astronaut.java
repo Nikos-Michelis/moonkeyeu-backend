@@ -12,11 +12,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
 @NamedEntityGraph(
         name = "astronaut-with-status-images-nationality-socialmedia",
         attributeNodes = {
@@ -80,11 +75,18 @@ import java.util.Set;
                 )
         }
 )
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "astronaut", schema = "moonkey_db")
 public class Astronaut {
     @Id
-    @Column(name = "astronaut_id")
+    @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Long astronautId;
     @Basic
     @Column(name = "name")
@@ -137,16 +139,5 @@ public class Astronaut {
     @ManyToOne
     @JoinColumn(name = "agency_id")
     private Agencies agency;
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Astronaut astronaut = (Astronaut) object;
-        return Objects.equals(astronautId, astronaut.astronautId);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(astronautId);
-    }
 }

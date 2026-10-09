@@ -24,12 +24,10 @@ public interface LauncherRepository extends JpaRepository<Launcher, Long>, JpaSp
              LEFT JOIN FETCH lrs.type
              LEFT JOIN FETCH lrs.rocket r
              LEFT JOIN FETCH lrs.landing
-             LEFT JOIN FETCH l.status
-             LEFT JOIN FETCH l.launcherImages
-             LEFT JOIN FETCH r.launches ls
-             WHERE l.launcherId = :launcherId  
+             WHERE l.launcherId = :launcherId
         """)
         Optional<Launcher> findLauncherWithLauncherId(@Param("launcherId") Integer launcherId);
+
         @EntityGraph(value = "launcher-launcherStage-status-images",  type = EntityGraph.EntityGraphType.FETCH)
         Page<Launcher> findAll(Specification<Launcher> specification, Pageable pageable);
 

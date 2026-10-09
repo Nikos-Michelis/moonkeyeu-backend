@@ -12,8 +12,6 @@ import com.moonkeyeu.core.api.launch.dto.mission.MissionDTO;
 import com.moonkeyeu.core.api.launch.dto.mission.MissionPatchesDTO;
 import com.moonkeyeu.core.api.launch.dto.program.ProgramSummarizedDTO;
 import com.moonkeyeu.core.api.launch.dto.rocket.RocketDetailedDTO;
-import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +30,7 @@ import java.util.Set;
                 "flightclub_url",
                 "fullname",
                 "lastUpdated",
+                "net_precision",
                 "net",
                 "probability",
                 "launch_provider",
@@ -54,6 +53,8 @@ public class LaunchDTO implements DTOEntity {
     @JsonProperty("net")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX", timezone = "UTC")
     private Instant net;
+    @JsonProperty("net_precision")
+    private String netName;
     @JsonProperty("window_start")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssX", timezone = "UTC")
     private Instant windowStart;

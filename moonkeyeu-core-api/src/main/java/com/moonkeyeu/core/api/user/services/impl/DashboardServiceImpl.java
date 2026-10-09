@@ -1,19 +1,16 @@
 package com.moonkeyeu.core.api.user.services.impl;
 
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import com.moonkeyeu.core.api.launch.dto.DTOEntity;
 import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
-import com.moonkeyeu.core.api.user.dto.BatchJobExecDTO;
 import com.moonkeyeu.core.api.user.dto.ContactDTO;
 import com.moonkeyeu.core.api.user.dto.UserDTO;
 import com.moonkeyeu.core.api.user.model.*;
-import com.moonkeyeu.core.api.user.reporitory.BatchRepository;
 import com.moonkeyeu.core.api.user.reporitory.ContactRepository;
 import com.moonkeyeu.core.api.user.reporitory.UserRepository;
 import com.moonkeyeu.core.api.user.reporitory.specification.MessagesSpecification;
-import com.moonkeyeu.core.api.user.services.BatchService;
 import com.moonkeyeu.core.api.user.services.DashboardService;
-import com.moonkeyeu.core.api.configuration.utils.DtoConverter;
+import com.moonkeyeu.core.api.utils.mapper.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,27 +28,24 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class DashboardServiceImpl implements DashboardService, BatchService {
+public class DashboardServiceImpl implements DashboardService {
     private final ContactRepository contactRepository;
-    private final BatchRepository batchRepository;
     private final UserRepository userRepository;
     private final DtoConverter dtoConverter;
     @Autowired
     public DashboardServiceImpl(
             ContactRepository contactRepository,
-            BatchRepository batchRepository,
             UserRepository userRepository,
             DtoConverter dtoConverter
     ) {
         this.contactRepository = contactRepository;
-        this.batchRepository = batchRepository;
         this.userRepository = userRepository;
         this.dtoConverter = dtoConverter;
     }
     @Override
     @Cacheable(value = CacheNames.CONTACT_MESSAGES_CACHE, key = "'messages-pagination-' + #requestParams + '-' + #pageSortingDTO", sync = true)
     public Page<DTOEntity> searchMessages(Map<String, String> requestParams, PageSortingDTO pageSortingDTO) {
-        Specification<Contact> spec = Specification.where(null);
+        Specification<Contact> spec = Specification.unrestricted();
         if (requestParams != null && !requestParams.isEmpty()) {
 
             if (requestParams.containsKey("search") && !requestParams.get("search").isEmpty()) {
@@ -94,16 +88,6 @@ public class DashboardServiceImpl implements DashboardService, BatchService {
                         .enabled(member.isEnabled())
                         .createdAt(member.getCreatedAt())
                         .build())
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Deprecated
-    public List<BatchJobExecDTO> getAllBatchJobs() {
-        List<BatchJobExecution> batchJobExecutions = batchRepository.findAll();
-        return batchJobExecutions
-                .stream()
-                .map(batchJob -> dtoConverter.convertToDto(batchJob, BatchJobExecDTO.class))
                 .collect(Collectors.toList());
     }
 }

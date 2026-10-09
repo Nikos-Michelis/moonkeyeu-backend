@@ -12,12 +12,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "permissions")
+@Table(name = "permissions", schema = "moonkey_db")
 @EqualsAndHashCode(of = "permissionId")
 public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "permission_id")
+    @Column(name = "id")
     private Long permissionId;
     @Column(name = "name", unique = true, nullable = false)
     @Enumerated(EnumType.STRING)

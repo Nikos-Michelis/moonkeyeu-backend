@@ -1,0 +1,11 @@
+common_packages:
+  - curl
+  - wget
+  - unzip
+  - git
+  - acl
+  - bc
+  - expect
+  - ca-certificates
+
+common_renew_cert_log: /var/log/renew_cert.log

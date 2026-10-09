@@ -1,22 +1,23 @@
 package com.moonkeyeu.core.api.launch.model.program;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "programs_images", schema = "moonkey_db")
 public class ProgramImages {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "image_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Long imageId;
     @Basic
-    @Column(name = "image_name")
+    @Column(name = "name")
     private String imageName;
     @Basic
     @Column(name = "image_url")

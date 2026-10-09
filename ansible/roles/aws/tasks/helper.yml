@@ -1,0 +1,51 @@
+---
+- name: ECR helper | Install amazon-ecr-credential-helper
+  ansible.builtin.apt:
+    name: amazon-ecr-credential-helper
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: ECR helper | Set registry host
+  ansible.builtin.set_fact:
+    ecr_registry: "{{ vault_aws_account_id }}.dkr.ecr.{{ vault_aws_region }}.amazonaws.com"
+
+- name: ECR helper | Ensure ~/.docker exists
+  ansible.builtin.file:
+    path: "/home/{{ env_user }}/.docker"
+    state: directory
+    owner: "{{ env_user }}"
+    group: "{{ env_user }}"
+    mode: "0700"
+  become: true
+
+- name: ECR helper | Write Docker config (credential helper only)
+  ansible.builtin.copy:
+    dest: "/home/{{ env_user }}/.docker/config.json"
+    owner: "{{ env_user }}"
+    group: "{{ env_user }}"
+    mode: "0600"
+    content: |
+      {
+        "credHelpers": {
+          "{{ ecr_registry }}": "ecr-login"
+        }
+      }
+  become: true
+
+- name: ECR helper | Verify helper can fetch credentials
+  ansible.builtin.command: docker-credential-ecr-login get
+  args:
+    stdin: "{{ ecr_registry }}"
+  become: true
+  become_user: "{{ env_user }}"
+  register: ecr_helper_check
+  changed_when: false
+  failed_when: false
+  no_log: true
+
+- name: ECR helper | Fail with readable error if helper cannot authenticate
+  ansible.builtin.fail:
+    msg: "ECR credential helper failed for {{ ecr_registry }}: {{ ecr_helper_check.stderr }}"
+  when: ecr_helper_check.rc != 0

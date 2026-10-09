@@ -11,16 +11,16 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "otp", schema = "moonkey_db")
 public class OtpToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "otp_id")
+    @Column(name = "id")
     private Long otpId;
     @Column(name = "otp_type")
     @Enumerated(EnumType.STRING)

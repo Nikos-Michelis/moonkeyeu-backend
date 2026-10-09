@@ -1,0 +1,32 @@
+---
+- name: Cron | Ensure cron is installed
+  ansible.builtin.package:
+    name: cron
+    state: present
+
+- name: Cron | Ensure cron service is enabled and started
+  ansible.builtin.service:
+    name: cron
+    state: started
+    enabled: true
+
+- name: Cron | Ensure SSL renewal log file exists
+  ansible.builtin.file:
+    path: "{{ common_renew_cert_log }}"
+    state: touch
+    owner: "{{ env_user }}"
+    group: "{{ env_user }}"
+    mode: "0640"
+    modification_time: preserve
+    access_time: preserve
+
+- name: Cron | Schedule SSL certificate renewal
+  ansible.builtin.cron:
+    name: "Renew SSL certificates"
+    user: "{{ env_user }}"
+    minute: "5"
+    hour: "0"
+    day: "15,30"
+    month: "*"
+    weekday: "*"
+    job: "cd {{ src }} && ./scripts/renew_cert.sh >> {{ common_renew_cert_log }} 2>&1"

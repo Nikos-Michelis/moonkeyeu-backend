@@ -2,17 +2,12 @@ package com.moonkeyeu.core.api.launch.model.spacecraft;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Objects;
 import java.util.Set;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @NamedEntityGraph(
         name = "spacecraft-images",
         attributeNodes = {
@@ -48,10 +43,17 @@ import java.util.Set;
                 )
         }
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
+@Table(name = "spacecraft", schema = "moonkey_db")
 public class Spacecraft {
     @Id
-    @Column(name = "spacecraft_id")
+    @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Long spacecraftId;
     @Basic
     @Column(name = "name")
@@ -84,17 +86,4 @@ public class Spacecraft {
     @OneToMany(mappedBy = "spacecraft")
     @BatchSize(size = 10)
     private Set<SpacecraftStage> spacecraftStages;
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Spacecraft that = (Spacecraft) object;
-        return Objects.equals(spacecraftId, that.spacecraftId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(spacecraftId);
-    }
 }

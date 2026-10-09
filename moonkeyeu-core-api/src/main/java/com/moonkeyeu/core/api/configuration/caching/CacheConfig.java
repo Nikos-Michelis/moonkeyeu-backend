@@ -1,7 +1,7 @@
 package com.moonkeyeu.core.api.configuration.caching;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.moonkeyeu.core.api.configuration.utils.CacheNames;
+import com.moonkeyeu.core.api.utils.caching.CacheNames;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -18,7 +18,7 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterWrite(1, TimeUnit.HOURS)
+                .expireAfterWrite(70, TimeUnit.MINUTES)
                 .maximumSize(5000));
         cacheManager.registerCustomCache(
                 CacheNames.NASA_APOD_CACHE,

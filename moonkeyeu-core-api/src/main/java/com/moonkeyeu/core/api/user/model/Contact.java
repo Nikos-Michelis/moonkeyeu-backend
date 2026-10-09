@@ -19,7 +19,7 @@ import java.time.Instant;
 public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "contact_id")
+    @Column(name = "id")
     private Long contactId;
     @Column(name = "email", nullable = false)
     private String email;

@@ -14,17 +14,18 @@ import java.util.List;
 import java.util.Set;
 
 
-@Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "roles")
 public class Roles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
+    @Column(name = "id")
     private Long roleId;
     @Column(name = "name", unique = true)
     private String name;
@@ -38,7 +39,7 @@ public class Roles {
     private Set<Permission> permissions;
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    private List<User> users = new ArrayList<>();
+    private List<User> users;
     @CreatedDate
     @Column(name = "created_at", nullable = false, unique = false)
     private Instant createdAt;

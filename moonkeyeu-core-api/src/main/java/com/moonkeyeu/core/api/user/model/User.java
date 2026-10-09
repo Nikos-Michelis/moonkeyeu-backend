@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class User implements UserDetails, Principal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Long userId;
     @Column(name = "username", unique = true)
     private String username;
@@ -90,7 +90,7 @@ public class User implements UserDetails, Principal {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "method_id")
     )
-    private Set<SignUpMethods> signUpMethods = new HashSet<>();
+    private Set<SignUpMethods> signUpMethods;
     @OneToMany(orphanRemoval = true, mappedBy = "user")
     @BatchSize(size = 20)
     private List<Bookmark> bookmarks;

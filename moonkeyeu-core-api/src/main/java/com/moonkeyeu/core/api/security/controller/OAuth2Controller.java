@@ -9,6 +9,7 @@ import com.moonkeyeu.core.api.security.services.cookie.CookieServiceProvider;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -24,6 +25,7 @@ import java.util.Map;
 @RequestMapping("oauth2")
 @RequiredArgsConstructor
 @Tag(name = "OAuth2")
+@Profile({"dev", "prod"})
 public class OAuth2Controller {
 
     private final CookieServiceProvider cookieServiceProvider;

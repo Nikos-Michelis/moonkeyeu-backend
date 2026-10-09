@@ -1,6 +1,6 @@
 jwt:
-  issuer: 'https://backend.moonkeyeu.com'
-  audience: 'https://www.moonkeyeu.com'
+  issuer: ${BACKEND_URL}
+  audience: ${DOMAIN_URL}
   public:
     access:
       key: ./jwt-keys/access-token/access-token-public.pem
@@ -17,24 +17,33 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     encoding: UTF-8
+
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:${LOCAL_MYSQL_PORT}}/${MYSQL_DATABASE:${LOCAL_MYSQL_DATABASE}}
-    username: ${MYSQL_USER:${LOCAL_MYSQL_USER}}
-    password: ${MYSQL_PASSWORD:${LOCAL_MYSQL_PASSWORD}}
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    username: ${MYSQL_APP_USER}
+    password: ${MYSQL_APP_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  flyway:
+    clean-disabled: false
+    enabled: false
+
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: false
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
         default_batch_fetch_size: 50
       jdbc:
         batch_size: 50
         time_zone: UTC
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
   security:
     oauth2:
       client:
@@ -57,11 +66,16 @@ spring:
           starttls:
             enable: true
             required: true
+
 application:
+  seo:
+    name: MoonkeyEU
+    logo: ${CLOUDFRONT_URL}/media/assets/logo/moonkeyeu-logo.jpg
+    description: Stay up to date with upcoming and past spaceflight from NASA, SpaceX, and other leading space agencies around the world.
   frontend:
-    url: https://www.moonkeyeu.com
+    url: ${DOMAIN_URL:http://localhost:3001}
   backend:
-    url: http://localhost:8080/api/v1/
+    url: ${BACKEND_URL:http://localhost:8080}/api/v1/
   limiter:
     threshold: 300000
     scheduled-time: 300000
@@ -87,10 +101,10 @@ management:
       show-details: always
       group:
         core-api:
-          include: db, mail
+          include: db
   health:
     mail:
-      enabled: true
+      enabled: false
     db:
       enabled: true
     diskspace:
@@ -101,7 +115,7 @@ management:
         enabled: true
 
 server:
-  port: 8080
+  port: ${API_CORE_PORT:8080}
   servlet:
     context-path: /api/v1/
   cors:

@@ -9,7 +9,9 @@ public enum SocialMediaCrawler {
     LINKEDIN("linkedinbot"),
     SLACK("slackbot"),
     DISCORD("discordbot"),
-    STEAM("SteamChatURLLookup");
+    STEAM("SteamChatURLLookup"),
+    APPLEBOT("Applebot"),
+    GOOGLE("Googlebot"),;
 
     private final String identifier;
 

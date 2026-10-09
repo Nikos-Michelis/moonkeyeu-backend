@@ -1,0 +1,19 @@
+discovery.relabel "mysql_metrics" {
+  targets = prometheus.exporter.mysql.mysql_metrics.targets
+
+  rule {
+    action       = "replace"
+    target_label = "mysql_db"
+    replacement  = "mysql_db_prod"
+  }
+}
+
+prometheus.exporter.mysql "mysql_metrics" {
+    data_source_name = env("MYSQL_ALLOY") + ":" + env("MYSQL_ALLOY_PASSWORD") + "@tcp(mysql-container:3306)/"
+}
+
+prometheus.scrape "mysql_metrics" {
+  targets    = prometheus.exporter.mysql.mysql_metrics.targets
+  scrape_interval = "30s"
+  forward_to = [prometheus.remote_write.default.receiver]
+}

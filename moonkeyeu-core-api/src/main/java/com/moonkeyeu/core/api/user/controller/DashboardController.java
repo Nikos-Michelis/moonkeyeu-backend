@@ -5,7 +5,6 @@ import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.security.limiter.RateLimited;
 import com.moonkeyeu.core.api.user.dto.ContactDTO;
 import com.moonkeyeu.core.api.user.dto.response.ResponseDTO;
-import com.moonkeyeu.core.api.user.services.BatchService;
 import com.moonkeyeu.core.api.user.services.DashboardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,7 +26,6 @@ import java.util.Map;
 @Tag(name = "Dashboard")
 public class DashboardController {
     private final DashboardService dashboardService;
-    private final BatchService batchService;
     private final int MAX_ITEMS = 50;
 
 
@@ -66,19 +64,6 @@ public class DashboardController {
                         .timestamp(Instant.now())
                         .message("Message deleted successfully.")
                         .data(contactDTO)
-                        .build());
-    }
-
-    @GetMapping("/report/tasks")
-    @PreAuthorize("hasAnyAuthority('developer:read', 'admin:read', 'moderator:read')")
-    @RateLimited(requests = 100, durationSeconds = 60)
-    @Deprecated
-    public ResponseEntity<?> getBatchJobExecutions() {
-        return ResponseEntity.ok().
-                body(ResponseDTO
-                        .builder()
-                        .timestamp(Instant.now())
-                        .data(batchService.getAllBatchJobs())
                         .build());
     }
 

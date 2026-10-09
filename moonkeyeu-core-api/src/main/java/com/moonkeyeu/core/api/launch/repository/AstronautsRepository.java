@@ -41,7 +41,7 @@ public interface AstronautsRepository extends JpaRepository<Astronaut, Long>, Jp
         LEFT JOIN FETCH l.infoUrls
         WHERE a.astronautId = :astronautId
     """)
-    Optional<Astronaut> findAstronautAndLaunchByAstronautId(@Param("astronautId") Integer astronautId);
+    Optional<Astronaut> findAstronautByAstronautId(@Param("astronautId") Integer astronautId);
 
 
     @EntityGraph(value = "astronaut-with-status-images-nationality-socialmedia", type = EntityGraph.EntityGraphType.FETCH)

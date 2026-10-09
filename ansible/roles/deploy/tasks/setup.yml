@@ -1,0 +1,23 @@
+---
+- name: Setup | Ensure base directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ env_user }}"
+    group: "{{ env_user }}"
+    mode: "0750"
+  loop: "{{ init_src }}"
+  become: true
+
+- name: Setup | Download static curl binaries
+  ansible.builtin.get_url:
+    url: "https://github.com/moparisthebest/static-curl/releases/download/{{ item.version }}/curl-{{ item.arch }}"
+    dest: "{{ src }}/bin/curl-{{ item.arch }}"
+    owner: "{{ env_user }}"
+    group: "{{ env_user }}"
+    mode: "0750"
+  loop:
+    - { arch: amd64,   version: v8.21.0 }
+    - { arch: aarch64, version: v8.11.0 }
+  loop_control:
+    label: "{{ item.arch }}"

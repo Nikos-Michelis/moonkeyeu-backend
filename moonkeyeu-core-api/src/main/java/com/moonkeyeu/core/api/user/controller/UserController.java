@@ -21,6 +21,7 @@ import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -38,6 +39,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Tag(name = "user")
 @Slf4j
+@Profile({"dev", "prod"})
 public class UserController {
 
     @Value("${application.backend.url}")

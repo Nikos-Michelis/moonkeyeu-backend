@@ -1,0 +1,6 @@
+---
+- name: Deploy | Deploy application
+  hosts: deploy
+  become: false
+  roles:
+    - deploy

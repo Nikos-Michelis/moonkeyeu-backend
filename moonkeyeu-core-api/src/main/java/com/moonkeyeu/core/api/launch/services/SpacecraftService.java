@@ -6,9 +6,8 @@ import com.moonkeyeu.core.api.launch.dto.spacecraft.SpacecraftConfigurationDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.Map;
-import java.util.Optional;
 
 public interface SpacecraftService {
-    Optional<SpacecraftConfigurationDTO> getSpacecraftById(Integer spacecraftId);
+    SpacecraftConfigurationDTO getSpacecraftById(Integer spacecraftId);
     Page<DTOEntity> searchSpacecraft(Map<String, String> requestParams, PageSortingDTO pageSortingDTO);
 }
