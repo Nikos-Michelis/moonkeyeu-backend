@@ -19,4 +19,4 @@ jwt-keys/refresh-token/*
 nginx/logs/*
 .github/test/*
 .github/workflows/test/*
-./docs
+/docs/*
