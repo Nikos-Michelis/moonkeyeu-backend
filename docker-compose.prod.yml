@@ -45,7 +45,7 @@ services:
       - private-internal-network
 
   moonkeyeu-core-api:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}-core-api:v2.0.0-RELEASE
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}-core-api:${IMAGE_TAG}
     deploy:
       resources:
         limits:
@@ -90,7 +90,7 @@ services:
       start_period: 40s
 
   moonkeyeu-etl-api:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}-etl-api:v2.0.0-RELEASE
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}-etl-api:${IMAGE_TAG}
     deploy:
       resources:
         limits:
@@ -224,12 +224,20 @@ services:
       start_period: 40s
 
   grafana:
-    image: grafana/grafana:9.5.2
+    image: docker.io/grafana/grafana-oss:12.4.0
     container_name: grafana-container
     environment:
       - GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL}
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_SECURITY_COOKIE_SECURE=true
+      - GF_SECURITY_COOKIE_SAMESITE=strict
+      - GF_SECURITY_DISABLE_GRAVATAR=true
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
     depends_on:
       prometheus:
         condition: service_healthy
@@ -241,6 +249,7 @@ services:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
       - ./monitoring/grafana/json:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana:rw
     deploy:
       resources:
         limits:
@@ -332,4 +341,7 @@ volumes:
     driver: local
   alloy_data:
     name: alloy_data
+    driver: local
+  grafana_data:
+    name: grafana_data
     driver: local

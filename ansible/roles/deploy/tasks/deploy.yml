@@ -1,4 +1,9 @@
 ---
+- name: Compose | Require the release image tag
+  ansible.builtin.assert:
+    that: image_tag | default('') | length > 0
+    fail_msg: "Pass the image tag to deploy, e.g. -e image_tag=v2.0.0"
+
 - name: Compose | Pull latest images and update the stack
   community.docker.docker_compose_v2:
     project_src: "{{ src }}"
@@ -11,6 +16,8 @@
     remove_orphans: true
   become: true
   become_user: "{{ env_user }}"
+  environment:
+    IMAGE_TAG: "{{ image_tag }}"
   register: app_compose
 
 - name: Compose | Remove unused Docker images
