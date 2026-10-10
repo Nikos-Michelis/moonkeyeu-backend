@@ -62,3 +62,4 @@ compose_env:
   VPS_PROVISION_USER: "{{ vault_vps_prov_user }}"
   VPS_ENVIRONMENT_USER: "{{ vault_vps_env_user }}"
   VPS_SSH_PUBLIC_KEY_ENV_USER: "{{ vault_vps_ssh_pub_key_env_user }}"
+  IMAGE_TAG: "{{ image_tag }}"

@@ -31,7 +31,7 @@ RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination 
 FROM eclipse-temurin:21-jre-jammy
 
 ARG APP_NAME=moonkeyeu-etl-api
-ARG APP_VERSION=v2.0.0-RELEASE
+ARG APP_VERSION=v2.0.0
 ARG APP_UID=1001
 ARG APP_GID=1001
 
