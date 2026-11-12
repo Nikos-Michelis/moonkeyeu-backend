@@ -37,6 +37,10 @@ public class NasaApodServiceImpl implements NasaApodService {
         try {
             NasaApodDTO latest = nasaApodClientService.fetchNasaAstronomyPictureOfTheDay();
 
+            if (latest == null) {
+                throw new NasaApodFetchException("Empty response from NASA APOD");
+            }
+
             if (!mediaType.equals(latest.getMedia_type())) {
                 throw new NasaApodFetchException("Invalid data format: expected 'image' but got '" + latest.getMedia_type() + "'");
             }
@@ -50,6 +54,9 @@ public class NasaApodServiceImpl implements NasaApodService {
                 log.info("Fetch failed, keeping cached NASA APOD from {}", cached.getDate());
             }
             log.error("Fetch failed: {}", e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("NASA APOD unreachable, keeping cached value{}: {}",
+                    cached != null ? " from " + cached.getDate() : " (none)", e.getMessage());
         }
     }
     @Override

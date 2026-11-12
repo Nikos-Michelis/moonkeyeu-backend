@@ -3,24 +3,35 @@ name: Deploy to LightSail VPS
 on:
   workflow_call:
     inputs:
+      environment:
+        description: "Target environment: dev | stag | prod"
+        required: true
+        type: string
       image_tag:
         required: true
         type: string
-    secrets:
-      VPS_HOST:
-        required: true
-      VPS_SSH_KEY:
-        required: true
-      VPS_PORT:
-        required: true
-      ANSIBLE_VAULT_PASSWORD:
-        required: true
-
 jobs:
   deploy:
+    name: Deploy (${{ inputs.environment }})
     runs-on: ubuntu-latest
-    environment: prod
+    environment: ${{ inputs.environment }}
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false
     steps:
+      - name: Resolve Ansible inventory
+        id: inventory
+        env:
+          TARGET_ENV: ${{ inputs.environment }}
+        run: |
+          case "$TARGET_ENV" in
+            dev)     dir=development ;;
+            stag) dir=staging ;;
+            prod)    dir=production ;;
+            *) echo "::error::Unknown environment '$TARGET_ENV' (expected dev|stag|prod)"; exit 1 ;;
+          esac
+          echo "path=inventories/$dir/hosts.yml" >> "$GITHUB_OUTPUT"
+
       - name: Checkout repository
         uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 #v6.0.2
 
@@ -29,7 +40,7 @@ jobs:
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
         run: |
           printf '%s' "$ANSIBLE_VAULT_PASSWORD" | tr -d '\r' > /tmp/vault_pass.txt
-          echo "vault password file: $(wc -c < /tmp/vault_pass.txt) bytes (expected 2774)"
+          echo "vault password file: $(wc -c < /tmp/vault_pass.txt) bytes"
 
       - name: Install Ansible
         shell: bash
@@ -53,9 +64,10 @@ jobs:
         working-directory: ansible
         env:
           IMAGE_TAG: ${{ inputs.image_tag }}
+          INVENTORY: ${{ steps.inventory.outputs.path }}
         run: |
           ansible-playbook \
-            -i inventories/production/hosts.yml \
+            -i "$INVENTORY" \
             --vault-password-file /tmp/vault_pass.txt \
             playbooks/deploy.yml \
             --private-key ~/.ssh/vps_key \

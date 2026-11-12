@@ -5,6 +5,7 @@ import com.moonkeyeu.core.api.launch.dto.paging.PageSortingDTO;
 import com.moonkeyeu.core.api.launch.model.launch.Launch;
 import com.moonkeyeu.core.api.launch.repository.LaunchRepository;
 import com.moonkeyeu.core.api.launch.repository.specifications.LaunchSpecification;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,6 +57,27 @@ class LaunchRepositoryIT {
     void findLaunchWithLaunchId() {
         Optional<Launch> launch = launchRepository.findLaunchWithLaunchId("00441721-5019-4c49-aa85-e38aad2d3937");
         assertTrue(launch.isPresent());
+    }
+
+    @Test
+    void findLaunchWithLaunchIdInitializesDetailGraph() {
+        Launch launch = launchRepository.findLaunchWithLaunchId("00441721-5019-4c49-aa85-e38aad2d3937").orElseThrow();
+
+        assertTrue(Hibernate.isInitialized(launch.getMissionPatches()));
+        assertTrue(Hibernate.isInitialized(launch.getInfoUrls()));
+        assertTrue(Hibernate.isInitialized(launch.getVideoUrls()));
+        assertTrue(Hibernate.isInitialized(launch.getAgencies().getAgenciesImages()));
+        assertTrue(Hibernate.isInitialized(launch.getAgencies().getCountries()));
+        assertTrue(Hibernate.isInitialized(launch.getLaunchPad().getLaunchPadImages()));
+        assertTrue(Hibernate.isInitialized(launch.getRocket().getSpacecraftStages()));
+        assertTrue(Hibernate.isInitialized(launch.getRocket().getLauncherStages()));
+        launch.getRocket().getSpacecraftStages()
+                .forEach(stage -> assertTrue(Hibernate.isInitialized(stage.getCrewMembers())));
+    }
+
+    @Test
+    void findLaunchWithLaunchIdReturnsEmptyWhenLaunchDoesNotExist() {
+        assertTrue(launchRepository.findLaunchWithLaunchId("missing-launch-id").isEmpty());
     }
 
     @Test
