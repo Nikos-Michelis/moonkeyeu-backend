@@ -132,6 +132,36 @@ class NasaApodServiceImplTest {
     }
 
     @Test
+    @DisplayName("Should not throw when NASA is unreachable (network/decode error)")
+    void shouldNotThrowWhenNasaUnreachable() {
+        // Given
+        when(cacheManagerUtil.getCacheByName(CacheNames.NASA_APOD_CACHE))
+                .thenReturn(cache);
+        when(cache.get("today", NasaApodDTO.class)).thenReturn(null);
+        when(nasaApodClientService.fetchNasaAstronomyPictureOfTheDay())
+                .thenThrow(new IllegalStateException("Connection refused"));
+        // When & Then
+        apodService.refreshNasaApod();
+
+        verify(cache, never()).put(any(), any());
+    }
+
+    @Test
+    @DisplayName("Should not throw when NASA returns an empty body")
+    void shouldNotThrowWhenResponseEmpty() {
+        // Given
+        when(cacheManagerUtil.getCacheByName(CacheNames.NASA_APOD_CACHE))
+                .thenReturn(cache);
+        when(cache.get("today", NasaApodDTO.class)).thenReturn(null);
+        when(nasaApodClientService.fetchNasaAstronomyPictureOfTheDay())
+                .thenReturn(null);
+        // When & Then
+        apodService.refreshNasaApod();
+
+        verify(cache, never()).put(any(), any());
+    }
+
+    @Test
     @DisplayName("Should return cached nasa apod image")
     void shouldReturnValueFromCache() {
         // Given
