@@ -1,14 +1,25 @@
 package com.moonkeyeu.core.api.launch.integration.controller;
 import com.moonkeyeu.core.api.launch.config.TestContainerConfiguration;
 import com.moonkeyeu.core.api.launch.config.TestSecurityConfiguration;
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.time.LocalDate;
 
 
 @Testcontainers
@@ -19,6 +30,44 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Import({TestSecurityConfiguration.class, TestContainerConfiguration.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class PublicControllerIT {
+
+    private static final MockWebServer nasaApodMock = new MockWebServer();
+
+    static {
+        nasaApodMock.setDispatcher(new Dispatcher() {
+            @Override
+            public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
+                return new MockResponse()
+                        .setResponseCode(200)
+                        .addHeader("Content-Type", "application/json")
+                        .setBody("""
+                                {
+                                  "date": "%s",
+                                  "title": "Test APOD",
+                                  "explanation": "Test explanation",
+                                  "media_type": "image",
+                                  "url": "https://example.com/apod.jpg"
+                                }
+                                """.formatted(LocalDate.now()));
+            }
+        });
+        try {
+            nasaApodMock.start();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @DynamicPropertySource
+    static void nasaApodProperties(DynamicPropertyRegistry registry) {
+        registry.add("application.api.nasa-apod.url", () -> nasaApodMock.url("/").toString());
+        registry.add("application.api.nasa-apod.key", () -> "test-key");
+    }
+
+    @AfterAll
+    static void stopNasaApodMock() throws IOException {
+        nasaApodMock.shutdown();
+    }
 
     @Autowired
     private WebTestClient webTestClient;
@@ -31,7 +80,7 @@ public class PublicControllerIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println);
+                .jsonPath("$.title").isEqualTo("Test APOD");
     }
 
     @Test

@@ -6,9 +6,9 @@ on:
       - 'backend/**'
       - 'moonkeyeu-core-api/**'
       - 'moonkeyeu-etl-api/**'
-    branches: [dev, main, feature/**]
+    branches: [dev, main, release/**]
   pull_request:
-    branches: [dev, main, feature/**]
+    branches: [dev, main, release/**]
 
 env:
   API_PROFILE: ${{ vars.API_PROFILE }}
@@ -80,15 +80,35 @@ jobs:
     with:
       module_name: ${{ matrix.module }}
 
-  deploy:
-    name: Deploy to VPS
+  #deploy-dev:
+   # name: Deploy dev
+    #needs: [ build ]
+    #if: github.ref == 'refs/heads/main' && vars.DEPLOY_DEV_ENABLED == 'true'
+    #uses: ./.github/workflows/deploy.yml
+    #with:
+      #environment: dev
+      #image_tag: ${{ needs.build.outputs.image_tag }}
+    #secrets: inherit
+
+  #deploy-staging:
+    #name: Deploy staging
+    #needs: [ build, deploy-dev ]
+    #if: >-
+      #!cancelled() && !failure()
+      #&& needs.build.result == 'success'
+      #&& github.ref == 'refs/heads/main'
+    #uses: ./.github/workflows/deploy.yml
+    #with:
+      #environment: stag
+      #image_tag: ${{ needs.build.outputs.image_tag }}
+    #secrets: inherit
+
+  deploy-prod:
+    name: Deploy prod
     needs: [ build ]
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/deploy.yml
     with:
+      environment: prod
       image_tag: ${{ needs.build.outputs.image_tag }}
-    secrets:
-      VPS_HOST: ${{ secrets.VPS_HOST }}
-      VPS_PORT: ${{ secrets.VPS_PORT }}
-      VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-      ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+    secrets: inherit
