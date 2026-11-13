@@ -1,0 +1,6 @@
+---
+- name: Compose | Remove unused Docker images
+  community.docker.docker_prune:
+    images: true
+  become: true
+  become_user: "{{ env_user }}"

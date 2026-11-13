@@ -253,8 +253,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.6"
-          memory: "160m"
+          cpus: "0.8"
+          memory: "300m"
     restart: unless-stopped
     networks:
       - private-internal-network
