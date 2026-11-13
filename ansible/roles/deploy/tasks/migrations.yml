@@ -10,5 +10,5 @@
       - "--region={{ vault_s3_region }}"
       - --delete
       - --exact-timestamps
-  register: migrations_s3_sync
-  changed_when: "'download:' in migrations_s3_sync.stdout or 'delete:' in migrations_s3_sync.stdout"
+  register: deploy_migrations_s3_sync
+  changed_when: "'download:' in deploy_migrations_s3_sync.stdout or 'delete:' in deploy_migrations_s3_sync.stdout"

@@ -12,13 +12,13 @@
   ansible.builtin.stat:
     path: "{{ src }}/{{ item }}"
   loop: "{{ app_files }}"
-  register: bundle_app_files_stat
+  register: deploy_bundle_app_files_stat
 
 - name: Bundle | Remove stale directories shadowing application files
   ansible.builtin.file:
     path: "{{ item.stat.path }}"
     state: absent
-  loop: "{{ bundle_app_files_stat.results }}"
+  loop: "{{ deploy_bundle_app_files_stat.results }}"
   loop_control:
     label: "{{ item.item }}"
   when: item.stat.exists and item.stat.isdir
