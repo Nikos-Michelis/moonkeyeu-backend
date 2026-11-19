@@ -274,7 +274,7 @@ services:
       CERTBOT_DOMAIN_BACKEND: ${CERTBOT_DOMAIN_BACKEND}
     volumes:
       - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./scripts:/scripts:ro
+      - ./scripts/cert/init_cert.sh:/scripts/init_cert.sh:ro
     entrypoint: [ "/bin/sh", "/scripts/init_cert.sh" ]
 
   nginx:

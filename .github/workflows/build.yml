@@ -30,8 +30,8 @@ jobs:
         env:
           MODULE_NAME: ${{ inputs.module_name }}
         run: |
-          chmod +x ./build/git-update.sh
-          ./build/git-update.sh "$MODULE_NAME"
+          chmod +x ./scripts/build/git-update.sh
+          ./scripts/build/git-update.sh "$MODULE_NAME"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 #v6.0.0
@@ -44,14 +44,16 @@ jobs:
         uses: aws-actions/amazon-ecr-login@261fc3d4806db1fa66a15cc11113c456db8870a7 #v2.1.0
 
       - name: Check AWS ECR for existing image
+        id: ecr-check
         env:
           MODULE_NAME: ${{ inputs.module_name }}
           IMAGE_TAG: ${{ steps.versioning.outputs.git-tag }}
         run: |
-          chmod +x ./build/ecr-update.sh
-          ./build/ecr-update.sh "$MODULE_NAME" "$IMAGE_TAG"
+          chmod +x ./scripts/build/ecr-update.sh
+          ./scripts/build/ecr-update.sh "$MODULE_NAME" "$IMAGE_TAG"
 
       - name: Build and push the tagged docker image to Amazon ECR
+        if: steps.ecr-check.outputs.exists != 'true'
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ inputs.module_name }}
