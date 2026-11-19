@@ -2,10 +2,6 @@ name: Backend CI/CD Pipeline
 
 on:
   push:
-    paths:
-      - 'backend/**'
-      - 'moonkeyeu-core-api/**'
-      - 'moonkeyeu-etl-api/**'
     branches: [dev, main, release/**]
   pull_request:
     branches: [dev, main, release/**]

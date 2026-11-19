@@ -12,6 +12,7 @@
     env_files:
       - ".env"
     pull: always
+    build: always
     state: present
     remove_orphans: true
   become: true
