@@ -36,4 +36,4 @@ nginx-reload:
 	$(COMPOSE) exec -T nginx nginx -s reload
 
 renew:
-	./scripts/renew_cert.sh
+	./scripts/cert/renew_cert.sh

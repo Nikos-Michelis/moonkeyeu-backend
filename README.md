@@ -126,7 +126,7 @@ Flyway runs as its own container before either service starts, applying the scri
   make renew               # renew and reload Nginx
   ```
 
-- **Backups:** `scripts/mysql_backup.sh`.
+- **Backups:** `scripts/backup/mysql_backup.sh`.
 
 ## Monitoring
 
